@@ -1,0 +1,8 @@
+stx subject add AI-Generated Experiment
+stx subject add Default
+stx subject add Functional Programming
+stx subject add LaTeX
+stx subject add Linux
+stx subject add Recreational Programming
+stx subject add Software & Computational Architecture
+stx subject add System Design

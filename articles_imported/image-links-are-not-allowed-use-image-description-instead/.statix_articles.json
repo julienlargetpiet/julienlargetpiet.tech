@@ -1,0 +1,8 @@
+{
+  "image-links-are-not-allowed-use-image-description-instead": {
+    "title": "- image links are not allowed, use ![image](description) instead",
+    "subject_id": 24,
+    "is_public": false,
+    "article_id": 187
+  }
+}

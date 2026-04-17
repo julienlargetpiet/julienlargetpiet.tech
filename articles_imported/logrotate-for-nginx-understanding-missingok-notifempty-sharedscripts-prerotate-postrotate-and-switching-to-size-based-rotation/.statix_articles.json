@@ -1,0 +1,8 @@
+{
+  "logrotate-for-nginx-understanding-missingok-notifempty-sharedscripts-prerotate-postrotate-and-switching-to-size-based-rotation": {
+    "title": "Logrotate for Nginx: Understanding missingok, notifempty, sharedscripts, prerotate, postrotate (and switching to size-based rotation)",
+    "subject_id": 10,
+    "is_public": true,
+    "article_id": 127
+  }
+}
