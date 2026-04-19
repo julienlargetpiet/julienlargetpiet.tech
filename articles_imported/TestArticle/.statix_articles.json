@@ -1,0 +1,8 @@
+{
+  "TestArticle": {
+    "title": "This is a test",
+    "subject_id": 1,
+    "is_public": true,
+    "article_id": 214
+  }
+}
