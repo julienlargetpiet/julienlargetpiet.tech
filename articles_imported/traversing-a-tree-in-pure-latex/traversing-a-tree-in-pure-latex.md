@@ -51,7 +51,7 @@ Used like:
 
 ```
 
-Output: "Hello rémi, julien et Lucas"
+Output: "Hello Rémi, Julien et Lucas"
 
 This stays pure expansions...
 
@@ -89,7 +89,7 @@ When you use it in comparisons functions such as:
 
 
 \ifx\a\b
-OUI
+YES
 \else
 NO
 \fi
@@ -113,7 +113,7 @@ Example:
 \edef\a{\b}
 
 \ifx\a\b
-OUI
+YES
 \else
 NO
 \fi
@@ -121,7 +121,7 @@ NO
 
 ```
 
-Outputs "OUI".
+Outputs "YES".
 
 `\gdef` is like `\def` but survives any scope `{...}`
 
@@ -189,7 +189,7 @@ Introducing `\ifnum`.
 
 
 \ifnum 5 > 3
-OUI
+YES
 \else
 NO
 \fi
@@ -197,7 +197,7 @@ NO
 
 ```
 
---\> "OUI"
+--\> "YES"
 
 ```latex
 
@@ -235,7 +235,7 @@ Maybe when you have a work and that you change dimensions (stored in a variable)
 
 
 \ifdim 2cm>1cm
-OUI
+YES
 \else
 NO
 \fi
@@ -243,7 +243,7 @@ NO
 
 ```
 
---\> "OUI"
+--\> "YES"
 
 Now introducing the most basic `if` comparison function... the `\ifBOOLEAN`.
 
@@ -251,19 +251,19 @@ Now introducing the most basic `if` comparison function... the `\ifBOOLEAN`.
 
 
 \iftrue
-OUI\_A
+YES\_A
 \fi
 
 
 ```
 
---\> "OUI\_A"
+--\> "YES\_A"
 
 ```latex
 
 
 \iffalse
-OUI\_B
+YES\_B
 \fi
 
 
@@ -321,7 +321,7 @@ And after its expansions that does not even require the infamous `\`, we can use
 
 
 \ifcool
-OUI
+YES
 \else
 NO
 \fi
@@ -329,7 +329,7 @@ NO
 
 ```
 
---\> "OUI"
+--\> "YES"
 
 After.
 
@@ -339,7 +339,7 @@ After.
 \coolfalse
 
 \ifcool
-OUI
+YES
 \else
 NO
 \fi
@@ -360,7 +360,7 @@ Now look at that.
 \coolbtrue
 
 \coolb
-OUIA
+YESA
 \else
 NOA
 \fi
@@ -368,15 +368,15 @@ NOA
 \coolbfalse
 
 \coolb
-OUIB
+YESB
 \else
-NONB
+NOB
 \fi
 
 
 ```
 
-First, outputs "OUIA" then "NONB".
+First, outputs "YESA" then "NOB".
 
 Why ?
 
