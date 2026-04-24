@@ -1174,6 +1174,63 @@ data = [
 df = pd.DataFrame(data)
 ```
 
+### HDF5
+
+### `fixed` flavor
+
+Because its binary i will show you by exporting from lisible data.
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    "name": ["Alice", "Bob", "Charlie"],
+    "age": [25, 30, 35],
+    "city": ["Paris", "London", "New York"]
+})
+
+df.to_hdf("file.hdf5", 
+          key="people", 
+          mode="w",
+          format="fixed")
+```
+
+Here i exported in `HDF5` format with `"fixed"` flavor.
+
+Contrary to `"table"`, it's less complex ->  quicker read and write.
+
+But with this format, you can not do partial reads (start - end), append or query on the fly for reading querried rows into memory.
+
+Also, note that i used `"w"` mode, meaning that it erased all possible other keys in the `HDF5` file.
+
+`key` is like a table name.
+
+If i'd use `a`, it would have created a new table in the file.
+
+A single file can store multiple tables / keys.
+
+`append=True` allow to add rows to an existing table, and as written before, is only supported with `format="fixed"`.
+
+Then we do that to read it.
+
+```python
+df = pd.read_hdf("file.hdf5", key="people")
+
+print(df)
+```
+
+Output.
+
+```
+      name  age      city
+0    Alice   25     Paris
+1      Bob   30    London
+2  Charlie   35  New York
+```
+
+### `table` flavor
+
+
 ## Going back to plot
 
 We can do it the "clasical" way:
