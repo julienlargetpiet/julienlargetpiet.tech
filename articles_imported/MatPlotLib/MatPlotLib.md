@@ -553,7 +553,7 @@ Series([], dtype: str)
 
 You can create a DataFrame in multiple ways.
 
-First, by reading a `CSV`.
+### First, by reading a `CSV`.
 
 ```python
 df = pd.read_csv("example.csv",
@@ -561,7 +561,7 @@ df = pd.read_csv("example.csv",
                  encoding="latin1")
 ```
 
-`PARQUET` file.
+### `PARQUET` file.
 
 You know the one that store data compressed and as:
 
@@ -599,7 +599,7 @@ df = pd.read_parquet(
 )
 ```
 
-Generic Table (twin of `pd.read_csv()`)
+### Generic Table (twin of `pd.read_csv()`)
 
 ```python
 df = pd.read_csv("example.csv",
@@ -763,7 +763,7 @@ Output.
 1    Bob   30  New York, "USA"
 ```
 
-`FWF` file
+### `FWF` file
 
 It is a file with no delimiters but each column is spaced by a constant space.
 
@@ -796,7 +796,7 @@ Output:
 
 Ha, it looks that it did not infere well spacing between Age and City, which is normal since there is not obvious spacing, they are contiguous.
 
-Then we can specifyourselves with `colspecs` option.
+Then we can specif ourselves with `colspecs` option.
 
 ```pyhton
 data = pd.read_fwf("file.fwf", 
@@ -815,7 +815,7 @@ Output:
 
 It also supports `quotechar` and `usecols`.
 
-`JSON`
+### `JSON`
 
 Best file is one row -> All cols contained on the same level, in one JSON object (`[]`).
 
@@ -972,7 +972,7 @@ Output.
 1    Bob   30
 ```
 
-`HTML` table, Seriously
+### `HTML` table, Seriously
 
 Consider this file.
 
@@ -1083,7 +1083,7 @@ Output.
 1    Bob   30  London
 ```
 
-`FEATHER` format.
+### `FEATHER` format.
 
 Same as `PARQUET` but not compressed -> quicker for ingesting data.
 
@@ -1126,7 +1126,7 @@ Output
 
 --> `use_threads=True`
 
-Manualy ingest local data. (`pd.DataFrame()`)
+### Manualy ingest local data. (`pd.DataFrame()`)
 
 **Al files can be remote on a server with `https://domainname.com/path-to-file`**
 
@@ -1134,7 +1134,7 @@ To read `xls`/`xlsx` files, you do it via `pd.read_excel("data.xlsx")` or `pd.re
 
 Select a sheet via `sheet_name="Sheet1"`or even multiple sheets `sheet_name=["Sheet1", "Sheet2"]`.
 
-- Dict
+####  Dict
 
 ```python
 data = {
@@ -1145,7 +1145,7 @@ data = {
 df = pd.DataFrame(data)
 ```
 
-- Even a list of Dicts
+#### Even a list of Dicts
 
 But first, let me tell you i donot see where it is valuable to store data as a list of dicts.
 
@@ -1161,7 +1161,7 @@ data = [
 df = pd.DataFrame(data)
 ```
 
-- Lists of Lists
+#### Lists of Lists
 
 Here you encode the column name as the first value of each python list.
 
