@@ -652,6 +652,41 @@ Output.
 Index([0, 1, 2, 3], dtype='int64')
 ```
 
+Note that Index can be used as column in a DataFrame, they are automatically converted to `pd.Series` with an appropriate `pd.Index...` type.
+
+Look at that:
+
+```python
+>>> df = pd.DataFrame({ 
+            "timestamp": x, 
+            "day": x.strftime("%Y-%m-%d"), 
+            "col3": pd.RangeIndex(0, 15, 1)}
+)
+>>> df
+                   timestamp         day  col3
+0  2024-01-16 00:10:00+01:00  2024-01-16     0
+1  2024-01-23 00:10:00+01:00  2024-01-23     1
+2  2024-01-30 00:10:00+01:00  2024-01-30     2
+3  2024-02-06 00:10:00+01:00  2024-02-06     3
+4  2024-02-13 00:10:00+01:00  2024-02-13     4
+5  2024-02-20 00:10:00+01:00  2024-02-20     5
+6  2024-02-27 00:10:00+01:00  2024-02-27     6
+7  2024-03-05 00:10:00+01:00  2024-03-05     7
+8  2024-03-12 00:10:00+01:00  2024-03-12     8
+9  2024-03-19 00:10:00+01:00  2024-03-19     9
+10 2024-03-26 00:10:00+01:00  2024-03-26    10
+11 2024-04-02 00:10:00+02:00  2024-04-02    11
+12 2024-04-09 00:10:00+02:00  2024-04-09    12
+13 2024-04-16 00:10:00+02:00  2024-04-16    13
+14 2024-04-23 00:10:00+02:00  2024-04-23    14
+>>> type(df["day"])
+<class 'pandas.Series'>
+>>> type(df["timestamp"])
+<class 'pandas.Series'>
+>>> type(df["col3"])
+<class 'pandas.Series'>
+```
+
 And they act just like list, no `iloc` / `loc`, just normal random access.
 
 Hmm, not totally.
@@ -1622,6 +1657,32 @@ DatetimeIndex(['2024-01-11 00:10:00+01:00', '2024-01-18 01:10:00+01:00',
               dtype='datetime64[us, Europe/Paris]', freq='<DateOffset: hours=1, weeks=1>')
 ```
 
+Note that the type used is `pd.datetime64`, it tells the type of the `DatetimeIndex`, it stores datetime as datetime like integers with microseconds precision (`us`) and a timezone metadata are attcahed (`Europe/Paris`).
+
+Also, note this constructor API looks a bit like the `RangeIndex` API, we got a start, we got a `freq` which is the `step` and the `end` is simply `start` + `freq` * `period`.
+
+But unfortunately, it just creates a big range of `pd.Timestamp` and it does not just store tiny object with `start`, `end` and `step`.
+
+That could be usefull, maybe at some point, Pandas team will introduce a `pd.RangeDatetimeIndex`, who knows... :=).. :=)
+
+Now you can do:
+
+```python
+>>> ser = pd.Series([1,2,3], index=pd.date_range("2024-01-01", periods=3, freq="D"))
+>>> ser["2024-01-02"]
+np.int64(2)
+```
+
+Or even slicing:
+
+```python
+>>> ser["2024-01-01":"2024-01-05"]
+2024-01-01    1
+2024-01-02    2
+2024-01-03    3
+Freq: D, dtype: int64
+```
+
 For time unit between hour and less, `pd.DateOffset()` and `pd.Timedelta()` are the same, because that are fixed time unit.
 
 But as we begin to speak about day, by how many hours it is made of, 24 hours ? Yesss, but sometimes in the year it is 23 hours or 25 hours.
@@ -1632,7 +1693,7 @@ Btw, `Timedelta` does not even have `months` or `years`.
 
 Then use `pd.Timedelta(time_unit)` when yo want to ADD a certain amount of time unit.
 
-And use `pd.DateOffset(time_nit)` when you want "the same date of origin + an offset of the unit time but **aware of calendar - interpreted by the calendar accoding to the local TimeZone**"
+And use `pd.DateOffset(time_unit)` when you want "the same date of origin + an offset of the unit time but **aware of calendar - interpreted by the calendar accoding to the local TimeZone**"
 
 So after saying this you know that those are equivalent.
 
@@ -2128,8 +2189,6 @@ And gracefully convert it back to `pd.Timestamp` without loss of time zone infor
 Timestamp('2024-01-16 00:10:00+0100', tz='Europe/Paris')
 ```
 
-
-
 Mental model:
 
 **datetime.datetime**
@@ -2149,9 +2208,384 @@ Mental model:
 - strong timezone/time-series integration
 - works with Timedelta and DateOffset
 
-In pandas work, stay with Timestamp, DatetimeIndex, and datetime64 as long as possible. Convert to Python datetime mostly for interoperability with libraries that expect standard Python objects.
+In pandas work, stay with `pd.datetime64` as long as possible. Convert to Python datetime mostly for interoperability with libraries that expect standard Python objects.
 
-Final Cheat Sheet:
+Back to methods.
+
+You cal also attach timezone to an `DatetimeIndex` with `.tz_localize()`, but it work only if the current `DatetimeIndex` has noy yet an attached timezone.
+
+```python
+>>> x_naive = pd.DatetimeIndex([
+...     "2024-01-16 00:10:00",
+...     "2024-01-23 00:10:00",
+...     "2024-01-30 00:10:00",
+... ])
+>>> x_naive
+DatetimeIndex(['2024-01-16 00:10:00', '2024-01-23 00:10:00',
+               '2024-01-30 00:10:00'],
+              dtype='datetime64[us]', freq=None)
+>>> x_naive.tz_localize("Europe/Paris")
+DatetimeIndex(['2024-01-16 00:10:00+01:00', '2024-01-23 00:10:00+01:00',
+               '2024-01-30 00:10:00+01:00'],
+              dtype='datetime64[us, Europe/Paris]', freq=None)
+```
+
+Of course clock values have not changed, but only the `+01:00` was attached to each clock value.
+
+If the index already have an attached timezone, you can use `.tz_convert()`.
+
+```python
+>>> x.tz_convert("Europe/Berlin")
+DatetimeIndex(['2024-01-16 00:10:00+01:00', '2024-01-23 00:10:00+01:00',
+               '2024-01-30 00:10:00+01:00', '2024-02-06 00:10:00+01:00',
+               '2024-02-13 00:10:00+01:00', '2024-02-20 00:10:00+01:00',
+               '2024-02-27 00:10:00+01:00', '2024-03-05 00:10:00+01:00',
+               '2024-03-12 00:10:00+01:00', '2024-03-19 00:10:00+01:00',
+               '2024-03-26 00:10:00+01:00', '2024-04-02 00:10:00+02:00',
+               '2024-04-09 00:10:00+02:00', '2024-04-16 00:10:00+02:00',
+               '2024-04-23 00:10:00+02:00'],
+              dtype='datetime64[us, Europe/Berlin]', freq=None)
+```
+
+You calso have basic `.floor(time_unit)` and `.ceil(time_unit)` methods.
+
+Quick remainder:
+
+- `floor` -> rounds value down to the nearest boundary
+
+- `ceil` -> rounds value up to the nearest boundary
+
+```python
+>>> x.floor("h")
+DatetimeIndex(['2024-01-16 00:00:00+01:00', '2024-01-23 00:00:00+01:00',
+               '2024-01-30 00:00:00+01:00', '2024-02-06 00:00:00+01:00',
+               '2024-02-13 00:00:00+01:00', '2024-02-20 00:00:00+01:00',
+               '2024-02-27 00:00:00+01:00', '2024-03-05 00:00:00+01:00',
+               '2024-03-12 00:00:00+01:00', '2024-03-19 00:00:00+01:00',
+               '2024-03-26 00:00:00+01:00', '2024-04-02 00:00:00+02:00',
+               '2024-04-09 00:00:00+02:00', '2024-04-16 00:00:00+02:00',
+               '2024-04-23 00:00:00+02:00'],
+              dtype='datetime64[us, Europe/Paris]', freq=None)
+>>> x.ceil("h")
+DatetimeIndex(['2024-01-16 01:00:00+01:00', '2024-01-23 01:00:00+01:00',
+               '2024-01-30 01:00:00+01:00', '2024-02-06 01:00:00+01:00',
+               '2024-02-13 01:00:00+01:00', '2024-02-20 01:00:00+01:00',
+               '2024-02-27 01:00:00+01:00', '2024-03-05 01:00:00+01:00',
+               '2024-03-12 01:00:00+01:00', '2024-03-19 01:00:00+01:00',
+               '2024-03-26 01:00:00+01:00', '2024-04-02 01:00:00+02:00',
+               '2024-04-09 01:00:00+02:00', '2024-04-16 01:00:00+02:00',
+               '2024-04-23 01:00:00+02:00'],
+              dtype='datetime64[us, Europe/Paris]', freq=None)
+```
+
+And in this case, `.round("h")` will have the same effect as `.floor("h")`.
+
+```python
+>>> x.round("h")
+DatetimeIndex(['2024-01-16 00:00:00+01:00', '2024-01-23 00:00:00+01:00',
+               '2024-01-30 00:00:00+01:00', '2024-02-06 00:00:00+01:00',
+               '2024-02-13 00:00:00+01:00', '2024-02-20 00:00:00+01:00',
+               '2024-02-27 00:00:00+01:00', '2024-03-05 00:00:00+01:00',
+               '2024-03-12 00:00:00+01:00', '2024-03-19 00:00:00+01:00',
+               '2024-03-26 00:00:00+01:00', '2024-04-02 00:00:00+02:00',
+               '2024-04-09 00:00:00+02:00', '2024-04-16 00:00:00+02:00',
+               '2024-04-23 00:00:00+02:00'],
+              dtype='datetime64[us, Europe/Paris]', freq=None)
+```
+
+And the `.normalize()` methods that keeps the date but set time to `00:00:00` has also same effect in this case.
+
+```python
+>>> x.normalize()
+DatetimeIndex(['2024-01-16 00:00:00+01:00', '2024-01-23 00:00:00+01:00',
+               '2024-01-30 00:00:00+01:00', '2024-02-06 00:00:00+01:00',
+               '2024-02-13 00:00:00+01:00', '2024-02-20 00:00:00+01:00',
+               '2024-02-27 00:00:00+01:00', '2024-03-05 00:00:00+01:00',
+               '2024-03-12 00:00:00+01:00', '2024-03-19 00:00:00+01:00',
+               '2024-03-26 00:00:00+01:00', '2024-04-02 00:00:00+02:00',
+               '2024-04-09 00:00:00+02:00', '2024-04-16 00:00:00+02:00',
+               '2024-04-23 00:00:00+02:00'],
+              dtype='datetime64[us, Europe/Paris]', freq=None)
+```
+
+Note that for all these 4 operations, `freq` is lost.
+
+But speaking of `freq`, there is one method where it is usefull, `.shift(n)`.
+
+It will shift all the datetime by `n * freq`.
+
+```python
+>>> x.shift(1)
+DatetimeIndex(['2024-01-23 00:10:00+01:00', '2024-01-30 00:10:00+01:00',
+               '2024-02-06 00:10:00+01:00', '2024-02-13 00:10:00+01:00',
+               '2024-02-20 00:10:00+01:00', '2024-02-27 00:10:00+01:00',
+               '2024-03-05 00:10:00+01:00', '2024-03-12 00:10:00+01:00',
+               '2024-03-19 00:10:00+01:00', '2024-03-26 00:10:00+01:00',
+               '2024-04-02 00:10:00+02:00', '2024-04-09 00:10:00+02:00',
+               '2024-04-16 00:10:00+02:00', '2024-04-23 00:10:00+02:00',
+               '2024-04-30 00:10:00+02:00'],
+              dtype='datetime64[us, Europe/Paris]', freq='W-TUE')
+```
+
+Here it shifted dates by one week.
+
+Nothing special happen at year start or end (January 1st is not always a Monday, it increases by one every normal year and by 2 for a leap year).
+
+Now, the infamous `.strftime()`.
+
+Wow, big mental model change here, now "M" is minute lol, "min" does not exists.
+
+If you want seconds after epoch, January 1st 1970, you do:
+
+```python
+>>> x.strftime("%s")
+Index(['1705360200', '1705965000', '1706569800', '1707174600', '1707779400',
+       '1708384200', '1708989000', '1709593800', '1710198600', '1710803400',
+       '1711408200', '1712009400', '1712614200', '1713219000', '1713823800'],
+      dtype='str')
+```
+
+"%s" is supported on many Unix/Linux/macOS systems, but it is not part of the standard Python strftime directives everywhere. On some platforms, especially Windows, it may not work as expected.
+
+What's fun is that you can now convert it to `int64` and it wil return and `pd.Index`.
+
+```python
+>>> x.strftime("%s").astype("int64")
+Index([1705360200, 1705965000, 1706569800, 1707174600, 1707779400, 1708384200,
+       1708989000, 1709593800, 1710198600, 1710803400, 1711408200, 1712009400,
+       1712614200, 1713219000, 1713823800],
+      dtype='int64')
+```
+
+Computer friendly (for sort) date format is the default:
+
+```python
+>>> x.strftime("%Y-%m-%d %H:%M:%S")
+Index(['2024-01-16 00:10:00', '2024-01-23 00:10:00', '2024-01-30 00:10:00',
+       '2024-02-06 00:10:00', '2024-02-13 00:10:00', '2024-02-20 00:10:00',
+       '2024-02-27 00:10:00', '2024-03-05 00:10:00', '2024-03-12 00:10:00',
+       '2024-03-19 00:10:00', '2024-03-26 00:10:00', '2024-04-02 00:10:00',
+       '2024-04-09 00:10:00', '2024-04-16 00:10:00', '2024-04-23 00:10:00'],
+      dtype='str')
+```
+
+Most important codes:
+
+```python
+%Y  4-digit year        2024
+%y  2-digit year        24
+%m  month number        01
+%B  full month name     January
+%b  short month name    Jan
+%d  day of month        16
+%A  full weekday name   Tuesday
+%a  short weekday name  Tue
+%H  hour 00-23          00
+%I  hour 01-12          12
+%p  AM/PM               AM
+%M  minute              10
+%S  second              00
+%f  microsecond         000000
+%z  UTC offset          +0100
+%Z  timezone name       CET
+```
+
+Now we'll introduce `pd.PeriodIndex` because we speak about the convertion from `pd.DatetimeIndex` to `pd.PeriodIndex` with `.to_period(time_unit)` method.
+
+So, basically:
+
+```python
+>>> idx
+DatetimeIndex(['2024-01-01', '2024-02-12', '2024-03-06'], dtype='datetime64[us]', freq=None)
+>>> idx.to_period("M")
+PeriodIndex(['2024-01', '2024-02', '2024-03'], dtype='period[M]')
+>>> idx.to_period("Q")
+PeriodIndex(['2024Q1', '2024Q1', '2024Q1'], dtype='period[Q-DEC]')
+...
+```
+
+So, now this is good for grouping by, for example.
+
+Note that, if you do not give argument as `time unit`, it tries to infere it.
+
+```python
+>>> idx
+DatetimeIndex(['2024-01-01 00:00:00', '2024-01-01 12:00:00',
+               '2024-01-02 00:00:00'],
+              dtype='datetime64[us]', freq=None)
+>>> idx.to_period()
+PeriodIndex(['2024-01-01 00:00', '2024-01-01 12:00', '2024-01-02 00:00'], dtype='period[12h]')
+```
+
+But, it can fail.
+
+Also, note that `pd.PeriodIndex` is not timezone-aware.
+
+A period stores an integer representing the datetime and the frequency.
+
+Elements of a `pd.PeriodIndex` are `pd.Period` objects, not `pd.Timestamp`.
+
+But they also accepts comparisons operator.
+
+```python
+>>> idx2[0] == idx2[1]
+False
+>>> idx2[0] < idx2[1]
+True
+```
+
+But now be carefull, because the identity/type of a `pd.Period` is defines not only by its value but also by its frequency, naive freq comparisons will fail.
+
+```python
+>>> idx2 < pd.Period("2025-01-01")
+```
+
+--> Error
+
+You have to put the matching freq for comparisons.
+
+```python
+>>> idx2 < pd.Period("2025-01-01", freq="D")
+```
+
+Also fails because `idx2` is a monthly freq.
+
+```python
+>>> idx2
+PeriodIndex(['2024-01', '2024-02', '2024-03'], dtype='period[M]')
+```
+
+Then, this succeeds.
+
+```python
+>>> idx2 < pd.Period("2025-01-01", freq="M")
+array([ True,  True,  True])
+```
+
+Or even:
+
+```python
+>>> idx2[0] < pd.Period("2025-01-01", freq="M")
+True
+```
+
+But `pd.Period` are smaller than `pd.Timestamp`:
+
+```python
+>>> import sys
+>>> sys.getsizeof(pd.Timestamp("2024-01-01", tz="Europe/Paris"))
+120 # bytes
+>>> sys.getsizeof(pd.Period("2024-01-01", freq="M"))
+72 # bytes
+```
+
+But thei respective container is the same.
+
+```python
+>>> sys.getsizeof(idx) # DatetimeIndex
+56
+>>> sys.getsizeof(idx2) # PeriodIndex
+56
+```
+
+It can be converted to a `pd.Timestamp` with `.to_timestamp()`.
+
+Scalar.
+
+```python
+>>> idx2[0].to_timestamp()
+Timestamp('2024-01-01 00:00:00')
+```
+
+Vectorized -> `pd.DatetimeIndex`
+
+```python
+>>> idx2.to_timestamp()
+DatetimeIndex(['2024-01-01', '2024-02-01', '2024-03-01'], dtype='datetime64[us]', freq='MS')
+```
+
+You can also convert the `pd.DatetimeIndex` to a numpy array of standard `datetime.datetime` elements.
+
+```python
+>>> idx.to_pydatetime()
+array([datetime.datetime(2024, 1, 1, 0, 0),
+       datetime.datetime(2024, 2, 12, 0, 0),
+       datetime.datetime(2024, 3, 6, 0, 0)], dtype=object)
+```
+
+Btw, `datetime.datetime` are extremely small compared to their pandas counter part (especially `pd.DatetimeIndex`):
+
+```python
+>>> sys.getsizeof(datetime.datetime(2024, 3, 6))
+48
+```
+
+Now, time to speak about Julian Date system.
+
+```python
+>>> idx = pd.DatetimeIndex([
+...     "2024-01-01 00:00:00",
+...     "2024-01-01 12:00:00",
+...     "2024-01-02 00:00:00",
+... ])
+>>>
+>>> jd = idx.to_julian_date()
+>>>
+>>> jd
+Index([2460310.5, 2460311.0, 2460311.5], dtype='float64')
+```
+
+It converts each date into a floating point.
+
+The `0` value / origin date is **4713 BC**.
+
+One day is **1 unit**.
+
+Notice the .5 at midnight. That is because astronomical **Julian days start at noon**, not midnight.
+
+It converts timestamps to a continuous astronomical day number (Julian Date System)
+
+About Julian **calendar**:
+
+The Julian calendar came first. It was introduced by Julius Caesar in 45 BC.
+
+The Gregorian calendar came much later. It was introduced by Pope Gregory XIII in 1582 to correct the drift that had accumulated under the Julian calendar.
+
+Why they differ
+
+Because the Julian year is slightly too long:
+
+```
+Julian year:      365.25 days
+Tropical year:    about 365.2422 days
+Difference:       about 11 minutes per year
+```
+
+That small error accumulates.
+
+Roughly:
+
+```
+1 day of drift every ~128 years
+```
+
+So over centuries, the Julian calendar falls behind the Gregorian calendar.
+
+Example today
+
+In the 20th and 21st centuries, the difference is 13 days.
+
+So:
+
+```
+Gregorian: 2024-01-01
+Julian:    2023-12-19
+```
+
+They are the same physical day, but expressed in two different calendars.
+
+
+- Final Cheat Sheet:
 
 ```python
 # components
@@ -2183,7 +2617,7 @@ idx.time
 idx.timetz
 
 # timezone
-idx.tz
+idx.tz # the timzeone
 idx.tz_localize(...)
 idx.tz_convert(...)
 
@@ -2205,6 +2639,932 @@ idx.freq
 idx.freqstr
 idx.inferred_freq
 ```
+
+### Custom `DatetimeRangeSr` class
+
+That's just a Proof Of Concept of what a `DatetimeRangeIndex` with a `pd.Series` could be.
+
+The chosen design is just a class wrapper, because even if we can assign other type to the index of a  `pd.Series`, like a list.
+
+```python
+>>> x = pd.Series([1,2,3])
+>>> x.index
+RangeIndex(start=0, stop=3, step=1)
+>>> x.index = [1,2,13]
+>>> x
+1     1
+2     2
+13    3
+dtype: int64
+```
+
+Modifying the behavior of the different dataframe operations with this index forces me to look at Pandas code direclty, and i do not have the motivation to do so.
+
+So here my class wrapper.
+
+```python
+import pandas as pd
+from typing import Self
+import numpy as np
+
+class DatetimeRangeSr:
+    def __init__(
+        self,
+        sr: pd.Series,
+        metadata: tuple[pd.Timestamp, pd.Timestamp, pd.Timedelta],
+    ):
+        start, stop, step = metadata
+
+        if not isinstance(start, pd.Timestamp):
+            start = pd.Timestamp(start)
+
+        if not isinstance(stop, pd.Timestamp):
+            stop = pd.Timestamp(stop)
+
+        if not isinstance(step, pd.Timedelta):
+            step = pd.Timedelta(step)
+
+        if step <= pd.Timedelta(0):
+            raise ValueError("step must be positive")
+
+        if not start < stop:
+            raise ValueError("stop must be higher than start")
+
+        expected_len = (stop - start) // step
+
+        if start + expected_len * step != stop:
+            raise ValueError("stop must align exactly with start + n * step")
+
+        if len(sr) != expected_len:
+            raise ValueError(
+                f"Series length does not match datetime range: "
+                f"len(sr)={len(sr)}, expected={expected_len}"
+            )
+
+        self.sr = sr.reset_index(drop=True)
+        self.start = start
+        self.stop = stop
+        self.step = step
+        self.length = int(expected_len)
+
+    def __len__(self):
+        return self.length
+
+    def __repr__(self):
+        return (
+            f"DatetimeRangeSr("
+            f"start={self.start!r}, "
+            f"stop={self.stop!r}, "
+            f"step={self.step!r}, "
+            f"length={self.length}"
+            f")\n"
+            f"{self.sr}"
+        )
+
+    def datetime_at(self, i: int) -> pd.Timestamp:
+        if i < 0:
+            i += self.length
+
+        if i < 0 or i >= self.length:
+            raise IndexError("index out of bounds")
+
+        return self.start + i * self.step
+
+    def position_of(self, date: pd.Timestamp) -> int:
+        date = pd.Timestamp(date)
+
+        if date < self.start or date >= self.stop:
+            raise KeyError("date out of bounds")
+
+        delta = date - self.start
+
+        if delta % self.step != pd.Timedelta(0):
+            raise KeyError("date does not match the DatetimeRangeSr step")
+
+        return int(delta // self.step)
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.sr.iloc[key]
+
+        if isinstance(key, slice):
+            return self._getitem_slice(key)
+
+        date = pd.Timestamp(key)
+        idx = self.position_of(date)
+        return self.sr.iloc[idx]
+
+
+    def _normalize_slice(self, key: slice) -> slice:
+        if (
+            (key.start is None or isinstance(key.start, int))
+            and (key.stop is None or isinstance(key.stop, int))
+            and (key.step is None or isinstance(key.step, int))
+        ):
+            return key
+
+        if key.start is None:
+            start_pos = 0
+        else:
+            start_pos = self.position_of(pd.Timestamp(key.start))
+
+        if key.stop is None:
+            stop_pos = self.length
+        else:
+            stop = pd.Timestamp(key.stop)
+
+            if stop > self.stop:
+                raise ValueError("stop out of bounds")
+            elif stop == self.stop:
+                stop_pos = self.length
+            else:
+                stop_pos = self.position_of(stop)
+
+        if key.step is None:
+            slice_step = 1
+        elif isinstance(key.step, int):
+            slice_step = key.step
+        else:
+            step = pd.Timedelta(key.step)
+
+            if step <= pd.Timedelta(0):
+                raise ValueError("slice step must be positive")
+
+            if step % self.step != pd.Timedelta(0):
+                raise ValueError("slice step must be a multiple of the range step")
+
+            slice_step = int(step // self.step)
+
+        return slice(start_pos, stop_pos, slice_step)
+
+    def _getitem_slice(self, key: slice) -> Self:
+
+        key = self._normalize_slice(key)
+
+        start_pos, stop_pos, slice_step = key.indices(self.length)
+
+        if slice_step <= 0:
+            raise ValueError("negative or zero slice steps are not supported yet")
+
+        new_sr = self.sr.iloc[key].reset_index(drop=True)
+
+        new_start = self.datetime_at(start_pos)
+        new_step = self.step * slice_step
+        new_stop = new_start + len(new_sr) * new_step
+
+        return DatetimeRangeSr(
+            new_sr,
+            metadata=(new_start, new_stop, new_step),
+        )
+
+    def to_series_with_datetime_index(self) -> pd.Series:
+        idx = pd.date_range(
+            start=self.start,
+            periods=self.length,
+            freq=self.step,
+        )
+
+        return pd.Series(self.sr.to_numpy(), index=idx, name=self.sr.name)
+
+    def concat(self, objects: list[Self]) -> Self:
+        all_objects = [self] + objects
+    
+        step = self.step
+    
+        for obj in all_objects:
+            if obj.step != step:
+                raise ValueError("cannot concat: all ranges must have the same step")
+    
+        for a, b in zip(all_objects, all_objects[1:]):
+            if a.stop != b.start:
+                raise ValueError(
+                    "cannot concat: ranges are not contiguous "
+                    f"between {a.stop} and {b.start}"
+                )
+    
+        new_sr = pd.concat(
+            [obj.sr for obj in all_objects],
+            ignore_index=True,
+        )
+    
+        return type(self)(
+            new_sr,
+            metadata=(self.start, all_objects[-1].stop, step),
+        )
+
+    def _lower_bound_pos(self, other: pd.Timestamp) -> int:
+        if other <= self.start:
+            return 0
+    
+        if other > self.stop:
+            return self.length
+    
+        delta = other - self.start
+        q = delta // self.step
+        r = delta % self.step
+    
+        if r == pd.Timedelta(0):
+            return int(q)
+    
+        return int(q) + 1
+    
+    
+    def _upper_bound_pos(self, other: pd.Timestamp) -> int:
+        if other < self.start:
+            return 0
+    
+        if other >= self.stop:
+            return self.length
+    
+        delta = other - self.start
+        q = delta // self.step
+        r = delta % self.step
+    
+        return int(q) + 1
+    
+    
+    def _compare_datetime(self, other, op: str):
+        other = pd.Timestamp(other)
+    
+        values = np.zeros(self.length, dtype=bool)
+    
+        lb = self._lower_bound_pos(other)
+        ub = self._upper_bound_pos(other)
+    
+        match op:
+            case "<":
+                values[:lb] = True
+            case "<=":
+                values[:ub] = True
+            case ">":
+                values[ub:] = True
+            case ">=":
+                values[lb:] = True
+            case "==":
+                values[lb:ub] = True
+            case "!=":
+                values[:] = True
+                values[lb:ub] = False
+            case _:
+                raise ValueError(f"unknown comparison operator: {op}")
+    
+        return values
+
+    def __lt__(self, other):
+        return self._compare_datetime(other, "<")
+
+    def __le__(self, other):
+        return self._compare_datetime(other, "<=")
+    
+    def __eq__(self, other):
+        return self._compare_datetime(other, "==")
+    
+    def __ne__(self, other):
+        return self._compare_datetime(other, "!=")
+    
+    def __ge__(self, other):
+        return self._compare_datetime(other, ">=")
+    
+    def __gt__(self, other):
+        return self._compare_datetime(other, ">")
+```
+
+Simle enough.
+
+It respects the stop-excluding pyton range semantic.
+
+Len is of course `(stop - start) // step`.
+
+We redifine operation like len:
+
+```python
+def __len__(self):
+    return self.length
+```
+Print.
+
+```python
+def __repr__(self):
+    return (
+        f"DatetimeRangeSr("
+        f"start={self.start!r}, "
+        f"stop={self.stop!r}, "
+        f"step={self.step!r}, "
+        f"length={self.length}"
+        f")\n"
+        f"{self.sr}"
+    )
+```
+
+Random access, suporting slice.
+
+```python
+def __getitem__(self, key):
+    if isinstance(key, int):
+        return self.sr.iloc[key]
+
+    if isinstance(key, slice):
+        return self._getitem_slice(key)
+
+    date = pd.Timestamp(key)
+    idx = self.position_of(date)
+    return self.sr.iloc[idx]
+```
+
+Note that it of course accpets both direct `iloc` with `int`, and also `loc` by first converting to a the corresponding index (`self.position_of(date)`) (just one corresponding `idx` because monotonicly increasing date) and then performing `iloc`.
+
+Here the convertion from date to int:
+
+```python
+def position_of(self, date: pd.Timestamp) -> int:
+    date = pd.Timestamp(date)
+
+    if date < self.start or date >= self.stop:
+        raise KeyError("date out of bounds")
+
+    delta = date - self.start
+
+    if delta % self.step != pd.Timedelta(0):
+        raise KeyError("date does not match the DatetimeRangeSr step")
+
+    return int(delta // self.step)
+```
+
+You also noted that in random access, i check wether it is done with slice with `isinstance(key, slice)`, if it is true then we pass to the slice random access function:
+
+```python
+def _getitem_slice(self, key: slice) -> Self:
+
+    key = self._normalize_slice(key)
+
+    start_pos, stop_pos, slice_step = key.indices(self.length)
+
+    if slice_step <= 0:
+        raise ValueError("negative or zero slice steps are not supported yet")
+
+    new_sr = self.sr.iloc[key].reset_index(drop=True)
+
+    new_start = self.datetime_at(start_pos)
+    new_step = self.step * slice_step
+    new_stop = new_start + len(new_sr) * new_step
+
+    return DatetimeRangeSr(
+        new_sr,
+        metadata=(new_start, new_stop, new_step),
+    )
+```
+
+It's of course another semantic meaning than scalar random access, here i return a brand new `DatetimeRangeSr`, so i need to pass by constructing stat and end date and also step timedelta, using `.datetime_at()` method.
+
+```python
+def datetime_at(self, i: int) -> pd.Timestamp:
+    if i < 0:
+        i += self.length
+ 
+    if i < 0 or i >= self.length:
+        raise IndexError("index out of bounds")
+ 
+    return self.start + i * self.step
+```
+
+In fact i do in this order slice -> normalize to int indices and ten using `datetime_at` to get the intyended value for the metadata.
+
+So, what's going on on the normalizing slices, i mean when the clises is done with `pd.Datetime` instead of `int` ?
+
+Here `_normalize_slice()` method.
+
+```python
+def _normalize_slice(self, key: slice) -> slice:
+    if (
+        (key.start is None or isinstance(key.start, int))
+        and (key.stop is None or isinstance(key.stop, int))
+        and (key.step is None or isinstance(key.step, int))
+    ):
+        return key
+
+    if key.start is None:
+        start_pos = 0
+    else:
+        start_pos = self.position_of(pd.Timestamp(key.start))
+
+    if key.stop is None:
+        stop_pos = self.length
+    else:
+        stop = pd.Timestamp(key.stop)
+
+        if stop > self.stop:
+            raise ValueError("stop out of bounds")
+        elif stop == self.stop:
+            stop_pos = self.length
+        else:
+            stop_pos = self.position_of(stop)
+
+    if key.step is None:
+        slice_step = 1
+    elif isinstance(key.step, int):
+        slice_step = key.step
+    else:
+        step = pd.Timedelta(key.step)
+
+        if step <= pd.Timedelta(0):
+            raise ValueError("slice step must be positive")
+
+        if step % self.step != pd.Timedelta(0):
+            raise ValueError("slice step must be a multiple of the range step")
+
+        slice_step = int(step // self.step)
+
+    return slice(start_pos, stop_pos, slice_step)
+```
+
+Note tha a slice is `start:end:step` -> `slice(start, end, range)`.
+
+Those are slices.
+
+- `1:4:2` -> start is `1`, end is `4` (stop excluding) and step is `2`
+
+- `:4:1` -> start is `None` -> `0`, end is `4` (stop excluding) and steop is `1`
+
+- `1:` -> start is `1`, step is `None` -> defaults to `1`, end is `None` -> length of he object (stop excluding)
+
+Of course, i redifine what are comparisons operator:
+
+```python
+def __lt__(self, other):
+    return self._compare_datetime(other, "<")
+
+def __le__(self, other):
+    return self._compare_datetime(other, "<=")
+
+def __eq__(self, other):
+    return self._compare_datetime(other, "==")
+
+def __ne__(self, other):
+    return self._compare_datetime(other, "!=")
+
+def __ge__(self, other):
+    return self._compare_datetime(other, ">=")
+
+def __gt__(self, other):
+    return self._compare_datetime(other, ">")
+```
+
+-> less than, less or equal, equal, not equal, greater or equal, greater than
+
+Now here the dispatcher and operator logic.
+
+```python
+def _compare_datetime(self, other, op: str):
+    other = pd.Timestamp(other)
+
+    values = np.zeros(self.length, dtype=bool)
+
+    lb = self._lower_bound_pos(other)
+    ub = self._upper_bound_pos(other)
+
+    match op:
+        case "<":
+            values[:lb] = True
+        case "<=":
+            values[:ub] = True
+        case ">":
+            values[ub:] = True
+        case ">=":
+            values[lb:] = True
+        case "==":
+            values[lb:ub] = True
+        case "!=":
+            values[:] = True
+            values[lb:ub] = False
+        case _:
+            raise ValueError(f"unknown comparison operator: {op}")
+
+    return values
+```
+
+You note because i already know step, start and stop date, i can just pre allocate a N length numpy boolean array, and after partially set boolean values where i need.
+
+Where i need is using uper and lower bounds.
+
+Lower bound:
+
+```python
+def _lower_bound_pos(self, other: pd.Timestamp) -> int:
+    if other <= self.start:
+        return 0
+
+    if other > self.stop:
+        return self.length
+
+    delta = other - self.start
+    q = delta // self.step
+    r = delta % self.step
+
+    if r == pd.Timedelta(0):
+        return int(q)
+
+    return int(q) + 1
+```
+
+Higher bound:
+
+```python
+def _upper_bound_pos(self, other: pd.Timestamp) -> int:
+    if other < self.start:
+        return 0
+
+    if other >= self.stop:
+        return self.length
+
+    delta = other - self.start
+    q = delta // self.step
+    r = delta % self.step
+
+    return int(q) + 1
+```
+
+Their result only differe when:
+
+```
+Date_n  Date_n+1
+DateOther = Date_n
+```
+
+So lower bound is `Date_n` and upper bound is `Date_n+1`
+
+If `Date_n` <  `DateOther` < `Date_n+1`, then they are equal.
+
+For `==` and `!=`, the boolean operation is only effective if we got a true inequality or equality.
+
+Because `LowerBound + 1 = UpperBound`.
+
+But when `Other` is not perfectly equal to `Date_Start + n * Step`, then we got `LowerBound == UpperBound`, then no assigment possible.
+
+Example:
+
+```python
+>> lst = np.zeros(3, dtype=bool)
+>> lst
+array([False, False, False])
+lst[1:1] = True
+>> lst
+array([False, False, False])
+```
+
+Btw, those slice assigment differes from normal list assigment.
+
+With `numpy.array`, this is possible:
+
+```python
+>>> lst
+array([False, False, False])
+>>> lst[0:] = True
+>>> lst
+array([ True,  True,  True])
+```
+
+And the equivalent in raw lists is:
+
+```python
+>>> lst2 = [False, False, False]
+>>> lst2[0:] = [True] * len(lst2)
+>>> lst2
+[True, True, True]
+```
+
+Look what happen if the assigment **iterable** is not the same length of the assigned iterable.
+
+```python
+>>> lst2[0:] = [True] * 2
+>>> lst2
+[True, True]
+```
+
+That's right, the assigned iterable shape is dictated by the shape of the value we assign from.
+
+```python
+>>> lst2 = [False] * 5
+>>> lst2[1:] = [True] * 2
+>>> lst2
+[False, True, True]
+```
+
+```python
+>>> lst2
+[False, False, False, False, False]
+>>> lst2[:3] = [True] * 2
+>>> lst2
+[True, True, False, False]
+```
+
+How to use it ?
+
+Constructor.
+
+```python
+ser = pd.Series([10, 20, 30, 22, 56])
+
+drs = DatetimeRangeSr(
+    ser,
+    metadata=(
+        pd.Timestamp("2024-01-01"),
+        pd.Timestamp("2024-01-06"),
+        pd.Timedelta(days=1),
+    ),
+)
+```
+
+Random access and slices.
+
+```python
+print(drs[1])
+```
+
+Output.
+
+```
+20
+```
+
+```python
+print(drs[1::2])
+```
+
+Output.
+
+```
+DatetimeRangeSr(start=Timestamp('2024-01-02 00:00:00'), stop=Timestamp('2024-01-06 00:00:00'), step=Timedelta('2 days 00:00:00'), length=2)
+0    20
+1    22
+dtype: int64
+```
+
+```python
+print(drs[pd.Timestamp("2024-01-02"):pd.Timestamp("2024-01-05")])
+```
+
+Output.
+
+```
+DatetimeRangeSr(start=Timestamp('2024-01-02 00:00:00'), stop=Timestamp('2024-01-05 00:00:00'), step=Timedelta('1 days 00:00:00'), length=3)
+0    20
+1    30
+2    22
+dtype: int64
+```
+
+Coomparison operaztions.
+
+```python
+print(drs > pd.Timestamp("2024-01-03"))
+```
+
+Output.
+
+```
+[False False False  True  True]
+```
+
+Concatenation (vertical).
+
+```python
+ser2 = pd.Series([10, 20, 30, 22, 56] * 2)
+
+drs2 = DatetimeRangeSr(
+    ser2,
+    metadata=(
+        pd.Timestamp("2024-01-06"),
+        pd.Timestamp("2024-01-16"),
+        pd.Timedelta(days=1),
+    ),
+)
+
+print(drs.concat([drs2]))
+```
+
+Output.
+
+```
+DatetimeRangeSr(start=Timestamp('2024-01-01 00:00:00'), stop=Timestamp('2024-01-16 00:00:00'), step=Timedelta('1 days 00:00:00'), length=15)
+0     10
+1     20
+2     30
+3     22
+4     56
+5     10
+6     20
+7     30
+8     22
+9     56
+10    10
+11    20
+12    30
+13    22
+14    56
+dtype: int64
+```
+
+### `pd.PeriodIndex`
+
+We already talked about it in [#`pd.DatetimeIndex`](#`pd.DatetimeIndex`) section.
+
+### `pd.TimedeltaIndex`
+
+It represents ellapsed time from an event.
+
+Here its constructor:
+
+```python
+>>> idx = pd.TimedeltaIndex(["1 days 00:00:00", 
+                             "2 days 00:00:00", 
+                             "3 days 00:00:00"], 
+                             freq=None, 
+                             dtype="timedelta64[ns]")
+>>> idx
+TimedeltaIndex(['1 days', '2 days', '3 days'], dtype='timedelta64[ns]', freq=None)
+```
+
+With tis notation `N date_unit time_units`.
+
+Or more traditionally:
+
+```python
+>>> idx2 = pd.TimedeltaIndex([pd.Timedelta(days=1), 
+                              pd.Timedelta(days=2), 
+                              pd.Timedelta(days=3)], 
+                              freq=None, 
+                              dtype="timedelta64[ns]")
+>>> idx2
+TimedeltaIndex(['1 days', '2 days', '3 days'], dtype='timedelta64[ns]', freq='D')
+```
+
+Of course here i could have put `"D"` as the frequency, anyway i can retrive it via inferring it.
+
+```python
+>>> idx2.inferred_freq
+'D'
+```
+
+Btw, in the same way we create a `pd.Timedelta` by operating on 2 `pd.Timestamp` (like a substraction), we can create a `pd.TimedeltaIndex` by operating on a `pd.DatetimeIndex`.
+
+```python
+>>> pd.date_range("2024-01-01", periods=67, freq="D") - pd.Timestamp("2024-01-05")
+TimedeltaIndex(['-4 days', '-3 days', '-2 days', '-1 days',  '0 days',
+                 '1 days',  '2 days',  '3 days',  '4 days',  '5 days',
+                 '6 days',  '7 days',  '8 days',  '9 days', '10 days',
+                '11 days', '12 days', '13 days', '14 days', '15 days',
+                '16 days', '17 days', '18 days', '19 days', '20 days',
+                '21 days', '22 days', '23 days', '24 days', '25 days',
+                '26 days', '27 days', '28 days', '29 days', '30 days',
+                '31 days', '32 days', '33 days', '34 days', '35 days',
+                '36 days', '37 days', '38 days', '39 days', '40 days',
+                '41 days', '42 days', '43 days', '44 days', '45 days',
+                '46 days', '47 days', '48 days', '49 days', '50 days',
+                '51 days', '52 days', '53 days', '54 days', '55 days',
+                '56 days', '57 days', '58 days', '59 days', '60 days',
+                '61 days', '62 days'],
+               dtype='timedelta64[us]', freq='D')
+```
+
+The equivalent to `pd.date_range(...)` constructor for `pd.DatetimeIndex`, is `pd.timedelta_range(...)` for constructing `pd.TimedeltaIndex`.
+
+```python
+>>> pd.timedelta_range(start="0 days", periods=4, freq="5h")
+TimedeltaIndex(['0 days 00:00:00', '0 days 05:00:00', '0 days 10:00:00',
+                '0 days 15:00:00'],
+               dtype='timedelta64[us]', freq='5h')
+```
+
+Or:
+
+```python
+>>> pd.timedelta_range(start=pd.Timedelta(days=1), periods=4, freq="5h")
+TimedeltaIndex(['1 days 00:00:00', '1 days 05:00:00', '1 days 10:00:00',
+                '1 days 15:00:00'],
+               dtype='timedelta64[us]', freq='5h')
+```
+
+Of course comparions to other `pd.Timedelta` work.
+
+```python
+>>> idx
+TimedeltaIndex(['1 days', '2 days', '3 days'], dtype='timedelta64[ns]', freq='D')
+>>> idx < pd.Timedelta(minutes=1)
+array([False, False, False])
+```
+
+I can also construct it directly via the `.to_delta()` method.
+
+```python
+>>> pd.to_timedelta([1, 2, 3], unit="D")
+TimedeltaIndex(['1 days', '2 days', '3 days'], dtype='timedelta64[s]', freq="D")
+```
+
+Note also that the `dtype` **does not** affectthe size of the Container neither the elements.
+
+Container size stays the same.
+
+```python
+>>> idx=pd.TimedeltaIndex([pd.Timedelta(days=1), 
+                           pd.Timedelta(days=2), 
+                           pd.Timedelta(days=3)], 
+                           freq="D", 
+                           dtype="timedelta64[us]")
+>>> idx.memory_usage(deep=True)
+24
+>>> idx=pd.TimedeltaIndex([pd.Timedelta(days=1), 
+                           pd.Timedelta(days=2), 
+                           pd.Timedelta(days=3)], 
+                           freq="D", 
+                           dtype="timedelta64[s]")
+>>> idx.memory_usage(deep=True)
+24
+>>> idx=pd.TimedeltaIndex([pd.Timedelta(days=1), 
+                           pd.Timedelta(days=2), 
+                           pd.Timedelta(days=3)], 
+                           freq="D", 
+                           dtype="timedelta64[ns]")
+>>> idx.memory_usage(deep=True)
+24
+```
+
+Same for elements, still `ps.Timedelta` -> same size.
+
+```python
+>>> idx=pd.TimedeltaIndex([pd.Timedelta(days=1), pd.Timedelta(days=2), pd.Timedelta(days=3)], freq="D", dtype="timedelta64[ns]")
+>>> sys.getsizeof(idx[0])
+160
+>>> idx=pd.TimedeltaIndex([pd.Timedelta(days=1), pd.Timedelta(days=2), pd.Timedelta(days=3)], freq="D", dtype="timedelta64[us]")
+>>> sys.getsizeof(idx[0])
+160
+>>> idx=pd.TimedeltaIndex([pd.Timedelta(days=1), pd.Timedelta(days=2), pd.Timedelta(days=3)], freq="D", dtype="timedelta64[s]")
+>>> sys.getsizeof(idx[0])
+160
+```
+
+Then wtf does `dtype` affects ? (fair question)
+
+```
+range
+precision
+overflow behavior
+conversion semantics
+display / dtype metadata
+```
+
+- `timedelta64[ns]` has very fine precision but smaller representable range
+- `timedelta64[s]` has coarser precision but much larger representable range
+
+Because both use the same 64-bit integer, the tradeoff is not memory. The tradeoff is:
+
+**precision vs range**
+
+Then, to use less memory, you can just use a normal `Index` and chose `np.int32`.
+
+```python
+import numpy as np
+import pandas as pd
+
+seconds = np.array([86400, 172800, 259200], dtype=np.int32)
+
+idx = pd.Index(seconds)
+```
+
+But, now you manage convertions yourself, with `pd.to_timedelta(value(s), time_unit)`.
+
+```python
+>>> pd.to_timedelta(pd.Index([1111, 343, 56544]), unit="s")
+TimedeltaIndex(['0 days 00:18:31', '0 days 00:05:43', '0 days 15:42:24'], dtype='timedelta64[s]', freq=None)
+```
+
+Or even scalar.
+
+```python
+>>> pd.to_timedelta(56544, unit="s")
+Timedelta('0 days 15:42:24')
+```
+
+Btw, this is identical to:
+
+```python
+>>> pd.Timedelta(56544, unit="s")
+Timedelta('0 days 15:42:24')
+```
+
+And, by default it is in nanosecond:
+
+```python
+>>> pd.to_timedelta(3)
+Timedelta('0 days 00:00:00.000000003')
+>>> pd.Timedelta(3)
+Timedelta('0 days 00:00:00.000000003')
+```
+
+### Custom `pd.TimedeltaIndex`
+
+Yess, same as `pd.TimedeltaIndex`, here is a POC of what could be a `pd.TimedeltaIndex`.
+
+
 
 ## Would you mind take some DataFrame ?
 
