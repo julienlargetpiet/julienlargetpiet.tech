@@ -4203,7 +4203,821 @@ Basically, adapt the same mental model for `pd.Period`.
 
 ### `pd.IntervalIndex`
 
+Here you index values by an interval.
 
+See it like a fancy `pd.CategoricalIndex`.
+
+```python
+>>> x = pd.Series(
+        [1, 2, 3, 4], 
+        index=pd.IntervalIndex.from_arrays([0, 2, 3.5, 4.6], 
+                                           [1, 3, 4, 6], 
+                                           closed="both"))
+>>> x
+[0.0, 1.0]    1
+[2.0, 3.0]    2
+[3.5, 4.0]    3
+[4.6, 6.0]    4
+dtype: int64
+```
+
+It literay means that you can reason like: What is the value that is associated to the interval where `X` is in ?
+
+```python
+>>> x[3]
+np.int64(2)
+```
+
+Because `3` belongs to `[2.0, 3.0]`.
+
+And yess even if 3 is the uper bound.
+
+Because of the `closed="both"` that stipulates that both bounds must be inclusive.
+
+Here are the possible values:
+
+```
+both
+neither
+left
+right
+```
+
+Going back to the semantics of the interval index, you can also get the `iloc` position of the interval that contains a certain value.
+
+```python
+>>> x.index.get_loc(2.5)
+np.int64(1)
+```
+
+Or as a boolean vector.
+
+```python
+>>> x.index.contains(2.5)
+array([False,  True, False, False])
+```
+
+Note that an interval where upper and lower bound is the same but both inclusive still contain one point.
+
+```python
+>>> pd.IntervalIndex.from_breaks([1, 1], closed="both").contains(1)
+array([ True])
+```
+
+But only for `closed="both`:
+
+```python
+>>> pd.IntervalIndex.from_breaks([1, 1], closed="left").contains(1)
+array([False])
+```
+
+`pd.IntervalIndex` of course exposes left (lower) bounds and right (upper) bounds.
+
+```python
+>>> x.index.left
+Index([0.0, 2.0, 3.5, 4.6], dtype='float64')
+>>> x.index.right
+Index([1.0, 3.0, 4.0, 6.0], dtype='float64')
+```
+
+That's fun, they are `pd.Index`.
+
+I wander if hey would be `pd.RangeIndex` if the step wuld be constant.
+
+```python
+>>> idx = pd.IntervalIndex.from_breaks([1, 2, 3, 4, 5, 6], closed="both")
+>>> idx
+IntervalIndex([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6]], dtype='interval[int64, both]')
+>>> idx.left
+Index([1, 2, 3, 4, 5], dtype='int64')
+>>> idx.right
+Index([2, 3, 4, 5, 6], dtype='int64')
+```
+
+Unfortunately, it's not sart enougt to detect that it cna be a `pd.RangeIndex`.
+
+Ho, i did not speak about constructors.
+
+Basically, you can construct via the classic `pd.interval_range()`.
+
+```python3
+>>> pd.interval_range(start=0, end=12, freq=2, closed="both")
+IntervalIndex([[0, 2], [2, 4], [4, 6], [6, 8], [8, 10], [10, 12]], dtype='interval[int64, both]')
+```
+
+And seriously, this is the constructor where they could have optimize storage for the uper - lower bounds, but they did not do it...
+
+```python
+>>> pd.interval_range(start=0, end=12, freq=2, closed="both").left
+Index([0, 2, 4, 6, 8, 10], dtype='int64')
+>>> pd.interval_range(start=0, end=12, freq=2, closed="both").right
+Index([2, 4, 6, 8, 10, 12], dtype='int64')
+```
+
+Ok, we also have from data constructors.
+
+I mean from lower/left and upper/right bounds as different list or arrays.
+
+```python
+>>> pd.IntervalIndex.from_arrays(left=[1, 3, 5], right=[2, 4, 6], closed="both")
+IntervalIndex([[1, 2], [3, 4], [5, 6]], dtype='interval[int64, both]')
+>>> pd.IntervalIndex.from_arrays(left=[1, 3, 5], right={2, 4, 6}, closed="both")
+IntervalIndex([[1, 2], [3, 4], [5, 6]], dtype='interval[int64, both]')
+>>> pd.IntervalIndex.from_arrays(left={1, 3, 5}, right={2, 4, 6}, closed="both")
+IntervalIndex([[1, 2], [3, 4], [5, 6]], dtype='interval[int64, both]')
+```
+
+Or even tupple (it appears that python data structure random acces is just what they use lol).
+
+```python
+>>> pd.IntervalIndex.from_arrays(left=(1, 3, 5), right=(2, 4, 6), closed="both")
+IntervalIndex([[1, 2], [3, 4], [5, 6]], dtype='interval[int64, both]')
+```
+
+Or you can also merge lower and upper bounds in one data structure (that suport standard random access), as even indices are for lower bounds and odd indices are for upper bounds.
+
+For example:
+
+```python
+>>> pd.IntervalIndex.from_breaks((2, 4, 6), closed="both")
+IntervalIndex([[2, 4], [4, 6]], dtype='interval[int64, both]')
+```
+
+`pd.IntevalIndex` supports overlapping intervals.
+
+```python
+>>> pd.IntervalIndex.from_breaks([1, 1, 1, 1], closed="left")
+IntervalIndex([[1, 1), [1, 1), [1, 1)], dtype='interval[int64, left]')
+```
+
+`.contains()` works properly.
+
+```python
+>>> pd.IntervalIndex.from_breaks([1, 1, 1, 1], closed="both").contains(1)
+array([ True,  True,  True])
+```
+
+And `.get_oc()` returns a slice instead of a scalar.
+
+```python
+>>> pd.IntervalIndex.from_breaks([1, 1, 1, 1], closed="both").get_loc(1)
+slice(0, 3, None)
+```
+
+So now you can use the slice with your random access.
+
+```python
+>>> idx[idx.get_loc(1)]
+IntervalIndex([[1, 1], [1, 1], [1, 1]], dtype='interval[int64, both]')
+```
+
+Also, it's now time to speak about values that describe the `pd.IntervalIndex` you are working with.
+
+First test if the interval are overlaping.
+
+```python
+>>> idx = pd.IntervalIndex.from_breaks([1, 1, 1, 1], closed="both")
+>>> idx.is_overlapping
+True
+```
+
+And the other one is for testing if the interval are not overlapping and strictly increasing.
+
+```python
+>>> idx.is_non_overlapping_monotonic
+False
+```
+
+Because they're overlapping.
+
+And now, i want to test intervals that are not overlapping but not ordered increasingly.
+
+You note that for creating this kind of interval index, we can not use `pd.IntervalIndex.from_breaks()`, because in this design all values must be sorted, because of course lower bound of an interval must be lower than its upper bound.
+
+So we must take the `pd.IntervalIndex.from_arrays()` API.
+
+```python
+>>> pd.IntervalIndex.from_arrays(
+        left={1, 0}, 
+        right={2, 1}, 
+        closed="both"
+    ).is_non_overlapping_monotonic
+False
+```
+
+--> Expected
+
+So an interval index that returns yes for this value is an interval index that we can create with `.from_breaks()` method or this one.
+
+```python
+>>> pd.IntervalIndex.from_arrays(left={0, 1}, right={1, 2}, closed="both").is_non_overlapping_monotonic
+False
+```
+
+Ho, wait what ?
+
+Haa yess, it is because of `closed="both"`. Woth all other 3 of its possible values, it's true:
+
+```python
+>>> pd.IntervalIndex.from_arrays(left={0, 1}, right={1, 2}, closed="neither").is_non_overlapping_monotonic
+True
+>>> pd.IntervalIndex.from_arrays(left={0, 1}, right={1, 2}, closed="right").is_non_overlapping_monotonic
+True
+>>> pd.IntervalIndex.from_arrays(left={0, 1}, right={1, 2}, closed="left").is_non_overlapping_monotonic
+True
+```
+
+One of the most useful thing you might do with that is to break data into bins.
+
+```python
+>>> pd.cut(pd.Series([7, 8, 17, 21, 55]), bins=[0, 10, 20, 30])
+0     (0.0, 10.0]
+1     (0.0, 10.0]
+2    (10.0, 20.0]
+3    (20.0, 30.0]
+4             NaN
+dtype: category
+Categories (3, interval[int64, right]): [(0, 10] < (10, 20] < (20, 30]]
+```
+
+Yess, this returned a `pd.Series`.
+
+```python
+>>> type(pd.cut(pd.Series([7, 8, 17, 21, 55]), bins=[0, 10, 20, 30]))
+<class 'pandas.Series'>
+```
+
+And the index is a normal `pd.RangeIndex`.
+
+```python
+>>> pd.cut(pd.Series([7, 8, 17, 21, 55]), bins=[0, 10, 20, 30]).index
+RangeIndex(start=0, stop=5, step=1)
+```
+
+But, what are the values ?
+
+```python
+>>> pd.cut(pd.Series([7, 8, 17, 21, 55]), bins=[0, 10, 20, 30]).values
+[(0.0, 10.0], (0.0, 10.0], (10.0, 20.0], (20.0, 30.0], NaN]
+Categories (3, interval[int64, right]): [(0, 10] < (10, 20] < (20, 30]]
+>>> type(pd.cut(pd.Series([7, 8, 17, 21, 55]), bins=[0, 10, 20, 30]).values)
+<class 'pandas.Categorical'>
+```
+
+They are `pd.Categorical`, that's normal array but each element is in fact stored as code/index relative to an array encoding code -> value/category.
+
+Then when i do:
+
+```python
+>>> cats = pd.cut(pd.Series([7, 8, 17, 21, 55]), bins=[0, 10, 20, 30])
+>>> cats[1]
+Interval(0, 10, closed='right')
+```
+
+Internally, it roughly does:
+
+```python
+>>> cats.cat.categories[cats.cat.codes[1]]
+Interval(0, 10, closed='right')
+```
+
+With one important nuance as you see, missing values have codes `-1`, so it does not strictly respect the expression above.
+
+```python
+>>> cats.cat.codes
+0    0
+1    0
+2    1
+3    2
+4   -1
+dtype: int8
+```
+
+And, damn, even `codes` is a `pd.Series`, i hope its index is a `pd.RangeIndex`.
+
+```python
+>>> cats.cat.codes.index
+RangeIndex(start=0, stop=5, step=1)
+```
+
+We are saved !
+
+So,now we can answer the question.
+
+"In which interval does my value fall?"
+
+```python
+>>> ser
+0     2
+1     7
+2    21
+3    19
+4    13
+5    27
+dtype: int64
+>>> pd.cut(ser, bins=[0, 10, 20, 30])[np.where(ser.values == 21)[0][0]]
+Interval(20, 30, closed='right')
+```
+
+Just a small point on `np.where()`.
+
+First a `np.array` shape / dimension must be symetric, what i mean by that you have the same way you think of a list a a tree.
+
+Like.
+
+```python
+[[1, 2], 3]
+```
+
+Can be drawn as.
+
+```python
+    /\
+   /  \
+  /\   3
+ 1  2
+```
+
+A `np.array` is the same.
+
+**Hmm, but not totally, the tree must be symetric.**
+
+So this is invalid.
+
+```python
+>>> np.array([[1, 2], 3])
+```
+
+Neither this.
+
+```python
+>>> np.array([[1, 2], [3]])
+```
+
+But this is.
+
+```python
+>>> np.array([[1, 2], [3, 4]])
+array([[1, 2],
+       [3, 4]])
+```
+
+Or just this.
+
+```python
+>>> np.array([1, 2, 3, 4])
+array([1, 2, 3, 4])
+```
+
+And this is not.
+
+```python
+>>> np.array([[1, 2, [3, 4]], [5, 6, [7, 8]]])
+```
+
+And this.
+
+```python
+>>> np.array([[[1, 2], 3, 4], [5, 6, [7, 8]]])
+```
+
+- "But, wait the last one symetric !"
+
+Yess, but i forgot to tel you the other rule, they must also share the same depth level.
+
+So this is not symetric but this one is.
+
+```python
+>>> np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+array([[[1, 2],
+        [3, 4]],
+
+       [[5, 6],
+        [7, 8]]])
+```
+
+Now, going back to `np.where()`, because this is the equivalent of `.index()` for list but for searchin scalar value(s), multiple index must be outpted, each one corresponding to a depth level.
+
+For example.
+
+```python
+>>> np.where(np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]) == 6)
+(array([1]), array([0]), array([1]))
+```
+
+Because 6 is at the second list, then in the first list and finally at the second index of this last list.
+
+The neat thing with `np.where()` is that you can search for multiple scalars in one call.
+
+```python
+>>> np.where(np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]) == [5, 8])
+(array([1, 1]), array([0, 1]), array([0, 1]))
+```
+
+Its why the output is a tupple of `array`.
+
+- 5 -> 1, 0, 0
+
+- 8 -> 1, 1, 1
+
+If it is not found, then it will just not take it into account for the returned data structure.
+
+```python
+>>> np.where(np.array([[[1, 2], [3, 4]], [[5, 6], [7, 5]]]) == [5, 8])
+(array([1]), array([0]), array([0]))
+```
+
+And it act like a match of the first sequence, so if you want to match the indices of the value that you know appears 2 times or so, so:
+
+```python
+>>> np.where(np.array([[[1, 2], [3, 4]], [[5, 6], [7, 5]]]) == [5, 5])
+(array([1, 1]), array([0, 1]), array([0, 1]))
+```
+
+You get the position of its first and second occurence.
+
+It works the same with tupple synthax.
+
+```python
+>>> np.where(arr == (5, 8))
+(array([1, 1]), array([0, 1]), array([0, 1]))
+```
+
+But not with arr (`{...}`) synthax, because it thinks this is the value and not a container containing the values you search for.
+
+```python
+>>> np.where(arr == {5, 8})
+(array([], dtype=int64), array([], dtype=int64), array([], dtype=int64))
+```
+
+And, did you know that numpy array supports tupple random acess ?
+
+I mean look those are equivalent.
+
+```python
+>>> arr[1][0][1]
+np.int64(6)
+```
+
+And.
+
+```python
+>>> arr[(1, 0, 1)]
+np.int64(6)
+```
+
+Then we can do:
+
+```python
+>>> f = lambda a, tpl: a[tpl]
+>>> f(arr, np.where(arr==[5, 8]))
+array([5, 8])
+```
+
+Then it selects just elements that exists **without returning an error when it did not find it**.
+
+```python
+>>> arr
+array([[[1, 2],
+        [3, 4]],
+
+       [[5, 6],
+        [7, 8]]])
+>>> f(arr, np.where(arr==[5, 18]))
+array([5])
+```
+
+Now, the beauty of `pd.IntervalIndex`.
+
+This is to retrieve values based on their bins !
+
+```python
+>>> x = pd.Series(["small", "medium", "large", "xxl"], index=pd.IntervalIndex.from_breaks([1, 2, 3, 4, 5]))
+>>> x
+(1, 2]     small
+(2, 3]    medium
+(3, 4]     large
+(4, 5]       xxl
+dtype: str
+>>> x[1.2]
+'small'
+```
+
+This is why i talked earlier about fancy `pd.CategoricalIndex`, it's like questioning to what categories this value belongs to.
+
+So semantically it is in reverse, for Series random access usage.
+
+Here an example.
+
+What we can do now is to assign category to `pd.Series` elements.
+
+```python
+>>> x = pd.Series(["small", "medium", "large", "xxl"], 
+                  index=pd.IntervalIndex.from_breaks([1, 2, 3, 4, 5], 
+                  closed="both"))
+>>> x2 = pd.Series(np.random.normal(1, 2.5, 12).clip(1, 5))
+>>> x2
+0     4.396643
+1     2.795797
+2     1.000000
+3     3.856331
+4     2.477599
+5     1.000000
+6     1.000000
+7     1.609508
+8     1.000000
+9     1.000000
+10    5.000000
+11    3.881804
+dtype: float64
+```
+
+I cliped `.clip(min, max)` values to lower and uper bounds of the interval index of `x` which are inclusive (would return error if one or less were not inclusive).
+
+Now, i just categorize them mapping a function to retrive category based on values.
+
+```python
+>>> x2.map(lambda v: x[v])
+0        xxl
+1     medium
+2      small
+3      large
+4     medium
+5      small
+6      small
+7      small
+8      small
+9      small
+10       xxl
+11     large
+dtype: str
+```
+
+It also works with `pd.Timestamp`.
+
+```python
+>>> x = pd.Series(["small", "medium", "large", "xxl"], index=pd.IntervalIndex.from_breaks([pd.Timestamp("2024-01-01"), pd.Timestamp("2024-01-02"), pd.Timestamp("2024-01-03"), pd.Timestamp("2024-01-04"), pd.Timestamp("2024-01-05")], closed="both"))
+>>> x
+[2024-01-01 00:00:00, 2024-01-02 00:00:00]     small
+[2024-01-02 00:00:00, 2024-01-03 00:00:00]    medium
+[2024-01-03 00:00:00, 2024-01-04 00:00:00]     large
+[2024-01-04 00:00:00, 2024-01-05 00:00:00]       xxl
+dtype: str
+```
+
+Then we create the data to labelize / categorize.
+
+```python
+>>> x2 = x2.map(lambda x: pd.Timestamp(f"2024-01-0{int(x)}"))
+>>> x2 = pd.Series(np.random.normal(1, 2.5, 12).clip(1, 5).round())
+>>> x2 = x2.map(lambda x: pd.Timestamp(f"2024-01-0{int(x)}"))
+>>> x2
+0    2024-01-03
+1    2024-01-01
+2    2024-01-01
+3    2024-01-05
+4    2024-01-02
+5    2024-01-01
+6    2024-01-01
+7    2024-01-01
+8    2024-01-02
+9    2024-01-01
+10   2024-01-01
+11   2024-01-01
+dtype: datetime64[us]
+```
+
+And then we categorize.
+
+```python
+>>> x2.map(lambda vl: x[vl])
+0     [2024-01-02 00:00:00, 2024-01-03 00:00:00]    ...
+1                                                 small
+2                                                 small
+3                                                   xxl
+4     [2024-01-01 00:00:00, 2024-01-02 00:00:00]    ...
+5                                                 small
+6                                                 small
+7                                                 small
+8     [2024-01-01 00:00:00, 2024-01-02 00:00:00]    ...
+9                                                 small
+10                                                small
+11                                                small
+dtype: object
+```
+
+wait, wait, wait, WTf is that ?
+
+I mean yeah that's a `pd.Series`, but have you seen its values ?
+
+```python
+>>> x2.map(lambda vl: x[vl]).values
+array([[2024-01-02 00:00:00, 2024-01-03 00:00:00]    medium
+       [2024-01-03 00:00:00, 2024-01-04 00:00:00]     large
+       dtype: str                                          , 'small',
+       'small', 'xxl',
+       [2024-01-01 00:00:00, 2024-01-02 00:00:00]     small
+       [2024-01-02 00:00:00, 2024-01-03 00:00:00]    medium
+       dtype: str                                          , 'small',
+       'small', 'small',
+       [2024-01-01 00:00:00, 2024-01-02 00:00:00]     small
+       [2024-01-02 00:00:00, 2024-01-03 00:00:00]    medium
+       dtype: str                                          , 'small',
+       'small', 'small'], dtype=object)
+```
+
+And array of -- oh my gosh, would it be `pd.Series` ?
+
+```python
+>>> x2.map(lambda vl: x[vl]).values[0]
+[2024-01-02 00:00:00, 2024-01-03 00:00:00]    medium
+[2024-01-03 00:00:00, 2024-01-04 00:00:00]     large
+dtype: str
+>>> type(x2.map(lambda vl: x[vl]).values[0])
+<class 'pandas.Series'>
+>>> x2.map(lambda vl: x[vl]).values[0].index
+IntervalIndex([[2024-01-02 00:00:00, 2024-01-03 00:00:00], [2024-01-03 00:00:00, 2024-01-04 00:00:00]], dtype='interval[datetime64[us], both]')
+```
+
+**Yess, they are !!!**
+
+Why ?
+
+Because remember `closed="both"`, i put in x interval index ?
+
+And look at those `x2` values.
+
+```python
+>>> x2
+0    2024-01-03
+1    2024-01-01
+2    2024-01-01
+3    2024-01-05
+4    2024-01-02
+5    2024-01-01
+6    2024-01-01
+7    2024-01-01
+8    2024-01-02
+9    2024-01-01
+10   2024-01-01
+11   2024-01-01
+dtype: datetime64[us]
+```
+
+They are for a good part, on uper and lower bounds of 2 intervals -> 2 categories.
+
+Apart from the first one for example (all the `"2024-01-01"` -> just one lower bound).
+
+```python
+>>> x2.map(lambda vl: x[vl]).values[1]
+'small'
+```
+
+Here this is just a scalar.
+
+At fist i was like "WTF, how does a numpy array can hold different type at the same time, like a string and a pd.Series ???"
+
+Because if i try to reproduce the shape:
+
+```python
+>>> np.array(["small", pd.Series([1, 2])])
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (2,) + inhomogeneous part.
+```
+
+Yup, an error.
+
+Then, what ?
+
+In fact there is this "tiny" option that you can set while constructing an array --> `dtype`.
+
+Normally it is set to `None`, meaning NumPy infers the type from the data.
+
+But sometimes it needs help, so set it to `object`
+
+```python
+>>> np.array(["small", pd.Series([1, 2])], dtype=object)
+array(['small', 0    1
+                1    2
+                dtype: int64], dtype=object)
+```
+
+And, also fun fact, you might think that this would work:
+
+```python
+>>> np.array(["small", pd.Series([1, 2])])
+```
+
+Would work, because they are both objects no ?
+
+In fact maybe yess in raw Python, but no in NumPy internal model.
+
+For performance concenrs it converts the str to a `numpy._str` which is not exactly a `str`, but a mix of it and an array.
+
+Why ?
+
+
+```python
+>>> np.array(["a-z", "sdsd"])
+array(['a-z', 'sdsd'], dtype='<U4')
+```
+
+NumPy inferred the dtype `<U4`.
+
+This does not mean the array has length 4. It means each element is stored as a fixed-width Unicode string that can hold up to 4 characters, because "sdsd" is the longest string passed to the constructor.
+
+So every element has the same storage size. This gives NumPy a predictable, contiguous memory layout, which is very different from a normal Python list of str objects.
+
+But when you access a single element, NumPy gives you a string-like scalar.
+
+For example:
+
+```python
+>>> "a-b".split("-")
+['a', 'b']
+
+>>> np.array(["a-z", "sdsd"])[0].split("-")
+['a', 'z']
+```
+
+The element returned by indexing is usually a `numpy.str_`, which behaves very much like a Python str:
+
+```python
+>>> type(np.array(["a-z", "sdsd"])[0])
+<class 'numpy.str_'>
+
+>>> isinstance(np.array(["a-z", "sdsd"])[0], str)
+True
+```
+
+So the array storage is fixed-width, but the scalar you get back still supports normal string methods such as .split().
+
+Also this storage `<UN` has consequences.
+
+```python
+>>> a = np.array(["a-z", "sdsd"])
+>>> a[0] = "hello"
+>>> a
+array(['hell', 'sdsd'], dtype='<U4')
+```
+
+Because the dtype is fixed at `<U4`, longer strings are truncated when assigned.
+
+Annnnd, it works with `pd.Timedelta` of course :)
+
+```python
+>>> idx = pd.IntervalIndex.from_breaks(
+        [pd.Timedelta(days=1), pd.Timedelta(days=2), pd.Timedelta(days=3), 
+        pd.Timedelta(days=4)], 
+        closed="both"
+)
+>>> ser = pd.Series(["early", "mid", "late"], index=idx)
+>>> ser
+[1 days 00:00:00, 2 days 00:00:00]    early
+[2 days 00:00:00, 3 days 00:00:00]      mid
+[3 days 00:00:00, 4 days 00:00:00]     late
+dtype: str
+```
+
+And now creating data to labelize.
+
+```python
+>>> ser2 = pd.Series(np.random.uniform(1, 4, 12)).map(lambda vl: pd.Timedelta(days=vl))
+>>> ser2
+0    2 days 21:38:43.802402493
+1    3 days 08:43:10.202247026
+2    2 days 22:44:02.396862022
+3    1 days 12:25:00.984635749
+4    3 days 18:59:06.272587609
+5    1 days 19:28:46.593006243
+6    2 days 19:46:45.232864534
+7    3 days 06:32:40.820480225
+8    2 days 09:15:57.313691881
+9    1 days 13:43:25.461874851
+10   1 days 06:05:25.508552033
+11   3 days 18:08:41.716050245
+dtype: timedelta64[ns]
+```
+
+Finally labelizing.
+
+```python
+>>> ser2.map(lambda vl: ser[vl])
+0       mid
+1      late
+2       mid
+3     early
+4      late
+5     early
+6       mid
+7      late
+8       mid
+9     early
+10    early
+11     late
+dtype: str
+```
 
 ## Would you mind take some DataFrame ?
 
