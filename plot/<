@@ -1,0 +1,120 @@
+import pandas as pd
+import numpy as np
+import os, shutil
+from itertools import product
+from pathlib import Path
+
+set_country = ["FR", "EN", "ESP"]
+set_location = ["A", "B"]
+
+df = pd.DataFrame({
+    "country": np.random.choice(set_country, 100_000),
+    "location": np.random.choice(set_location, 100_000),
+    "PIB": np.random.normal(3, 15, 100_000),
+    })
+
+df = df.sort_values("PIB", ascending=False)
+df["PIB_bucket"] = (df["PIB"] // 10) * 10
+
+def make_predicates2(df: pd.DataFrame, dct: dict) -> list:
+    keys = list(dct.keys())
+    all_combinations = product(*(dct[k] for k in keys))
+
+    predicates = []
+
+    for combo in all_combinations:
+        mask = pd.Series(True, index=df.index)
+        for k, v in zip(keys, combo):
+            mask &= (df[k] == v)
+        predicates.append(mask)
+
+    return predicates
+
+def get_ids(n: int, lst_nb: list) -> list:
+    ids = []
+    for base in reversed(lst_nb):
+        ids.append(n % base)
+        n //= base
+    return list(reversed(ids))
+
+def make_predicates(df: pd.DataFrame, 
+                    dct: dict) -> list:
+    lst = []
+    lst_nb = []
+    max_value = 1
+
+    for k in dct.keys():
+        cur_lst = []
+        for vl in dct[k]:
+            cur_lst.append(df[k] == vl)
+        lst.append(cur_lst)
+        lst_nb.append(len(dct[k]))   
+        max_value *= len(dct[k])
+
+    rtn_lst = []
+
+    cnt = 0
+    while cnt < max_value:
+        ids = get_ids(cnt, lst_nb)
+
+        cur_sr = pd.Series(True, index=df.index)
+
+        for i in range(len(ids)):
+            cur_sr &= lst[i][ids[i]]   
+
+        rtn_lst.append(cur_sr)         
+        cnt += 1
+
+    return rtn_lst
+
+def write_partitions_feather(f: str,
+                             df: pd.DataFrame,
+                             partitions: list) -> None:
+
+    shutil.rmtree(f)
+    os.mkdir(f)
+
+    f += "/"
+    dct = {}
+    max_value = 1
+    lst_nb = []
+    for cl in partitions:
+        cur_unique = df[cl].unique()
+        lst_nb.appen(cur_unique)
+        max_value *= cur_unique
+        dct[cl] = cur_unique
+    lst_predicates = make_predicates(df, dct)
+    
+    cnt = 0
+    while cnt < max_value:
+        ids = get_ids(cnt, lst_nb)
+        cur_f = f
+        for i in range(len(partitions)):
+            k = partitions[i]
+            cur_f += f"{k}={dct[k][ids[i]]}/"
+        cur_f += "data.feather"
+        cur_df = df[lst_predicates[cnt]]
+        cur_df.to_feather(cur_f)
+        cnt += 1
+
+def read_partitions_feather(f: str,
+                            df: pd.DataFrame,
+                            *,
+                            columns: list | None = None) -> pd.DataFrame:
+    lst_files = [p for p in Path(f).rglob("*.feather") if p.is_file()]
+    rtn_df = 
+    for f in lst_files:
+        cur_df = pd.read_feather(f)
+        rtn_df = rtn_df.concat(cur_df, axis = 1)
+    return rtn_df
+
+write_partitions_feather("dataset_feather", 
+                         df,
+                         ["country", "PIB_bucket"])
+
+df = read_partitions_feather("dataset_feather",
+                             c)
+
+
+
+
