@@ -1,16 +1,16 @@
 A lot of text-processing tools can get surprisingly far without a real parser.
 
-For simple patterns, tools like `sed`, `awk`, or small ad-hoc string transformations are often enough. You match a fragment, replace it, split on a delimiter, maybe scan left to right, and the job is done. For flat data, this is not only acceptable — it is often the most direct and elegant solution.
+For simple patterns, tools like `sed`, `awk`, or small ad-hoc string transformations are often enough. You match a fragment, replace it, split on a delimiter, maybe scan left to right, and the job is done. For flat data, it's often the most direct and elegant solution.
 
 But this approach starts to break down when the input has structure.
 
-As soon as you have nesting, precedence, escaping rules, ambiguous symbols, or context-dependent meaning, the input is no longer “just a string”. It becomes a small language. At that point, continuing to manipulate characters directly means you are building a parser anyway — just an implicit, fragile, and usually inefficient one.
+As soon as you have nesting, precedence, escaping rules, ambiguous symbols, or context-dependent meaning, the input should not be considered as just a string. It becomes a small language. At that point, continuing to manipulate characters directly means you are building a parser anyway, just an implicit, fragile, and usually inefficient one.
 
 This article is about discovering that boundary.
 
-We start with a calculator implemented through direct string manipulation: finding parentheses, replacing subexpressions, normalizing operators, and repeatedly scanning the input. It works, and that is precisely why it is interesting. Then we move toward the cleaner architecture: tokenize the input, give names to the pieces, and evaluate the structure according to clear rules.
+We start with a calculator implemented (in Haskell) through direct string manipulation: finding parentheses, replacing subexpressions, normalizing operators, and repeatedly scanning the input. It works, and that is precisely why it is interesting. Then we move toward the cleaner architecture: tokenize the input, give names to the pieces, and evaluate the structure according to clear rules and the performance gain is just MASSIVE.
 
-That shift is the real lesson: for simple text, string logic is enough. For structured input, parsers are not academic overhead. They are the natural tool.
+That shift is the real lesson: for simple text, string logic is enough. For structured input, Tokenizer and Parser are the right tool.
 
 ## Context
 
