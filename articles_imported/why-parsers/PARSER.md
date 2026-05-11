@@ -870,6 +870,8 @@ This crashes:
 
 Because `seq` tries to evaluate the first argument before returning the second.
 
+So `benchCalc` effectively creates a chain of function calls (`calc`) that must be evaluated.
+
 ### Back to Benchmarks
 
 Now we compile.
