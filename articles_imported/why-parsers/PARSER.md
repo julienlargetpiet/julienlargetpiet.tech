@@ -808,6 +808,70 @@ main = do
 
 ```
 
+#### `seq`, the one that forces evaluation
+
+Just a quick note about `seq` function.
+
+In Haskell, `seq` is a special function used to force evaluation of something to weak head normal form.
+
+Its type is:
+
+```haskell
+
+seq :: a -> b -> b
+
+```
+
+It looks weird, but the idea is:
+
+```haskell
+
+x `seq` y
+
+```
+
+means:
+
+Evaluate `x` enough to know it is not bottom, then return `y`.
+
+Simple example:
+
+```haskell
+
+main = print (1 `seq` 2)
+
+```
+
+Output:
+
+```
+2
+
+```
+
+Because `seq` evaluates `1`, then returns `2`.
+
+More revealing:
+
+```haskell
+
+main = print (undefined `seq` 2)
+
+```
+
+This crashes:
+
+
+```
+
+*** Exception: Prelude.undefined
+
+```
+
+Because `seq` tries to evaluate the first argument before returning the second.
+
+### Back to Benchmarks
+
 Now we compile.
 
 ```bash
