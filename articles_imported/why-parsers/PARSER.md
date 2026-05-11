@@ -808,7 +808,7 @@ main = do
 
 ```
 
-#### `seq`, the one that forces evaluation
+### `seq`, the one that forces evaluation
 
 Just a quick note about `seq` function.
 
