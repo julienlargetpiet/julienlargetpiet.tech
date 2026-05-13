@@ -1017,6 +1017,10 @@ But the elements are still not necessarily evaluated:
 
 So `seq` is shallow and `deepseq` is not.
 
+But, do we need it here ?
+
+Not really, because we do a lot of works that require the string to be constructed / evaluated inside the `calc` function, but that stills is a good practice in Haskell benchmark.
+
 ### Back to Benchmarks
 
 Now we compile.
