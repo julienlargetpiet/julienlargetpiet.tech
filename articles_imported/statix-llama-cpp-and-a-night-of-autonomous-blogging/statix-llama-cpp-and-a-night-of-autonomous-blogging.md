@@ -402,8 +402,6 @@ The script loaded that file once at startup, ignored blank lines and comments, a
 
 The prompt was also moved out of the code and into `prompt.txt`.
 
-Again, that may seem small, but it makes iterative prompt engineering much easier. The script could now evolve independently from the instructions given to the model.
-
 At startup, the script loaded the prompt template once into memory, then replaced a `{{TOPIC}}` placeholder for each iteration. This avoided repeatedly reading the file and reduced the amount of variability and failure inside the hot loop.
 
 That is a small optimization, but it reflects a larger principle: configuration should be loaded once, not re-read on every iteration unless hot reload is explicitly required.
@@ -491,10 +489,6 @@ stx publish --file articles/some-title.md some-title
 
 ```
 
-At that point, there was no longer a conceptual gap between "AI generated content" and "published article." The system had crossed that boundary. Generated text became a real article in the real site database, reachable through a real URL.
-
-That is the moment where an experiment becomes emotionally satisfying. The terminal command stops being a toy. It writes into the actual world of the application.
-
 Statix, once again, was the reason this felt so smooth. The CLI had already solved the publishing layer. The AI layer only had to plug itself into it.
 
 ## The generated articles
@@ -549,15 +543,7 @@ And they can be seen here:
 - [link21](https://julienlargetpiet.tech/articles/and-header-will-be.html)
 - [link22](https://julienlargetpiet.tech/articles/this-is-a-valid-markdown-header.html)
 
-The list itself tells a story.
-
 Some titles are serious and relevant. Some are malformed. Some clearly reflect prompt leakage. Some reveal formatting instructions accidentally turned into content. Some are surprisingly on-topic. Some are chaotic.
-
-That is not a flaw in the experiment. It is the experiment.
-
-It shows exactly what happens when a local language model is plugged into a real publishing pipeline with only partial guardrails. You do not get science fiction. You get a mixture of signal, slippage, emergent humor, and genuine usefulness.
-
-And that mixture is fascinating.
 
 ## Querying the database directly
 
@@ -607,60 +593,4 @@ In other words, the experiment did not only generate and publish content. It als
 
 That is another sign that this was not a toy hack glued on top of the blog. It became a genuine part of the publishing ecosystem.
 
-## The emotional side of the engineering
 
-What makes this experiment satisfying is not merely that it worked. It is that the path from idea to execution followed a series of understandable engineering moves.
-
-First came the realization that Statix already exposed everything necessary through a CLI.
-
-Then came the local model setup, including the practical lessons about quantization, context size, and RAM limits.
-
-Then came the shift from terminal experimentation to HTTP-based local inference.
-
-Then came the Python glue, which translated generated text into publishable content.
-
-Then came the database query, which confirmed that the articles were truly there.
-
-At every step, the next move felt natural. Nothing required a leap of faith. The dots connected because each component had been built or chosen in a way that respected composability.
-
-And that may be the most important takeaway of all.
-
-When your tools are built with clear boundaries and proper interfaces, unexpected experiments become possible. A static blog system becomes a programmable publishing engine. A local model runtime becomes a content backend. A short Python loop becomes an autonomous article factory.
-
-This is not about AI replacing authorship. It is about what becomes possible when software is designed so that its parts can be rearranged into new systems.
-
-## What the experiment revealed
-
-The experiment revealed several things at once.
-
-It showed that local LLM inference is not mystical. It is a resource-constrained systems problem that can be reasoned about and tuned.
-
-It showed that a well-designed CLI transforms a product into a platform.
-
-It showed that automation becomes truly interesting when it acts on a system you actually own.
-
-It showed that language models, when connected to a real publishing path, generate not only content but also artifacts of their own constraints: malformed titles, leaked instructions, accidental comedy, and moments of genuine relevance.
-
-It showed that the distance between "I wonder if this is possible" and "this is running against my real database" can be surprisingly short when the interfaces are good.
-
-Most of all, it reinforced a simple conviction:
-
-> Once you have a CLI, everything becomes possible.
-
-Not because the CLI is magic, but because it forces your system to become composable. And composability is what lets experiments turn into tools.
-
-## Closing thought
-
-There is something deeply satisfying about watching a machine on your desk generate text, save files, invoke your own CLI, update your own publishing system, and fill a dedicated subject on your site while you sleep.
-
-Not because the generated content is perfect. It isn't.
-
-Not because the experiment proves some grand theory about the future. It doesn't.
-
-But because it demonstrates, in a very concrete way, what happens when software components are designed to connect cleanly. A blog engine, a model server, a Python script, a database query, and a few shell commands became a coherent autonomous publishing loop.
-
-That is the real story here.
-
-The model was interesting. The generated articles were amusing. The malformed outputs were revealing. But the most beautiful part was architectural:
-
-Statix already made it possible. The local LLM only completed the circuit.
