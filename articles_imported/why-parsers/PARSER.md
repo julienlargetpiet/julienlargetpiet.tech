@@ -872,6 +872,151 @@ Because `seq` tries to evaluate the first argument before returning the second.
 
 So `benchCalc` effectively creates a chain of function calls (`calc`) that must be evaluated.
 
+But is that enough ?
+
+### `deepseq` the honest `seq`
+
+Because i also heard about:
+
+```haskell
+
+import Control.DeepSeq (deepseq)
+
+```
+
+What `deepseq` actualy does that `seq` does not ?
+
+In Haskell, the difference is:
+
+```haskell
+
+seq     :: a -> b -> b
+deepseq :: NFData a => a -> b -> b
+
+```
+
+`seq` forces only the outer constructor.
+
+`deepseq` forces the value all the way down, recursively, as long as the type has an `NFData` instance.
+
+`NFData` is a typeclass from Control.DeepSeq.
+
+It means:
+
+“Values of this type know how to be fully evaluated to normal form.”
+
+The core method is:
+
+```haskell
+
+class NFData a where
+    rnf :: a -> ()
+
+```
+
+`rnf` means reduce to normal form.
+
+So when you write:
+
+```haskell
+
+x `deepseq` y
+
+```
+
+it is roughly:
+
+```haskell
+
+rnf x `seq` y
+
+```
+
+Meaning:
+
+fully evaluate `x`, then return `y`
+
+For simple types like Int, this is easy:
+
+```haskell
+
+rnf (42 :: Int) = ()
+
+```
+
+Because an Int is already a simple strict value once evaluated.
+
+For a list:
+
+```haskell
+
+[1, 2, 3]
+
+```
+
+the `NFData` instance recursively forces:
+
+the list spine
+each element
+
+So:
+
+```haskell
+
+[1, 2, 3] `deepseq` "done"
+
+```
+
+forces the whole list.
+
+But:
+
+```haskell
+
+[1, undefined, 3] `deepseq` "done"
+
+```
+
+crashes, because the second element is forced.
+
+`seq`: shallow evaluation
+
+Example:
+
+```haskell
+
+xs = [1 + 2, 3 + 4, 5 + 6]
+
+```
+
+If you do:
+
+```haskell
+
+xs `seq` "done"
+
+```
+
+Haskell only checks that `xs` is not bottom and evaluates it enough to see the outer shape:
+
+`(:)` thunk tail
+
+So it knows:
+
+`xs` is a non-empty list
+
+But the elements are still not necessarily evaluated:
+
+```haskell
+
+1 + 2  still maybe not evaluated
+3 + 4  still maybe not evaluated
+5 + 6  still maybe not evaluated
+
+```
+
+So `seq` is shallow and `deepseq` is not.
+
 ### Back to Benchmarks
 
 Now we compile.
@@ -926,29 +1071,28 @@ So what are the results ?
 
 ```haskell
 
-❯ ./calculator +RTS -s -RTS
 21.00425863264272
-  19,459,337,528 bytes allocated in the heap
-       4,652,384 bytes copied during GC
-         107,416 bytes maximum residency (2 sample(s))
+  19,924,132,880 bytes allocated in the heap
+       4,784,504 bytes copied during GC
+         108,264 bytes maximum residency (2 sample(s))
           29,400 bytes maximum slop
                6 MiB total memory in use (0 MB lost due to fragmentation)
 
                                      Tot time (elapsed)  Avg pause  Max pause
-  Gen  0      4671 colls,     0 par    0.018s   0.020s     0.0000s    0.0001s
+  Gen  0      4778 colls,     0 par    0.019s   0.021s     0.0000s    0.0001s
   Gen  1         2 colls,     0 par    0.000s   0.000s     0.0002s    0.0003s
 
   INIT    time    0.000s  (  0.000s elapsed)
-  MUT     time    4.022s  (  4.019s elapsed)
-  GC      time    0.018s  (  0.020s elapsed)
-  EXIT    time    0.000s  (  0.001s elapsed)
-  Total   time    4.041s  (  4.040s elapsed)
+  MUT     time    4.098s  (  4.096s elapsed)
+  GC      time    0.019s  (  0.021s elapsed)
+  EXIT    time    0.000s  (  0.002s elapsed)
+  Total   time    4.118s  (  4.120s elapsed)
 
   %GC     time       0.0%  (0.0% elapsed)
 
-  Alloc rate    4,838,108,614 bytes per MUT second
+  Alloc rate    4,862,069,316 bytes per MUT second
 
-  Productivity  99.5% of total user, 99.5% of total elapsed
+  Productivity  99.5% of total user, 99.4% of total elapsed
 
 ```
 
@@ -1574,10 +1718,6 @@ Same compiling and execution than for the first one.
 
 ```haskell
 
-❯ ghc -O2 -rtsopts calculator3.hs -o calculator3
-Loaded package environment from /home/juju/.ghc/x86_64-linux-9.4.7/environments/default
-juju@juju-System-Product-Name ~/99HaskellProbs
-❯ ./calculator3 +RTS -s
 21.00425863264272
   14,051,918,568 bytes allocated in the heap
        2,341,552 bytes copied during GC
@@ -1590,16 +1730,16 @@ juju@juju-System-Product-Name ~/99HaskellProbs
   Gen  1         2 colls,     0 par    0.000s   0.000s     0.0002s    0.0003s
 
   INIT    time    0.000s  (  0.000s elapsed)
-  MUT     time    3.405s  (  3.404s elapsed)
-  GC      time    0.018s  (  0.020s elapsed)
+  MUT     time    3.357s  (  3.355s elapsed)
+  GC      time    0.018s  (  0.019s elapsed)
   EXIT    time    0.000s  (  0.006s elapsed)
-  Total   time    3.424s  (  3.430s elapsed)
+  Total   time    3.376s  (  3.380s elapsed)
 
   %GC     time       0.0%  (0.0% elapsed)
 
-  Alloc rate    4,126,271,880 bytes per MUT second
+  Alloc rate    4,185,492,983 bytes per MUT second
 
-  Productivity  99.5% of total user, 99.2% of total elapsed
+  Productivity  99.5% of total user, 99.3% of total elapsed
 
 ```
 
@@ -2269,29 +2409,28 @@ Loaded package environment from /home/juju/.ghc/x86_64-linux-9.4.7/environments/
 
 ```bash
 
-❯ ./calculator4 +RTS -s
 21.00425863264272
-   1,891,338,976 bytes allocated in the heap
-         305,128 bytes copied during GC
+   2,026,537,624 bytes allocated in the heap
+         139,536 bytes copied during GC
           44,328 bytes maximum residency (2 sample(s))
           33,496 bytes maximum slop
                6 MiB total memory in use (0 MB lost due to fragmentation)
 
                                      Tot time (elapsed)  Avg pause  Max pause
-  Gen  0       452 colls,     0 par    0.002s   0.002s     0.0000s    0.0000s
+  Gen  0       489 colls,     0 par    0.001s   0.001s     0.0000s    0.0000s
   Gen  1         2 colls,     0 par    0.000s   0.000s     0.0002s    0.0003s
 
   INIT    time    0.000s  (  0.000s elapsed)
-  MUT     time    0.304s  (  0.304s elapsed)
+  MUT     time    0.352s  (  0.352s elapsed)
   GC      time    0.002s  (  0.002s elapsed)
-  EXIT    time    0.000s  (  0.004s elapsed)
-  Total   time    0.306s  (  0.310s elapsed)
+  EXIT    time    0.000s  (  0.006s elapsed)
+  Total   time    0.354s  (  0.360s elapsed)
 
   %GC     time       0.0%  (0.0% elapsed)
 
-  Alloc rate    6,219,790,958 bytes per MUT second
+  Alloc rate    5,757,237,520 bytes per MUT second
 
-  Productivity  99.2% of total user, 98.0% of total elapsed
+  Productivity  99.4% of total user, 97.7% of total elapsed
 
 ```
 
