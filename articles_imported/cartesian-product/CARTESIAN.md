@@ -3219,9 +3219,9 @@ First, a recap perf table:
 | Haskell fused general | 6.09s | 12.5GB | Fusion not automatically better |
 | Haskell fused flat special-case | 2.45s | 12.5GB | Fastest Haskell version |
 | C unfused pointer data | 1.12s | 25GB | Manual memory + simple loops |
-| C unfused flat data | 1.07s | 25GB | Slightly faster |
+| C unfused flat special-case | 1.07s | 25GB | Slightly faster |
 | C fused pointer data | 0.56s | 12GB | Fastest overall |
-| C fused flat data | 0.58s | 12GB | Slightly slower than pointer data |
+| C fused flat special-case | 0.58s | 12GB | Slightly slower than pointer data |
 
 
 
