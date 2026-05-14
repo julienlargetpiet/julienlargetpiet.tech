@@ -32,6 +32,16 @@ In the best case, one architecture ends up roughly 2 times faster than native Ha
 
 And we haven’t even talked about the C version yet, which casually crushes native `sequence` by running roughly 9 times faster.
 
+Before we start, if you want to reproduce the results at home (GHC Haskell compiler is assumed to be installed), you will need to install the Haskell vector package:
+
+On debian / ubuntu based distro:
+
+```bash
+
+sudo apt install libghc-vector-dev
+
+```
+
 ## Naive architecture
 
 This is the implementation you do when you are not yet fully familiarized with functional programming.
