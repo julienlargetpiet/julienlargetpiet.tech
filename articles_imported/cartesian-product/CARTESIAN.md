@@ -591,7 +591,7 @@ Straight to the results (`-O2` etcetera).
 
 Lol, so it looks we just discovered the Haskell implementation of `sequence`, praticaly the exact same results.
 
-## Changing Data Represntation
+## Changing Data Representation
 
 At this point, we can suppose the bottleneck is the representation of the results which are `[[a]]`, where `a` is the atomic type.
 
