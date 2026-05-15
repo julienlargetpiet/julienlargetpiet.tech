@@ -3243,7 +3243,13 @@ First, a recap perf table:
 | C fused flat special-case | 0.58s | 12GB | Slightly slower than pointer data |
 
 
+This section should be read mainly as an educational detour.
 
+In practice, Haskell is most valuable when a clear, naive implementation is already fast enough, while giving strong guarantees about correctness. That is especially useful in domains where correctness matters more than raw control over every allocation, or when fast iteration lets a team build something reliable before competitors even get there.
+
+Optimizing data representations can still be useful, especially when an algorithm benefits from contiguous memory, cache locality, or reduced allocation pressure.
+
+But once a project reaches the point where deep, low-level optimization becomes the central concern, Haskell may no longer be the right tool for the job. In that case, a systems language is often a better default, except perhaps in mission-critical software where correctness remains the dominant constraint.
 
 
 
