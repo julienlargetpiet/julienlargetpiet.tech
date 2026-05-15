@@ -12,6 +12,15 @@ We start with a calculator implemented (in Haskell) through direct string manipu
 
 That shift is the real lesson: for simple text, string logic is enough. For structured input, Tokenizer and Parser are the right tool.
 
+The `ghc` version we will use all along this article is:
+
+```bash
+
+❯ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 9.4.7
+
+```
+
 ## Context
 
 In this project, we build a **complete calculator** in Haskell that can evaluate normal
