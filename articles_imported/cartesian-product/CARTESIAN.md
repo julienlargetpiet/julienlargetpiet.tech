@@ -42,6 +42,15 @@ sudo apt install libghc-vector-dev
 
 ```
 
+Also, here is the `ghc` version we will use all along this article:
+
+```bash
+
+❯ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 9.4.7
+
+```
+
 ## Naive architecture
 
 This is the implementation you do when you are not yet fully familiarized with functional programming.
