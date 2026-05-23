@@ -6,7 +6,7 @@ I already had a (very) messy YouTube experience.
 
 I was absolutely brainwashed by the LukeSmith Wave at the time.
 
-![lukewave.png](assets/common_files/obs_article/lukewave.png)
+![lukewave.png](/assets/common_files/obs_article/lukewave.png)
 
 With my Patched DWM ( larbs config for the initiated ;) ).
 
@@ -122,7 +122,7 @@ DWM was my tiling window manager but also my OBS scenes dashboard in this case.
 
 For example my webcam was literally a visible window i set at the top-right.
 
-![dwm_example_webcam.png](assets/common_files/obs_article/dwm_example_webcam.png)
+![dwm_example_webcam.png](/assets/common_files/obs_article/dwm_example_webcam.png)
 
 `$DISPLAY` is usually something like:
 
@@ -731,7 +731,7 @@ And here i had fun making a good setup.
 
 <video controls width ="800">
 
-  <source src="assets/common_files/obs_article/setup.mp4" type="video/mp4">
+  <source src="/assets/common_files/obs_article/setup.mp4" type="video/mp4">
   Your browser does not support the video tag.
 
 </video>
@@ -746,7 +746,7 @@ So basically to crop my webcam I used this `PNG` created via `convert`.
 
 Then go to filters of the webcam source V4L2 (right click on it) -> image blend.
 
-![filter1.png](assets/common_files/obs_article/filter1.png)
+![filter1.png](/assets/common_files/obs_article/filter1.png)
 
 I created 2 scenes, one webcam-focues and another screen-focused (XSHM video source).
 
@@ -780,7 +780,7 @@ The I (re)start `obs`.
 
 And in the Scene-Transition part, i see the `move` transition.
 
-![move.png](assets/common_files/obs_article/move.png)
+![move.png](/assets/common_files/obs_article/move.png)
 
 ### OBS HTML and CSS Animations
 
@@ -990,7 +990,7 @@ Example, the normal document flow with default position value -> `static`:
 
 Will output:
 
-![test_html2.png](assets/common_files/obs_article/test_html2.png)
+![test_html2.png](/assets/common_files/obs_article/test_html2.png)
 
 But, look what hapen when the child position is absolute. 
 
@@ -1003,7 +1003,7 @@ But, look what hapen when the child position is absolute.
 
 ```
 
-![test_html2b.png](assets/common_files/obs_article/test_html2b.png)
+![test_html2b.png](/assets/common_files/obs_article/test_html2b.png)
 
 Yess, "A" and "B" are merged.
 
@@ -1026,7 +1026,7 @@ First one:
 
 ```
 
-![test_html2b.png](assets/common_files/obs_article/test_html2b.png)
+![test_html2b.png](/assets/common_files/obs_article/test_html2b.png)
 
 Same output.
 
@@ -1043,7 +1043,7 @@ But now:
 
 ```
 
-![test_html2c.png](assets/common_files/obs_article/test_html2c.png)
+![test_html2c.png](/assets/common_files/obs_article/test_html2c.png)
 
 Yess, not merged !
 
@@ -1070,7 +1070,7 @@ That is why this:
 ```
 Will output that:
 
-![test_html4.png](assets/common_files/obs_article/test_html4.png)
+![test_html4.png](/assets/common_files/obs_article/test_html4.png)
 
 ### The background
 
@@ -1699,7 +1699,7 @@ A
 
 ```
 
-![boxshadow1.png](assets/common_files/obs_article/boxshadow1.png)
+![boxshadow1.png](/assets/common_files/obs_article/boxshadow1.png)
 
 
 We got the same concept here:
@@ -1722,7 +1722,7 @@ B
 
 ```
 
-![boxshadow2.png](assets/common_files/obs_article/boxshadow2.png)
+![boxshadow2.png](/assets/common_files/obs_article/boxshadow2.png)
 
 
 Then both combined:
@@ -1735,7 +1735,7 @@ B
 
 ```
 
-![boxshadow3.png](assets/common_files/obs_article/boxshadow3.png)
+![boxshadow3.png](/assets/common_files/obs_article/boxshadow3.png)
 
 
 Now, the animation:
@@ -1919,7 +1919,7 @@ Example from th real file:
 
 ```
 
-![flex1.png](assets/common_files/obs_article/flex1.png)
+![flex1.png](/assets/common_files/obs_article/flex1.png)
 
 If we had set `flex-direction: column;` it would have placed the direct children of `.header` vertically, one below the other.
 
@@ -1935,7 +1935,7 @@ Example of what it could have been:
 
 ```
 
-![flex2.png](assets/common_files/obs_article/flex2.png)
+![flex2.png](/assets/common_files/obs_article/flex2.png)
 
 And we also control how the aligment is performed with `align-items: center;`
 
@@ -2068,7 +2068,7 @@ Example:
 
 ```
 
-![grid1.png](assets/common_files/obs_article/grid1.png)
+![grid1.png](/assets/common_files/obs_article/grid1.png)
 
 
 Creates just 2 cols with the first having 1 tier of the width space and the second the 2 tier.
@@ -2913,7 +2913,7 @@ NexiGo N60 FHD Webcam Audio: Ne (usb-0000:0a:00.3-1):
 
 But look at that crappy default image:
 
-![me1.png](assets/common_files/obs_article/me1.png)
+![me1.png](/assets/common_files/obs_article/me1.png)
 
 Post stream treatment on OBS did not really improoved.
 
@@ -2977,7 +2977,7 @@ Camera Controls
 
 Playing a bit with improved a little bit.
 
-![me2.png](assets/common_files/obs_article/me2.png)
+![me2.png](/assets/common_files/obs_article/me2.png)
 
 But stillnowhere near a good enough quality imo.
 
