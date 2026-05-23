@@ -2,6 +2,8 @@
 
 On `Sun May 17 21:35:37 CEST 2026`, I decided it was time to start a YouTube channel to promote my articles.
 
+Here is the link: [https://www.youtube.com/@control-room-11](https://www.youtube.com/@control-room-11)
+
 I already had a (very) messy YouTube experience.
 
 I was absolutely brainwashed by the LukeSmith Wave at the time.
