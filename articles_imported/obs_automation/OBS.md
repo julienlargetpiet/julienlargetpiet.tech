@@ -1,22 +1,24 @@
 
 
-On this `dim. 17 mai 2026 21:35:37 CEST`, it was time for me to start a YouTube Channel in the goal to promote my articles.
+On `Sun May 17 21:35:37 CEST 2026`, I decided it was time to start a YouTube channel to promote my articles.
 
 I already had a (very) messy YouTube experience.
 
-I was absolutely braiwashed by the LukeSmith Wave at the time.
+I was absolutely brainwashed by the LukeSmith Wave at the time.
 
-![lukewave.jpg](assets/common_files/obs_article/lukewave.jpg)
+![lukewave.png](assets/common_files/obs_article/lukewave.png)
 
 With my Patched DWM ( larbs config for the initiated ;) ).
 
-Just plugged an ECO+ webcam on USB 2.0 and of course without tweaking the firmware settings to make the image looks good.
+I had just plugged a cheap webcam into USB 2.0, without tweaking any firmware-level settings to make the image look decent.
 
 In this article i will share the evolution of my setup across the ages as a practical guide so you can reproduce and understand each confs according to your needs.
 
-It will be very video creator on Lunux system oriented and beginner friendly.
+This article is aimed at beginner Linux users who want to build a simple but controllable video-creator setup.
 
 ## `FFmpeg` CLI - Practical use
+
+My first “scene system” was not OBS. It was DWM. My webcam was just another window, placed manually in the top-right corner.
 
 To record my videos, at first i used `FFmpeg`.
 
@@ -88,7 +90,7 @@ Let's describe what is going on here.
 
 ```
 
-First, what's `x11grab`, looks like an external programm with its own args.
+First, what's `x11grab`, looks like an external program with its own args.
 
 Indeed.
 
@@ -116,11 +118,11 @@ You get it right, it grabs the whole screen, there is no concept of special wind
 
 But in this case this is exactly what i wanted.
 
-DWM was my tilig window manager but also my OBS scenes dashboard in this case.
+DWM was my tiling window manager but also my OBS scenes dashboard in this case.
 
-For example my webacam was literally a visible window i set at the top-right.
+For example my webcam was literally a visible window i set at the top-right.
 
-![dwm_example_webcam.jpg](assets/common_files/obs_article/dwm_example_webcam.jpg)
+![dwm_example_webcam.png](assets/common_files/obs_article/dwm_example_webcam.png)
 
 `$DISPLAY` is usually something like:
 
@@ -219,11 +221,11 @@ R3 B4 G4 R4
 
 ```
 
-But for hardware decoding the memory oriented un-optimized format that is `bgr0` is nicer because it is divisible by 2 and better handles with SIMD instruction set for example.
+`bgr0` uses 4 bytes per pixel, which is wasteful in storage but convenient in memory: each pixel starts at a 4-byte boundary, making addressing and many CPU operations simpler than tightly packed 3-byte pixels like `bgr24`.
 
 So now we got `32 bits` per pixel, `2073600 pixels` per frame and `30 frames` per second.
 
-Then the raw framerate is `32 * 2073600 * 30 = 1990656000 bits` -> `1.99GB per second`.
+Then the raw framerate is `32 * 2073600 * 30 = 1990656000 bits` -> `1.99GBits per second`.
 
 That is why we need a video compression algorithm like `H.264` like we'll see.
 
@@ -289,7 +291,7 @@ Sets the quality target. Lower means better quality and larger files:
 
 So if i set it to `18` with `-preset veryfast` and the video is long, i will have a heavy video file.
 
-Especially if there are a lot of moovements, because `H.264` represents pixels difference between frames -> moovements -> **temporal compression**.
+Especially if there are a lot of movements, because `H.264` represents pixels difference between frames -> movements -> **temporal compression**.
 
 Because `H.264` does not usually store every frame as a full independent image. It tries to exploit the fact that most video frames are similar to nearby frames.
 
@@ -339,7 +341,7 @@ So let's see its performance, we will just record a video with the same settings
 
 ```
 
-ffmpeg -f x11grab -framerate 30 -video_size 190x1080 -i "$DISPLAY" -c:v libx264 -preset veryfast -crf 23 vid.mkv
+ffmpeg -f x11grab -framerate 30 -video_size 1920x1080 -i "$DISPLAY" -c:v libx264 -preset veryfast -crf 23 vid.mkv
 
 ```
 
@@ -365,11 +367,11 @@ And now how much it weighs ?
 
 ```
 
-So the copressed video bitrate is at `217 683 / 9.83 = 22144 bytes per second = 177158 bits per second` instead of raw uncompressed which is at `1.99GB` -> That is a `11232.91` weigh decrease !
+So the compressed video bitrate is at `217 683 / 9.83 = 22144 bytes per second = 177158 bits per second` instead of raw uncompressed which is at `1.99GBits` -> That is a `11232.91` weigh decrease !
 
-But in fact i just filmed a little video with pratically no moovements, this is why this is so impressive.
+But in fact i just filmed a little video with pratically no movements, this is why this is so impressive.
 
-And also with `FFmpeg` you can see the bitrate varies on the fly according to the moovements of your video.
+And also with `FFmpeg` you can see the bitrate varies on the fly according to the movements of your video.
 
 ```
 
@@ -393,7 +395,7 @@ Now, the audio.
 
 ```
 
-Ok, first you imediatly get what does `-i` mean, of course that's the input.
+Ok, first you immediatly get what does `-i` mean, of course that's the input.
 
 But in fact, when i plugged my mic, i did not know its name on the Linux system.
 
@@ -573,7 +575,7 @@ And yess, `PipeWire` covers a much wider surface:
 - sandboxed app media access
 - Wayland-compatible screen sharing
 
-**So our FFmpeg command is perfectly fone and better for our use case (directly comunicating with `x11grab`, because that is what we want -> sharing the whole screen) **
+**So our FFmpeg command is perfectly fine and better for our use case (directly communicating with `x11grab`, because that is what we want -> sharing the whole screen) **
 
 ```bash
 
@@ -643,13 +645,25 @@ For example this `s16le`:
 
 ```
 
-- `0x12` -> low (address 0)
+In `little-endian` memory, it is stored as:
 
-- `0x34` -> high (adress 1)
+```
 
-In `big-endian` encoding memory we read it as value at adress 0, then value at address 1.
+address 0: 0x34  /* low byte */
+address 1: 0x12  /* high byte */
 
-In little-endian that is the contrary, so we got `34` and the `12`.
+```
+
+So visually `0x3412`.
+
+In `big-endian` memory, it would be stored in the opposite order:
+
+```
+
+address 0: 0x12  /* high byte */
+address 1: 0x34  /* low byte */
+
+```
 
 Inside each byte, the bit order is absolutely not reversed.
 
@@ -659,7 +673,7 @@ We got one channel (my mic is mono 1 channel -> `1ch`) and in ffmpeg we explicit
 
 So we got `1 * 48000 * 16 = 768000 bits` => `768 kbits per second`
 
-Nowhere near the raw video bitrate at `1.99GB per second` but still we can optimize the storage by using audio codec like `aac` which uses a lossy compression algorithm we'll discuss.
+Nowhere near the raw video bitrate at `1.99GBits per second` but still we can optimize the storage by using audio codec like `aac` which uses a lossy compression algorithm we'll discuss.
 
 ### Audio encoding
 
@@ -677,7 +691,7 @@ What does `acc`?
 
 First the data stream is received in `PCM` format, it means raw amplitude.
 
-So at a regualr time interval it will analyze the frequencies that appear in the block of samples.
+So at a regular time interval it will analyze the frequencies that appear in the block of samples.
 
 What i mean by that is that it will basically perform a Fourier Transform, to compute the frequencies that appeared at a certain time (the current block of samples).
 
@@ -685,13 +699,13 @@ Then because human hearing is frequency based, it will compress certain frequenc
 
 And the compression level is in fact very accurate because here we explicitely tell that we want a bitrate of `160 kbits per second`, so in this case just `160 000 / 768 000 = 4.8` times smaller -> stil good optimizations.
 
-So contrary to `H.264`, here we have **total** control over the compression data size.
+Here we have a much more direct bitrate target than with video encoding: `-b:a 160k` tells the AAC encoder to aim around `160 kbit/s`.
 
 ## OBS
 
 You get it right, animations and overlays controled in real time are basically impossible in `FFmpeg`, it is just not the right tool for that.
 
-And i do not want my Desktop Environment being a mess with a tons of floating windonw everywhere to mimic an external contrled overlay flow lol.
+And i do not want my Desktop Environment being a mess with a tons of floating window everywhere to mimic an external contrled overlay flow lol.
 
 So i switched to `OBS`.
 
@@ -732,7 +746,7 @@ So basically to crop my webcam I used this `PNG` created via `convert`.
 
 Then go to filters of the webcam source V4L2 (right click on it) -> image blend.
 
-![move.jpg](assets/common_files/obs_article/filter1.png)
+![filter1.png](assets/common_files/obs_article/filter1.png)
 
 I created 2 scenes, one webcam-focues and another screen-focused (XSHM video source).
 
@@ -754,7 +768,7 @@ move-transition-3.2.1-x86_64-linux-gnu.deb
 
 ```
 
-Hoow a `.deb`, nice now i just install it via `apt`.
+Ho a `.deb`, nice now i just install it via `apt`.
 
 ```bash
 
@@ -766,7 +780,7 @@ The I (re)start `obs`.
 
 And in the Scene-Transition part, i see the `move` transition.
 
-![move.jpg](assets/common_files/obs_article/move.png)
+![move.png](assets/common_files/obs_article/move.png)
 
 ### OBS HTML and CSS Animations
 
@@ -956,7 +970,7 @@ The key element is:
     inset 0 0 16px rgba(35, 216, 219, 0.05);
 
   position: relative;
-  overflow: hidden; /* elements or part of elements inside this container that exceed contaner space go cutted off */
+  overflow: hidden; /* elements or part of elements inside this container that exceed contaner space go cut off */
 }
 
 ```
@@ -976,7 +990,7 @@ Example, the normal document flow with default position value -> `static`:
 
 Will output:
 
-![test_html2.jpg](assets/common_files/obs_article/test_html2.png)
+![test_html2.png](assets/common_files/obs_article/test_html2.png)
 
 But, look what hapen when the child position is absolute. 
 
@@ -989,7 +1003,7 @@ But, look what hapen when the child position is absolute.
 
 ```
 
-![test_html2.jpg](assets/common_files/obs_article/test_html2b.png)
+![test_html2b.png](assets/common_files/obs_article/test_html2b.png)
 
 Yess, "A" and "B" are merged.
 
@@ -1012,7 +1026,7 @@ First one:
 
 ```
 
-![test_html2b.jpg](assets/common_files/obs_article/test_html2b.png)
+![test_html2b.png](assets/common_files/obs_article/test_html2b.png)
 
 Same output.
 
@@ -1029,7 +1043,7 @@ But now:
 
 ```
 
-![test_html2c.jpg](assets/common_files/obs_article/test_html2c.png)
+![test_html2c.png](assets/common_files/obs_article/test_html2c.png)
 
 Yess, not merged !
 
@@ -1056,7 +1070,7 @@ That is why this:
 ```
 Will output that:
 
-![test_html4.jpg](assets/common_files/obs_article/test_html4.png)
+![test_html4.png](assets/common_files/obs_article/test_html4.png)
 
 ### The background
 
@@ -1416,7 +1430,7 @@ body {
 
   align-items: baseline;
 
-  margin: 9px 0; /* inner space between cell and its content */
+  margin: 9px 0; /* vertical space between cell and its content */
   line-height: 1.22; /* font-size * 1.22 */
 
   opacity: 0;
@@ -1639,7 +1653,7 @@ So first the `.panel`:
 
 First concerning the dimesnion, we provided `width` but not the `height`, so its height is determined by the content we put inside the element that inherits from this class plus the top and bottom padding.
 
-Also, a small word on `padding` synthax.
+Also, a small word on `padding` syntax.
 
 
 - `padding x` -> means all side
@@ -1653,7 +1667,7 @@ Also, a small word on `padding` synthax.
 
 Now, what does `overflow: hidden;` mean ?
 
--> All things that are outside the container get cutted off 
+-> All things that are outside the container get cut off 
 
 And what about the shadow thing ?
 
@@ -1685,7 +1699,7 @@ A
 
 ```
 
-![boxshadow1.jpg](assets/common_files/obs_article/boxshadow1.png)
+![boxshadow1.png](assets/common_files/obs_article/boxshadow1.png)
 
 
 We got the same concept here:
@@ -1708,7 +1722,7 @@ B
 
 ```
 
-![boxshadow2.jpg](assets/common_files/obs_article/boxshadow2.png)
+![boxshadow2.png](assets/common_files/obs_article/boxshadow2.png)
 
 
 Then both combined:
@@ -1721,7 +1735,7 @@ B
 
 ```
 
-![boxshadow3.jpg](assets/common_files/obs_article/boxshadow3.png)
+![boxshadow3.png](assets/common_files/obs_article/boxshadow3.png)
 
 
 Now, the animation:
@@ -1759,7 +1773,7 @@ If we had put `linear` instead of `ease` it wuld have been.
 
 But, what does `ease` mean ?
 
--> accelerate slowly, accelerate in the middle and slow near the end (its speed over time can be roughly represented as a `-x^2`)
+-> accelerate slowly, accelerate in the middle and slow near the end
 
 Now, pseudo-element `.panel::first`:
 
@@ -1808,12 +1822,12 @@ And look at the shade as background color, yess it's a **color pattern** from `t
 
 Where we have the same color rectangle (`1px` height and has te `with` of `.panel`) repeating each `7nth px`.
 
-And between those same color rectangle, we have just raw transparancy `1px -> 6px`.
+And between those same color rectangle, we have just raw transparency `1px -> 6px`.
 
-`pointer-event: none;` is absolutely unecessary here because it just tells te browser to make this pseudo element not intercept the mouse-click, so in this case just the `.panel` element intercepts them.
+`pointer-event: none;` is absolutely unnecessary here because it just tells te browser to make this pseudo element not intercept the mouse-click, so in this case just the `.panel` element intercepts them.
 
 
-But in fact because this separation between the class and its pseudo-element is just a way to make the abstraction more explicit, like we are drawing the pseudo-element background on top of the class element background, and we control each of thei setting in term of colors, transparancy...
+But in fact because this separation between the class and its pseudo-element is just a way to make the abstraction more explicit, like we are drawing the pseudo-element background on top of the class element background, and we control each of thei setting in term of colors, transparency...
 
 But in fact for this simple use case, we can absolutely merge them:
 
@@ -1859,7 +1873,7 @@ But in fact for this simple use case, we can absolutely merge them:
 
 ```
 
-Because the psedo-element transparancy was `0.45`, so the transparancy of the background color is multipied by `0.45`.
+Because the psedo-element transparency was `0.45`, so the transparency of the background color is multipied by `0.45`.
 
 In not so much modern browsers, maybe that the `calc` may not be supported, so just precompute them and hardcode the result.
 
@@ -1905,7 +1919,7 @@ Example from th real file:
 
 ```
 
-![flex1.jpg](assets/common_files/obs_article/flex1.png)
+![flex1.png](assets/common_files/obs_article/flex1.png)
 
 If we had set `flex-direction: column;` it would have placed the direct children of `.header` vertically, one below the other.
 
@@ -1921,7 +1935,7 @@ Example of what it could have been:
 
 ```
 
-![flex2.jpg](assets/common_files/obs_article/flex2.png)
+![flex2.png](assets/common_files/obs_article/flex2.png)
 
 And we also control how the aligment is performed with `align-items: center;`
 
@@ -2001,7 +2015,7 @@ Then the `.line`.
 
   align-items: baseline;
 
-  margin: 9px 0; /* inner bottom and top space between cell and its content */
+  margin: 9px 0; /* vertical bottom and top space between cell and its content */
   line-height: 1.22; /* font-size * 1.22 */
 
   opacity: 0;
@@ -2517,7 +2531,7 @@ If the character is less than 2, then it just prepends `"0"`.
 
 ## How do i automate my OBS records ?
 
-First, OBS has a websockt protocol.
+First, OBS has a websocket protocol.
 
 So in veeeery brief:
 
@@ -2542,7 +2556,7 @@ server can send messages anytime
 
 ```
 
-But for us it means that we can make a programm that sends certain requests to OBS.
+But for us it means that we can make a program that sends certain requests to OBS.
 
 Also this is good to keep in mind that we can view OBS as a **state machine**.
 
@@ -2575,7 +2589,7 @@ pip install obsws-python
 
 ```
 
-Also, i want to get notfied when i do an action, so i must install `notify-send`.
+Also, i want to get notified when i do an action, so i must install `notify-send`.
 
 ```bash
 
@@ -2651,7 +2665,7 @@ I just have to make it executable before linking it to a keyboard shortcut.
 
 ```bash
 
-> sudo chmod +x .local/bin/obs-record-start
+> chmod +x .local/bin/obs-record-start
 
 ```
 
@@ -2663,7 +2677,7 @@ bindsym $mod+Shift+r exec ~/.local/bin/obs-record-start
 
 ```
 
-To bind a keyboard combination shortcut to the execution of this programm.
+To bind a keyboard combination shortcut to the execution of this program.
 
 
 ### Stop it 
@@ -3008,6 +3022,40 @@ And the ip and port are displayed on the droidcam app.
 Note that to connect, you have to launch your droidcam app on your phone.
 
 And, now much nicer quality.
+
+### Script that up
+
+Of course we can make it a script and bind it.
+
+```bash
+
+#!/usr/bin/env bash
+
+IP="192.168.1.18"
+PORT="4747"
+
+notify-send "Starting DroidCam" "IP: $IP PORT: $PORT" -t 1000 -u normal
+
+droidcam-cli -v "$IP" "$PORT"
+
+```
+
+Because we can only get if the `droidcam-cli` command has succeded when it stopes being used, then we preventvely send a success message.
+
+Same for stopping it:
+
+```bash
+
+#!/usr/bin/env bash
+
+IP="192.168.1.18"
+PORT="4747"
+
+killall droidcam-cli
+
+notify-send "Stopping DroidCam" "IP: $IP PORT: $PORT" -t 1000 -u normal
+
+```
 
 ## Conclusion
 
