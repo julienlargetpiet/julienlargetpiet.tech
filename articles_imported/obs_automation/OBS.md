@@ -2531,6 +2531,361 @@ function pad2(n) {
 
 If the character is less than 2, then it just prepends `"0"`.
 
+And finally my intro:
+
+```css
+
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Control Room Intro</title>
+
+  <style>
+
+    :root {
+        --start-logo: -140px;
+        --end-logo: 620px;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      height: 1080;
+      width: 1920;
+
+      background:
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.10), transparent 35%),
+        linear-gradient(90deg, rgba(7, 17, 31, 0.92), rgba(18, 65, 115, 0.72)),
+        rgba(0, 0, 0, 0.25);
+
+    }
+
+    .intro {
+      position: relative;
+      width: 740px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 28px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(60px);
+    }
+
+    .text {
+      font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace;
+      font-size: 86px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: white;
+      text-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
+
+      clip-path: inset(0 100% 0 0);
+      animation: reveal-text 2s ease-out forwards;
+    }
+
+    .logo {
+      position: absolute;
+
+      width: 120px;
+      height: 120px;
+
+      object-fit: contain;
+
+      transform: translateX(var(--start-logo));
+      animation: move-logo 2s ease-out forwards;
+      z-index: 2;
+
+      border-radius: 50%;
+
+      box-shadow:
+        drop-shadow(0 0 18px rgba(255, 255, 255, 0.35))
+        drop-shadow(0 16px 28px rgba(0, 0, 0, 0.45));
+    }
+
+    .logo-glow {
+      position: absolute;
+
+      width: 120px;
+      height: 150px;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.22);
+
+      filter: blur(24px);
+
+      transform: translateX(var(--start-logo));
+      animation: move-glow 2s ease-out forwards;
+      z-index: 1;
+    }
+
+    @keyframes move-logo {
+      from {
+        transform: translateX(var(--start-logo));
+      }
+
+      to {
+        transform: translateX(var(--end-logo));
+      }
+    }
+
+    @keyframes move-glow {
+      from {
+        transform: translateX(var(--start-logo));
+      }
+
+      to {
+        transform: translateX(var(--end-logo));
+      }
+    }
+
+    @keyframes reveal-text {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
+
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="intro">
+    <div class="logo-glow"></div>
+    <img class="logo" src="logo2.png" alt="Logo">
+    <div class="text">Control Room</div>
+  </div>
+</body>
+</html>
+
+```
+
+There are quite new CSS properties here:
+
+First in the Intro:
+
+```css
+
+.intro {
+  position: relative;
+  width: 740px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(60px);
+}
+
+```
+
+And then used as:
+
+```html
+
+<div class="intro">
+  <div class="logo-glow"></div>
+  <img class="logo" src="logo2.png" alt="Logo">
+  <div class="text">Control Room</div>
+</div>
+
+```
+
+The `backdrop-filter` is a propery that only applies to the element behind the current element, in this case the background but only in the element area it is called from, this is why it perfectly respects the `.intro` dimensions.
+
+We apply a blur to it.
+
+At first i thought it meant to take a `10px * 10px` pixel square, compute the mean of the color value inside that square and apply this color to evry pixel inside that square.
+
+But in fact no, we have the intuition that the blur would be much more like a mosaic.
+
+Conceptually, the browser does something close to this:
+
+**For each output pixel, it looks at neighboring pixels around it and computes a weighted mix.**
+
+More precisely the neighboors pixel are chosen in a circle with radius you precise, in this case `10px`.
+
+But here the blur is not uniform but gaussian.
+
+Meaning that in the area of the `.intro` element, the farther pixel from its center matters less than the center pixels.
+
+Now, the `.body`:
+
+```css
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  height: 1080;
+  width: 1920;
+
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.10), transparent 35%),
+    linear-gradient(90deg, rgba(7, 17, 31, 0.92), rgba(18, 65, 115, 0.72)),
+    rgba(0, 0, 0, 0.25);
+
+}
+
+```
+
+Basicaly the `display: grid;` in the case where `.body` has only one children (a `.intro` element), then the `.body` can be viewed as one big grid cell and the `.intro` element is centered because of `place-items: center;`.
+
+We also encounter new concepts in `.text`:
+
+```css
+
+.text {
+  font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace;
+  font-size: 86px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  color: white;
+  text-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
+
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-text 2s ease-out forwards;
+}
+
+```
+
+`clip-path` defines the visible area from the element.
+
+Here it is defined as a rectangle `indet(top-clip right-clip bottom-clip left-clip)` (`padding` argument like order).
+
+So here the initial element has no visible region, because all is clipped from the right.
+
+That is only when we start the animation `reveal-text`, that it will become progressively visible.
+
+The animation:
+
+```css
+
+@keyframes reveal-text {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+```
+
+And now for the `.logo`:
+
+```css
+
+.logo {
+  position: absolute;
+
+  width: 120px;
+  height: 120px;
+
+  object-fit: contain;
+
+  transform: translateX(var(--start-logo));
+  animation: move-logo 2s ease-out forwards;
+  z-index: 2;
+
+  border-radius: 50%;
+
+  box-shadow:
+    drop-shadow(0 0 18px rgba(255, 255, 255, 0.35))
+    drop-shadow(0 16px 28px rgba(0, 0, 0, 0.45));
+}
+
+```
+
+Here, the `object-fit: contain;` if for `<img>` tag.
+
+Meaning it must keep the initial image ratio and resize it (if the container dimensions are not exactly the image dimensions) **WITHOUT** cropping the image.
+
+Note that the initial position relative to its parent if of course `top: 0; right: 0; bottom: 0; left: 0;`, but we apply a X translation by `--start-logo = -140px`, so it visually starts at `top: 0; right: -140px; bottom: 0; left: 0;`.
+
+And the animation:
+
+```css
+
+@keyframes move-logo {
+  from {
+    transform: translateX(var(--start-logo));
+  }
+
+  to {
+    transform: translateX(var(--end-logo));
+  }
+}
+
+```
+
+Will move from left to right `--end-logo = 620px` the image.
+
+We use `ease-out` -> animation starts fast and slow near the end.
+
+And we go furher, we add a glow to the logo with a light opacity white `rgba(255, 255, 255, 0.22)`.
+
+```css
+
+.logo-glow {
+  position: absolute;
+
+  width: 120px;
+  height: 150px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.22);
+
+  filter: blur(24px);
+
+  transform: translateX(var(--start-logo));
+  animation: move-glow 2s ease-out forwards;
+  z-index: 1;
+}
+
+```
+
+And same animation values:
+
+```css
+
+@keyframes move-glow {
+  from {
+    transform: translateX(var(--start-logo));
+  }
+
+  to {
+    transform: translateX(var(--end-logo));
+  }
+}
+
+```
+
+But wait is the glow behind or above the logo ?
+
+That's where `z-index` comes.
+
+Here, because the `z-index` of the logo is `2`, which is higher than the `z-index` of the glow (`1`), so the `.logo` element is painted above the glow.
+
 ## How do i automate my OBS records ?
 
 First, OBS has a websocket protocol.
@@ -2875,6 +3230,16 @@ except Exception as e:
         str(e)
     ])
     sys.exit(1)
+
+```
+
+And then here are the keyboard shortcuts defined in my I3 configuration:
+
+```
+
+bindsym $mod+F1 exec ~/.local/bin/obs-scene "Scène"
+bindsym $mod+F2 exec ~/.local/bin/obs-scene "Webcam"
+bindsym $mod+F3 exec ~/.local/bin/obs-scene "Intro"
 
 ```
 
