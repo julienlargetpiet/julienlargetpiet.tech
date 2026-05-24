@@ -577,7 +577,7 @@ And yess, `PipeWire` covers a much wider surface:
 - sandboxed app media access
 - Wayland-compatible screen sharing
 
-**So our FFmpeg command is perfectly fine and better for our use case (directly communicating with `x11grab`, because that is what we want -> sharing the whole screen) **
+**So our FFmpeg command is perfectly fine and better for our use case (directly communicating with `x11grab`, because that is what we want -> sharing the whole screen)**
 
 ```bash
 
