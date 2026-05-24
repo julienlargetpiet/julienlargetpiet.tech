@@ -2546,6 +2546,7 @@ And finally my intro:
     :root {
         --start-logo: -140px;
         --end-logo: 620px;
+        --animation-duration: 0.7s;
     }
 
     body {
@@ -2588,7 +2589,7 @@ And finally my intro:
       text-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
 
       clip-path: inset(0 100% 0 0);
-      animation: reveal-text 2s ease-out forwards;
+      animation: reveal-text var(--animation-duration) ease-out forwards;
     }
 
     .logo {
@@ -2600,7 +2601,7 @@ And finally my intro:
       object-fit: contain;
 
       transform: translateX(var(--start-logo));
-      animation: move-logo 2s ease-out forwards;
+      animation: move-logo var(--animation-duration) ease-out forwards;
       z-index: 2;
 
       border-radius: 50%;
@@ -2623,7 +2624,7 @@ And finally my intro:
       filter: blur(24px);
 
       transform: translateX(var(--start-logo));
-      animation: move-glow 2s ease-out forwards;
+      animation: move-glow var(--animation-duration) ease-out forwards;
       z-index: 1;
     }
 
