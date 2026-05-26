@@ -394,7 +394,7 @@ Now, `convert` can work for cutting yourself out only if the background is unifo
 
 Example with this cat picture:
 
-![cat1.jpg](minia_maker/cat1.jpg)
+![cat1.jpg](/assets/common_files/minia_maker/cat1.jpg)
 
 ```bash
 
@@ -404,7 +404,7 @@ Example with this cat picture:
 
 And we got:
 
-![cat2.png](minia_maker/cat2.png)
+![cat2.png](/assets/common_files/minia_maker/cat2.png)
 
 Now let's dissect the command.
 
@@ -458,7 +458,7 @@ That is just Pythagorean Theorem extended to 3 dimensions.
 
 Like take a cube for example, you know the sides (A, B, C) are 1 meters long for example and you want to compute the length of the diagonal between the 2 most distant apex. (E)
 
-![cube.jpg](minia_maker/cube.jpg)
+![cube.jpg](/assets/common_files/minia_maker/cube.jpg)
 
 So you first compute the length of a diagonal that is shared between 2 dimensons (D), which is in fact same length as (D').
 
@@ -498,7 +498,7 @@ What i find funny about that is that order of diagonal computation does not matt
 
 So here:
 
-![pave.png](minia_maker/pave.png)
+![pave.png](/assets/common_files/minia_maker/pave.png)
 
 We can say that (GA) is `(FE)^2 + DELTA_1^2` which is not intuitive at all.
 
@@ -540,7 +540,7 @@ For that we will use:
 
 It produces something like:
 
-![cat_halo1.png](minia_maker/cat_halo1.png)
+![cat_halo1.png](/assets/common_files/minia_maker/cat_halo1.png)
 
 Because it takes the initial PNG `cat2.png`, and enters in a sub-pipeline we define between parenthesis `(` and `)` -> to make them interpretable by `imagemagick` and not bash we escape them with `\`.
 
@@ -560,11 +560,11 @@ And 12 is the blur radius/sigma-like value used to spread the shadow. (shadow di
 
 If we increase it to `100` for example:
 
-![cat_halo1B.png](minia_maker/cat_halo1B.png)
+![cat_halo1B.png](/assets/common_files/minia_maker/cat_halo1B.png)
 
 Now when we go outside of the sub-pipeline, the image that is generated is just a cyan shadow:
 
-![cat_halo2.png](minia_maker/cat_halo2.png)
+![cat_halo2.png](/assets/common_files/minia_maker/cat_halo2.png)
 
 And in `imagemagick` we reason in term of a stack of images, so at this point we got this image stack:
 
@@ -717,7 +717,7 @@ The logo starts at 40 pixels from the left and 40 pixels from the top.
 
 For example, this outputs:
 
-![thumbnail.png](minia_maker/thumbnail.png)
+![thumbnail.png](/assets/common_files/minia_maker/thumbnail.png)
 
 ## All we need is `imagemagick` 
 
@@ -788,7 +788,7 @@ convert -size 1920x1080 xc:none \
 
 It outputs that image:
 
-![text_img.png](minia_maker/text_img.png)
+![text_img.png](/assets/common_files/minia_maker/text_img.png)
 
 This creates a transparent image of dimensions `1920x1080`:
 
