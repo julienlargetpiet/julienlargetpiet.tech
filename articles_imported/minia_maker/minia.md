@@ -719,6 +719,23 @@ For example, this outputs:
 
 ![thumbnail.png](/assets/common_files/minia_maker/thumbnail.png)
 
+With this title:
+
+```
+
+Cartesian product
+     Deep Dive
+
+```
+
+OR 
+
+```
+
+Cartesian product\n     Deep Dive
+
+```
+
 ## All we need is `imagemagick` 
 
 But we can also translate this exact operation with `imagemagick` to stay in its ecosystem.
