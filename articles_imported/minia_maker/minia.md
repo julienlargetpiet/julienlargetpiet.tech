@@ -240,7 +240,7 @@ dstPath := filepath.Join(uploadDir, finalName)
 
 ```
 
--> "uploads/filename_SECONDSSINCE1STJANUARY1970"
+"uploads/filename_SECS1STJANUARY1970"
 
 6. Creating the destination file.
 
