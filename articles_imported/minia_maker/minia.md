@@ -5,11 +5,9 @@ Since my face will be shown on my YouTube channel, i've studied YouTubers thumbn
 
 ## Anatomy of YouTube Thumbnails
 
-And i came to the following conclusion:
+And I came to the following conclusion:
 
 **The composition is simple -> arround 3 or 4 elements**
-
-Soper thumbnals we got:
 
 1. The Background -> minimalistic enough, just one color tone
 
