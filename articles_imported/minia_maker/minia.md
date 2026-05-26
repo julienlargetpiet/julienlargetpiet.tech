@@ -1,7 +1,7 @@
 
 Following up on my YouTube channel creation from the previous article, on Mon. 25 May 2026 14:02:06 CEST, I wanted to write a program to automate the generation of my thumbnails.
 
-Since my face will be shown on my YouTube channel, i've studied YouTubers thumbnails that have their face visible, such as [https://www.youtube.com/@LowLevelTV/videos](https://www.youtube.com/@LowLevelTV/videos).
+Since my face will be shown on my YouTube channel, i've studied YouTubers thumbnails that have their face visible, such as [LowLevel](https://www.youtube.com/@LowLevelTV/videos).
 
 ## Anatomy of YouTube Thumbnails
 
