@@ -32,4 +32,7 @@ So if, within two months, we do not receive any response from either the hosting
 
 Also, for any content indexed by Google, we can click on “Remove result,” add the personal information found in the search result, and ask Google to de-index it. It may take a while, though.
 
+PS: It appears that it was a company that shared my Cv with another one during an application process, so **be carefull to what you accept especially on the hurry**.
+
+
 
