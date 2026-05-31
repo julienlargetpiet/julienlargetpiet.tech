@@ -1,32 +1,31 @@
-<div class="code-panel">
-  <div class="code-panel-header">
-    <span>Same implementation in two languages</span>
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="rust">Rust</button>
+    <button class="code-tab" data-tab="cpp">C++</button>
   </div>
 
-  <div class="code-panel-grid">
-  <section class="code-panel-item">
-  <div class="code-panel-label">Rust</div>
+  <div class="code-tab-panel active" data-panel="rust">
 
 ```rust
 fn main() {
     println!("Hello");
 }
-    
 ```
 
+  </div>
 
-  </section>
-  <section class="code-panel-item">
-  <div class="code-panel-label">C++</div>
+  <div class="code-tab-panel" data-panel="cpp">
 
- ```cpp
- #include &lt;iostream&gt;
+```cpp
+#include &lt;iostream&gt;
 
 int main() {
     std::cout &lt;&lt; "Hello\n";
 }
 ```
 
-  </section>
   </div>
 </div>
+
+
+
