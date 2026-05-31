@@ -15,7 +15,6 @@ fn main() {
 ```
 
 
-  </div>
   </section>
   <section class="code-panel-item">
   <div class="code-panel-label">C++</div>
@@ -28,7 +27,6 @@ int main() {
 }
 ```
 
-  </div>
   </section>
   </div>
 </div>
