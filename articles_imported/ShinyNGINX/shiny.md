@@ -1,31 +1,1886 @@
+
+Recently, I wanted to create an analytical dashboard for the visits on this blog, entirely server-side.
+
+This means reading the `NGINX` `/var/log/statix.log` file, reducing bot noise as precisely as possible, and outputting useful visualizations.
+
+I know that some libraries, like `Streamlit` in Python, allow this kind of analysis, but at the time, I was way more comfortable with R.
+
+My first version was absolutely awful in terms of performance, not only because I used `dplyr`, which is a good dataframe engine and noticeably better than base R’s dataframe engine, but also because of a completely awful execution order.
+
+In this article, I will not only show you the exact performance difference between the `dplyr` and `data.table` implementations, but also show you how much execution order matters in a real data pipeline.
+
+One important distinction in this benchmark is the difference between data ingestion and data manipulation. Ingestion is the part where the raw log file is parsed into R, using tools such as `readr::read_tsv()`, `vroom::vroom()`, or `data.table::fread()`. Data manipulation is the part where the loaded data is filtered, grouped, joined, and summarised.
+
+This distinction matters because a pipeline can be fast at reading but slower once real transformations start, or the opposite. So I will benchmark both the ingestion layer and the actual transformation layer separately.
+
+So we will fairly benchmark `dplyr` and `data.table` manipulation functions in data manipulatin steps and `readr`, `vroom` and `data.table` ingestion functions in the ingestion step.
+
+But also the transition step, which is important, especially for lazy parsing.
+
+## What are we even talking about
+
+We define the log format in `/etc/nginx/nginx.conf`, in the `http {...}` block as a tsv:
+
+```
+
+log_format statix_tsv '$remote_addr\t'
+                      '$msec\t'
+                      '$uri\t'
+                      '$status\t'
+                      '$http_user_agent';
+```
+
+And i tell my blog to use this format for the log in the associated `server {...}` block:
+
+```
+
+access_log /var/log/nginx/statix.log statix_tsv;
+
+```
+
+So we got all columns we need to perform our bot filtering heuristics and analysis.
+
+
+- `$remote_addr` -> IPV4 address
+
+- `$msec` -> seconds since 1st January 1970 (Unix timestamp)
+
+- `uri` -> The targeted URL
+
+- `status` -> Status of the request, basicaly we will only filtr on success (code: 200)
+
+- `$http_user_agent` -> The user agent sent by the client. It is a text string that usually identifies the browser, operating system, device, or bot making the request
+
+Fields are separated by a tab character `\\t` -> TSV.
+
+## RShiny architecture
+
+In a typical RShiny application, you have 3 files.
+
+- `global.R` -> set up the global ressources that can be accessible from anywhere in the application (variables, functions...)
+
+- `ui.R` -> describe in R the layouts and send input values to the server / recieves computed objects from the server and render them
+
+- `server.R` -> Runs for each session / is charged to compute valies according to `global.R` ressources and `ui.R` input values
+
+### Reactive variables
+
+We have this code in `ui.R`:
+
+```r
+
+
+navset_tab(
+  nav_panel(
+    title = "Most Visited Pages",
+    page_sidebar(
+      title = "Main Dashboard",
+      sidebar = tagList(
+        selectInput(
+          inputId = "time_unit",
+          label = "Time Unit",
+          choices = c("h", "d", "w", "m", "y"),
+          selected = "h"
+        ),
+        numericInput(
+          inputId = "last_n",
+          label = "Last n units",
+          value = 72,
+          min = 1,
+          step = 1
+        ),
+        fileInput(
+          inputId = "upload_asn_mmdb",
+          label = "Upload GeoLite2-ASN.mmdb",
+          accept = c(".mmdb"),
+          multiple = FALSE
+        ),
+        fileInput(
+          inputId = "upload_city_mmdb",
+          label = "Upload GeoLite2-City.mmdb",
+          accept = c(".mmdb"),
+          multiple = FALSE
+        ),
+        uiOutput("mmdb_status")
+      ),
+
+      # KPI row + pie
+      layout_column_wrap(
+        width = 1/3,
+        value_box(title = "Total requests", value = textOutput("kpi_hits")),
+        value_box(title = "Unique IPs", value = textOutput("kpi_ips")),
+        value_box(title = "Unique pages", value = textOutput("kpi_pages")),
+        value_box(title = "Median Read Time", value = textOutput("kpi_med_readtime"))
+      ),
+
+      value_box(
+        title = NULL,
+        value = withSpinner(plotlyOutput("pie_chart"), type = 5, size = 1.3)
+      )
+    )
+  ),
+
+  nav_panel(
+    title = "WebPages Accross time",
+    value_box(
+      title = NULL,
+      value = withSpinner(plotlyOutput("graph"), type = 5, size = 1.3)
+    )
+  ),
+
+  nav_panel(
+    title = "Data Page",
+    card(
+      withSpinner(DTOutput("mytable"), type = 5, size = 1.0)
+    )
+  ),
+
+  nav_panel(
+    title = "ReadTime Page",
+    card(
+      withSpinner(DTOutput("read_time"), type = 5, size = 1.0)
+    )
+  ),
+
+  nav_panel(
+    title = "Geo Map",
+    card(
+      withSpinner(
+        leafletOutput("map", height = 650),
+        type = 5,
+        size = 1.2
+      )
+    )
+  )
+
+)
+
+```
+
+Nothing fancy, just 5 tabs, and on each tab we have a different dataframe visualized / displayed.
+
+But what i want you to think about is locate on the very first tab, here:
+
+```r
+
+selectInput(
+  inputId = "time_unit",
+  label = "Time Unit",
+  choices = c("h", "d", "w", "m", "y"),
+  selected = "h"
+),
+numericInput(
+  inputId = "last_n",
+  label = "Last n units",
+  value = 72,
+  min = 1,
+  step = 1
+),
+
+```
+
+Default values say we want to get the dashboard on the vists on the last 72 hours, but what hapen when i change the units or the number ?
+
+Of course visualizations will be obsolete.
+
+Then, the client will wai for the new ressoures to be computed once again since the beginning of the session from the server.
+
+For example KPIs:
+
+```r
+
+layout_column_wrap(
+  width = 1/3,
+  value_box(title = "Total requests", value = textOutput("kpi_hits")),
+  value_box(title = "Unique IPs", value = textOutput("kpi_ips")),
+  value_box(title = "Unique pages", value = textOutput("kpi_pages")),
+  value_box(title = "Median Read Time", value = textOutput("kpi_med_readtime"))
+),
+
+```
+
+Will respectively wait for the `"kpi_hits"`, `"kpi_ips"`, `"kpi_pages"` and `"kpi_med_readtime"` variable from the server.
+
+At the time we change inputs, a new request is made to `server.R` to recompute the reactive ressources according to the new inputs.
+
+A reactive ressource is defined in the server.
+
+This one for example is a reactive ressource:
+
+```r
+
+output$mytable <- renderDT({
+  df <- geo_enriched_data()
+  req(input$client_tz)
+
+  df[, date := format(
+                      lubridate::with_tz(date, tzone = input$client_tz), 
+                      "%Y-%m-%d %H:%M:%S"
+                     )
+  ]
+
+  data.table::setorder(df, -date)
+  df[, target := paste0(
+        '<a href=\"https://julienlargetpiet.tech', 
+        target,
+        '\" target=\"_blank\">',
+        target,
+        "</a>"
+      )
+  ]
+  datatable(
+      df[, .(country,
+             asn_org,
+             ip,
+             date,
+             target,
+             time_on_page
+            )
+      ],
+    options = list(
+      pageLength = 100,
+      scrollX = TRUE,
+      ordering = TRUE
+    ),
+    rownames = FALSE,
+    escape = FALSE
+  )
+
+})
+
+```
+
+It is used in he third tabs in the UI.
+
+And now we look at its dependency -> `geo_enriched_data()`.
+
+`geo_enriched_data` is not a function like the `()` can make us think of, but a call to recompute this variable.
+
+Now, we'll check on how it is computed / its definition.
+
+```r
+
+geo_enriched_data <- reactive({
+
+  t <- Sys.time()
+
+  df <- filtered_data()
+  req(nrow(df) > 0)
+
+  ips <- sort(unique(df$ip))
+
+  if (!identical(ips, last_ips())) {
+    geo_data <- lookup_ips(
+      ips,
+      db_path = geo_db_path
+    )
+
+    geo_cache_reactive(geo_data)
+    last_ips(ips)
+  }
+
+  geo <- geo_cache_reactive()
+
+  if (!is.null(geo)) {
+    df <- geo[df, on = "ip"]
+  }
+
+  log_step("GEO Enrichment", t, df)
+
+  df
+})
+
+```
+
+We see that its definition is wraped inside a `reactive()`, because it is a reactive ressource.
+
+Meaning it will read and its result will be cached.
+
+If one of the upstream reactive dependencies / node changes, the current reactive resource is marked as invalid. Then, the next time it is read, Shiny recomputes the invalidated part of the dependency graph, while unchanged reactive resources can still return their cached values.
+
+In this case, if `filtered_data` (a reactive ressource) was invalidated / recomputed before, then `geo_enriched_data` will be invalidated (cache not up to date) and the computation inside the `geo_enriched_data` will be run again when R will call `geo_enriched_data()`.
+
+Also lok at what i hve in the `filtered_data` definition:
+
+```r
+
+
+filtered_data <- reactive({
+
+  mmdb_bump()
+}
+
+```
+
+Meaning that it creates a dependency from a reactive variable called `mmdb_bump`.
+
+In fact that is a variable that tells when a MaxMindDB file is uploaded, so the IP locations and ASNs are updated:
+
+```r
+
+  observeEvent(input$upload_asn_mmdb, {
+    req(input$upload_asn_mmdb)
+  
+    src <- input$upload_asn_mmdb$datapath
+    dst <- asn_db_path
+  
+    ok <- file.copy(src, dst, overwrite = TRUE)
+    if (!ok) {
+      showNotification(paste("Failed to write:", dst), type = "error")
+      return()
+    }
+
+    clear_ip_caches()
+    geo_cache_reactive(NULL)
+    last_ips(character())
+
+    mmdb_bump(mmdb_bump() + 1)
+    
+    showNotification("ASN DB uploaded and installed.", type = "message")
+
+  })
+
+```
+
+That is just a dependency graph.
+
+### Limitations
+
+We do not want a live update of the logs in the dashboard.
+
+We just want that in each session / connnection to the dashboard, last connections since the last session to be taken in count.
+
+We can't interpolate the number of connections from the time interval of the analysis.
+
+Meaning that if we want to be sure to include all possible connections from the last `N` hours we need to read the entirety of the logs file for each session which is computationally expensive (to fit it in RAM and / or Cahches)
+
+But to limit the amount of rows we will parse, i have set a `logrotate` service that limits the current log file to `500MB`.
+
+Because each line length changes we can't infer on the total amount of connections we will be able to analyze at max.
+
+Neither on the maximum time interval, because oftenwe got a huge increase of connections in a short range of time (2 to one week for example) and then it come back to normal status.
+
+But in comon situations, those won't be a problem.
+
+From my experience, for example i can go as far as last 360 hours.
+
+## How i'll benchmark ?
+
+I'm gonna define this function:
+
+```r
+
+log_step <- function(name, start, df = NULL) {
+  elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
+
+  if (!is.null(df)) {
+    cat(sprintf("[filtered_data] %-25s %.4f sec | rows: %s\n",
+                name,
+                elapsed,
+                format(nrow(df), big.mark = " ")))
+  } else {
+    cat(sprintf("[filtered_data] %-25s %.4f sec\n",
+                name,
+                elapsed))
+  }
+}
+
+```
+
+And apply this pattern:
+
+```r
+
+t <- Sys.time()
+
+FUNCTION_CALL
+
+log_step("FUNCTION CALL 1", t, df)
+
+```
+
+The `data.table` and `dplyr` variant will be executed on the same log file, on the same machine.
+
+The log file is made of `725832` rows and it size is `124M`.
+
+The log file is available here if you want to reproduce the benchmark [logs.tsv](/assets/common_files/shiny_bench/logs.tsv)
+
+The execution time of each function is computed from the median of 9 runs.
+
+## Bots noise reducer
+
+The goal of this part is to remove bots on the fly from our final data without too much false positives and false negatives.
+
+### Reading the file
+
+In `global.R`, we define:
+
 <div class="code-tabs">
   <div class="code-tabs-header">
-    <button class="code-tab active" data-tab="rust">Rust</button>
-    <button class="code-tab" data-tab="cpp">C++</button>
+    <button class="code-tab active" data-tab="read1A">reader + dplyr</button>
+    <button class="code-tab" data-tab="read2A">vroom + dplyr</button>
+    <button class="code-tab" data-tab="read3A">fread + data.table</button>
+    <button class="code-tab" data-tab="read4A">vroom + data.table</button>
   </div>
 
-  <div class="code-tab-panel active" data-panel="rust">
+  <div class="code-tab-panel active" data-panel="read1A">
 
-```rust
-fn main() {
-    println!("Hello");
+```r
+
+load_raw_data <- function(file_path) {
+   
+  readr::read_tsv(
+    file_path,
+    col_names = c("ip", "ts", "target", "status", "ua"),
+    col_types = readr::cols(
+      ip = readr::col_character(),
+      ts = readr::col_double(),
+      target = readr::col_character(),
+      status = readr::col_integer(),
+      ua = readr::col_character()
+    ),
+    progress = FALSE
+  ) %>%
+    mutate(
+      date = as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")
+    ) %>%
+    select(ip, date, target, status, ua) %>%
+    filter(
+      !is.na(date),
+      !is.na(target),
+      !is.na(status),
+      status == 200
+    ) %>%
+    select(-status)
+
+}
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2A">
+
+```r
+
+load_raw_data <- function(file_path) {
+   
+  vroom::vroom(
+    file_path,
+    delim = "\t",
+    col_names = c("ip", "ts", "target", "status", "ua"),
+    col_types = vroom::cols(
+      ip = vroom::col_character(),
+      ts = vroom::col_double(),
+      target = vroom::col_character(),
+      status = vroom::col_integer(),
+      ua = vroom::col_character()
+    ),
+    progress = FALSE
+  ) %>%
+    mutate(
+      date = as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")
+    ) %>%
+    select(ip, date, target, status, ua) %>%
+    filter(
+      !is.na(date),
+      !is.na(target),
+      !is.na(status),
+      status == 200
+    ) %>%
+    select(-status)
+
+}
+
+```
+
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read3A">
+
+```r
+
+load_raw_data <- function(file_path) {
+
+    df <- data.table::fread(input = file_path,
+                      sep="\t",
+                      quote = "\"",
+                      col.names = c("ip", "ts", "target", "status", "ua"),
+                      header = FALSE,
+                      colClasses = list(
+                                        character = c(1, 3, 5),
+                                        double = 2,
+                                        integer = 4
+                                       ),
+                      showProgress = FALSE
+          ) 
+
+    df[, date := as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")]
+    df <- df[, .(ip, date, target, status, ua)]
+    df <- df[!is.na(date) & 
+             !is.na(target) & 
+             !is.na(status) & 
+             status == 200]
+    df[, status := NULL]
+}
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read4A">
+
+```r
+
+load_raw_data <- function(file_path) {
+
+   df <-  data.table::as.data.table(vroom::vroom(
+      file_path,
+      delim = "\t",
+      col_names = c("ip", "ts", "target", "status", "ua"),
+      col_types = vroom::cols(
+        ip = vroom::col_character(),
+        ts = vroom::col_double(),
+        target = vroom::col_character(),
+        status = vroom::col_integer(),
+        ua = vroom::col_character()
+      ),
+      progress = FALSE
+    ))
+
+    df[, date := as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")]
+    df <- df[, .(ip, date, target, status, ua)]
+    df <- df[!is.na(date) & 
+             !is.na(target) & 
+             !is.na(status) & 
+             status == 200]
+    df[, status := NULL]
+}
+
+```
+
+  </div>
+
+</div>
+
+And we call it in `server.R` as:
+
+```r
+
+t <- Sys.time()
+
+raw_data <- load_raw_data(file_path)
+
+log_step("Read First", t, raw_data)
+
+```
+
+Before i give you my benchmarks, we need to describe the difference between lazy and eager ingestion.
+
+The eager like ingestion engines here are `readr::read_tsv()` and `data.table::fread()`, meaning they fully materialize / allocate vectors for each columns, so after the operations return, all the cells values will be in cache.
+
+In the other hand, we have `vroom::vroom` which is a lazy ingestion function, meaning it will not parse the full file and only cache the log file as plain text data. It is only when the next functions will ask for operation on specific subset of the dataframe, like certain cols, that the specific columns will be parsed / materialized, thus creating a delayed performance cost.
+
+So lazy ingestion function are very powerfull when we need to perform operations on a small subset of a huge data file, because only the concerned part will be parsed instead of the whole file which is a waste of computations in those cases.
+
+But is that the case here ?
+
+Not really, you see that just after readin the log file we perform a mutation, creating a column based on the `ts` column, hence we have to read this col, so parse it.
+
+And if it were only one column why not, but just after that we also perform filtering operations that require parsing `target` and `status`.
+
+And if we extrapolate all along the pipeline, we will eventually need to parse all columns.
+
+So here lazy ingestion is at first glance useless and counter productive.
+
+But we need to look further and measure where the materialization cost actually happens. In particular, we need to compare the cost of using the lazy output of `vroom::vroom()` directly with `dplyr` transformations, which materialize columns as they are touched, versus forcing materialization upfront with `data.table::as.data.table()` and then running the `data.table` pipeline.
+
+From raw file:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B">reader + dplyr</button>
+    <button class="code-tab" data-tab="read2B">vroom + dplyr</button>
+    <button class="code-tab" data-tab="read3B">fread + data.table</button>
+    <button class="code-tab" data-tab="read4B">vroom + data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B">
+
+[dplyr_readr.txt](/assets/comon_files/shiny_nginx/dplyr_readr.txt)
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B">
+
+[dplyr_vroom.txt](/assets/comon_files/shiny_nginx/dplyr_vroom.txt)
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read3B">
+
+[data_table.txt](/assets/comon_files/shiny_nginx/data_table.txt)
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read4B">
+
+[data_table_vroom.txt](/assets/comon_files/shiny_nginx/data_table_vroom.txt)
+
+  </div>
+
+
+</div>
+
+Here are he results:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1C">readr + dplyr</button>
+    <button class="code-tab" data-tab="read2C">vroom + dplyr</button>
+    <button class="code-tab" data-tab="read3C">fread + data.table</button>
+    <button class="code-tab" data-tab="read4C">vroom + data.table</button>
+  </div>
+
+  <div class="code-tab-panel" data-panel="read1C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+
+cat("\n #### READR + DPLYR #### \n\n")
+
+data <- read.table("dplyr_readr.result", 
+                             sep = ",", 
+                             header = FALSE
+                        )
+
+cat("\n")
+
+seconds <- as.data.frame(matrix(data$V1, 
+                        ncol = length(label),
+                        byrow=TRUE
+                       )
+                 )
+
+colnames(seconds) <- label
+
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+
+```
+
+```
+
+ #### READR + DPLYR ####
+
+
+Ingestion time 0.3302
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+
+cat("\n #### VROOM + DPLYR #### \n\n")
+
+data <- read.table("dplyr_vroom.result", 
+                       sep = ",", 
+                       header = FALSE
+                  )
+
+cat("\n")
+
+seconds <- as.data.frame(matrix(data$V1, 
+                  ncol = length(label),
+                  byrow=TRUE
+                 )
+           )
+
+colnames(seconds) <- label
+
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+
+```
+
+```
+
+ #### VROOM + DPLYR ####
+
+Ingestion time: 0.3312
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read3C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+cat("\n #### FREAD + DATATABLE #### \n\n")
+
+data_datatable <- read.table("data_table.result", 
+                             sep = ",", 
+                             header = FALSE
+                            )
+
+seconds <- as.data.frame(matrix(data_datatable$V1, 
+                            ncol = length(label),
+                            byrow=TRUE
+                           )
+                     )
+
+colnames(seconds) <- label
+
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+
+```
+
+```
+
+ #### FREAD + DATATABLE ####
+
+Ingestion time: 0.4192
+
+```
+
+  </div>
+  <div class="code-tab-panel" data-panel="read4C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+cat("\n #### VROOM + DATATABLE #### \n\n")
+
+data <- read.table("data_table_vroom.result", 
+                             sep = ",", 
+                             header = FALSE
+                        )
+
+cat("\n")
+
+seconds <- as.data.frame(matrix(data$V1, 
+                        ncol = length(label),
+                        byrow=TRUE
+                       )
+                 )
+
+colnames(seconds) <- label
+
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+
+```
+
+```
+
+ #### VROOM + DATATABLE ####
+
+
+Ingestion time: 0.3498
+
+```
+
+  </div>
+
+</div>
+
+Strictly speaking, this is not a pure ingestion benchmark. It measures the ingestion step as it exists in the **real pipeline** (article's goal), including the minimal transformations needed to make the loaded data usable by the following processing stages.
+
+Note that we did everything we can to maximize the parsing like the fact we already told the function the column types -> so no column inference cost.
+
+Also, note that the select operations is not strictly necessary because we select all columns, but that assure we only got the 5 columns, even if later we add other columns in the NGINX log format. So i can erase it, but for the sake of production robustness i'll keep it. And especially, that assure us a good column order.
+
+So first, let's compare the eager ingestion:
+
+- `readr::read_tsv()` + `dplyr` (mutate + filter) = 0.3302
+
+- `data.table::fread()` + `data.table` (mutate + filter) = 0.4192
+
+It looks like the `readr::read_tsv()` + `dplyr` is actually roughly 25% faster.
+
+You know what, that is intriguing, so lets' decompose the step further and measure raw eager ingestion.
+
+Just tweaking a bit the fuctions.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B2">readr + dplyr</button>
+    <button class="code-tab" data-tab="read2B2">fread + data.table</button>
+  </div>
+
+  <div class="code-tab-panel" data-panel="read1B2">
+
+```r
+
+load_raw_data <- function(file_path) {
+  
+  t <- Sys.time()
+
+  df <- readr::read_tsv(
+    file_path,
+    col_names = c("ip", "ts", "target", "status", "ua"),
+    col_types = readr::cols(
+      ip = readr::col_character(),
+      ts = readr::col_double(),
+      target = readr::col_character(),
+      status = readr::col_integer(),
+      ua = readr::col_character()
+    ),
+    progress = FALSE
+  )
+
+  log_step("RAW Ingestion", t, df)
+
+  df <- df %>%
+    mutate(
+      date = as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")
+    ) %>%
+    select(ip, date, target, status, ua) %>%
+    filter(
+      !is.na(date),
+      !is.na(target),
+      !is.na(status),
+      status == 200
+    ) %>%
+    select(-status)
+
+}
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B2">
+
+```r
+
+load_raw_data <- function(file_path) {
+
+    t <- Sys.time()
+
+    df <- data.table::fread(input = file_path,
+                      sep="\t",
+                      quote = "\"",
+                      col.names = c("ip", "ts", "target", "status", "ua"),
+                      header = FALSE,
+                      colClasses = list(
+                                        character = c(1, 3, 5),
+                                        double = 2,
+                                        integer = 4
+                                       ),
+                      showProgress = FALSE
+          ) 
+
+    log_step("RAW Ingestion", t, df)
+
+    df[, date := as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")]
+    df <- df[, .(ip, date, target, status, ua)]
+    df <- df[!is.na(date) & 
+             !is.na(target) & 
+             !is.na(status) & 
+             status == 200]
+    df[, status := NULL]
 }
 ```
 
   </div>
 
-  <div class="code-tab-panel" data-panel="cpp">
+</div>
 
-```cpp
-#include &lt;iostream&gt;
+And look at the results:
 
-int main() {
-    std::cout &lt;&lt; "Hello\n";
-}
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B3">readr + dplyr</button>
+    <button class="code-tab" data-tab="read2B3">fread + data.table</button>
+  </div>
+
+   <div class="code-tab-panel" data-panel="read1B3">  
+
+```
+
+Raw Ingestion 0.2912
+Read First 0.34
+
+```
+
+   </div>
+
+   <div class="code-tab-panel" data-panel="read2B3">  
+
+```
+
+Raw Ingestion 0.2193
+Read First 0.4149
+
 ```
 
   </div>
 </div>
+
+So, in raw ingestion speed, `data.table::fread()` beats `readr::read_tsv()`, but it looks like in the data manipulation path, `dplyr` mutation and/or filter beats `data.table` equivalent operations.
+
+To be certain of that, i will again decompose more.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B4">readr + dplyr</button>
+    <button class="code-tab" data-tab="read2B4">fread + data.table</button>
+  </div>
+
+   <div class="code-tab-panel" data-panel="read1B4">  
+
+```
+Raw Ingestion 0.2916
+Date mutation 0.0068
+Selection 0.0012
+Filtering 0.0345
+Col drop 0.0014
+
+```
+
+   </div>
+
+   <div class="code-tab-panel" data-panel="read2B4">  
+
+```
+
+Raw Ingestion 0.2206
+Date mutation 0.0023
+Selection 0.0203
+Filtering 0.0272
+Col drop 7e-04
+
+```
+
+  </div>
+</div>
+
+It looks like mutation operations on `data.table` is faster (x3), maybe vectorized ?
+
+In a marginal way, we have the same thing for the filtering (x1.25).
+
+But, when it comes to the operatins that change the structure of the dataframe like select or column drop, `dplyr` wins here.
+
+It is surely the case because in the select for example, it surely  creates a new object that points to existing column vectors. It does not necessarily copy all column data while `data.table` do it.
+
+In dplyr, this step:
+
+```r
+
+df <- df %>%  select(ip, date, target, status, ua)
+
+```
+
+Creates a new tibble/data frame object whose column list points to the existing vectors.
+
+But wait, I can explicit the same thing with `data.table::setcolorder()`
+
+So instead of:
+
+```r
+
+df <- df[, .(ip, date, target, status, ua)]
+
+```
+
+I do:
+
+```r
+
+data.table::setcolorder(df, c("ip", "date",  "target", "status", "ua"))
+
+```
+
+And now, look at that:
+
+```
+
+Raw Ingestion 0.2204
+Date mutation 0.0035
+Selection 1e-04
+Filtering 0.025
+Col drop 7e-04
+
+```
+
+Selection is now basicaly free, we already beat `data.table` on this function at every step !
+
+It literally just changes the order of the references in the internal column list, just what we want :=)
+
+## Bots fitering
+
+Now the real work begins:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B4">dplyr</button>
+    <button class="code-tab" data-tab="read2B4">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B4">
+
+```r
+
+filtered_data <- reactive({
+
+  mmdb_bump()
+
+  req(input$time_unit, input$last_n)
+
+  df <- raw_data
+  req(nrow(df) > 0)
+
+  t <- Sys.time()
+
+  # -----------------------------
+  # TIME WINDOW FILTER
+  # -----------------------------
+  last <- input$last_n * mult_map[[input$time_unit]]
+  cutoff <- max(df$date) - last
+
+  df <- df %>% filter(date >= cutoff)
+
+  log_step("Time Window", t, df)
+  t <- Sys.time()
+
+  ua_unique <- unique(df$ua)
+  
+  ua_is_bot <- setNames(
+    grepl(
+      bot_regex,
+      ua_unique,
+      ignore.case = TRUE,
+      perl = TRUE
+    ),
+    ua_unique
+  )
+  
+  df <- df %>%
+    filter(!ua_is_bot[ua])
+  
+  log_step("UA AGENT", t, df)
+  t <- Sys.time()
+
+  # Asset heuristic
+
+  css_clients <- df %>% 
+          filter(endsWith(tolower(target), ".css")) %>%
+          distinct(ip) %>%
+          pull(ip)
+
+  df <- df %>% filter(ip %in% css_clients)
+
+  log_step("Asset heuristic", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  df <- df %>%
+    filter(grepl("^/articles/.*\\.html$", target, ignore.case=TRUE))
+
+  log_step("Aticle filtering", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  # Rate heuristic
+  df <- df %>%
+    group_by(ip, sec = floor_date(date, "second")) %>%
+    mutate(req_per_sec = n()) %>%
+    filter(req_per_sec < 10) %>%
+    ungroup() %>%
+    select(-req_per_sec)
+
+  log_step("Rate heuristic", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  # Reading-time heuristic
+  df <- df %>%
+    arrange(ip, date) %>%
+    group_by(ip) %>%
+    mutate(
+      next_date = lead(date),
+      time_on_page = as.numeric(difftime(next_date, date, units = "secs")),
+      time_on_page = coalesce(time_on_page, -1)
+    ) %>%
+    ungroup() %>%
+    filter(time_on_page == -1 | time_on_page > 5 & time_on_page < 3600) %>%
+    select(-next_date)
+
+  log_step("Read time heuristic", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  #--- ASN enrichment (minimal)
+  ips <- sort(unique(df$ip))
+
+  asn_data <- lookup_asns(ips, 
+                          db_path = asn_db_path
+  )
+
+  df <- df %>% left_join(asn_data, by = "ip")
+
+  log_step("ASN Enrichment", t, df)
+  t <- Sys.time()
+
+  # cloud ASN repeated range burst
+
+  df <- df %>%
+    arrange(date) %>%
+    mutate(
+      is_cloud_asn = grepl(cloud_asn_regex, asn_org, ignore.case = TRUE),
+      asn_org_clean = coalesce(asn_org, "UNKNOWN_ASN"),
+      ip_16 = sub("\\.[0-9]+\\.[0-9]+$", "", ip),
+      asn_changed = asn_org_clean != lag(asn_org_clean, default = first(asn_org_clean)),
+      asn_bucket = cumsum(asn_changed) + 1
+    ) %>%
+    group_by(asn_bucket, ip_16) %>%
+    mutate(ip_16_occ = n()) %>%
+    ungroup() %>%
+    filter(ip_16_occ == 1 | !is_cloud_asn) %>%
+    select(-asn_org_clean, 
+           -ip_16, 
+           -asn_changed, 
+           -asn_bucket, 
+           -ip_16_occ
+    )
+
+  log_step("ASN filtering 1", t, df)
+  t <- Sys.time()
+
+  df <- df %>%
+    arrange(date) %>%
+    mutate(
+      ip_24 = sub("\\.[0-9]+$", "", ip),
+      half_hour_bucket = floor_date(date, unit="30 minutes") # ful date + hour
+    ) %>%
+    group_by(half_hour_bucket, ip_24) %>%
+    mutate(ip_24_occ = n()) %>%
+    ungroup() %>%
+    filter(ip_24_occ == 1 | !is_cloud_asn) %>%
+    select(-ip_24, 
+           -ip_24_occ,
+           -is_cloud_asn,
+           -half_hour_bucket
+    )
+
+  log_step("ASN filtering 2", t, df)
+  t <- Sys.time()
+
+  df <- df %>% filter(!grepl(ip_exclude, ip))
+
+  log_step("IP Exclusion", t, df)
+  t <- Sys.time()
+
+  bad_ip <- df %>%
+    filter(target %in% honey_pots) %>%
+    distinct(ip) %>%
+    pull(ip)
+  
+  df <- df %>%
+    filter(!(ip %in% bad_ip))
+
+  log_step("HONEY POTS", t, df)
+
+  df
+
+})  
+
+geo_cache_reactive <- reactiveVal(NULL)
+last_ips <- reactiveVal(character())
+
+geo_enriched_data <- reactive({
+
+  t <- Sys.time()
+
+  df <- filtered_data()
+  req(nrow(df) > 0)
+
+  ips <- sort(unique(df$ip))
+
+  if (!identical(ips, last_ips())) {
+    geo_data <- lookup_ips(
+      ips,
+      db_path = geo_db_path
+    )
+
+    geo_cache_reactive(geo_data)
+    last_ips(ips)
+  }
+
+  geo <- geo_cache_reactive()
+
+  if (!is.null(geo)) {
+    df <- df %>% left_join(geo, by = "ip")
+  }
+
+  log_step("GEO Enrichment", t, df)
+
+  df
+})
+
+```
+
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read2B4">
+
+```r
+
+filtered_data <- reactive({
+
+  mmdb_bump()
+
+  req(input$time_unit, input$last_n)
+
+  df <- raw_data
+  req(nrow(df) > 0)
+
+  t <- Sys.time()
+
+  # -----------------------------
+  # TIME WINDOW FILTER
+  # -----------------------------
+  last <- input$last_n * mult_map[[input$time_unit]]
+  cutoff <- max(df$date) - last
+
+  df <- df[date >= cutoff]
+
+  log_step("Time Window", t, df)
+  t <- Sys.time()
+
+  ua_unique <- unique(df$ua)
+  
+  ua_is_bot <- setNames(
+    grepl(
+      bot_regex,
+      ua_unique,
+      ignore.case = TRUE,
+      perl = TRUE
+    ),
+    ua_unique
+  )
+  
+  df <- df[!ua_is_bot[ua]]
+
+  log_step("UA AGENT", t, df)
+  t <- Sys.time()
+
+  # Asset heuristic
+
+  css_clients <- df[endsWith(tolower(target), ".css"), 
+                    unique(ip)
+                    ]
+
+  df <- df[ip %in% css_clients]
+
+  #df <- df[
+  #  ,
+  #  if (any(endsWith(tolower(target), ".css"))) .SD else NULL,
+  #  by = ip
+  #]
+  #df <- df[
+  #  ,
+  #  if (any(endsWith(tolower(target), ".css"))) .SD,
+  #  by = ip
+  #]
+
+  log_step("Asset heuristic", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  df <- df[grepl("^/articles/.*\\.html$", target, ignore.case=TRUE)]
+
+  log_step("Aticle filtering", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  # Rate heuristic
+
+  #df[, sec := lubridate::floor_date(date, unit="second")]
+  #df[, req_per_sec := .N, by = .(ip, sec)]
+  #df <- df[req_per_sec < 10] 
+  #df[, c("sec", "req_per_sec") := NULL]
+
+  df[, sec := lubridate::floor_date(date, unit="second")]
+  df <- df[df[, .I[.N < 10], by = .(ip, sec)]$V1]
+  df[, sec := NULL]
+
+  log_step("Rate heuristic", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  # Reading-time heuristic
+  data.table::setorder(df, ip, date)
+  df[, next_date := shift(date, type="lead"), by = ip]
+  df[, time_on_page := data.table::fcoalesce(
+                                      as.numeric(difftime(next_date, date, units = "secs")), 
+                                      -1
+                                   )
+  ]
+  df <- df[time_on_page == -1 | 
+           (time_on_page > 5 & time_on_page < 3600)
+  ]
+  df[, next_date := NULL]
+
+  log_step("Read time heuristic", t, df)
+  t <- Sys.time()
+
+  if (nrow(df) == 0) return(df)
+
+  #--- ASN enrichment (minimal)
+  ips <- sort(unique(df$ip))
+
+  asn_data <- lookup_asns(ips, 
+                          db_path = asn_db_path
+  )
+
+  df <- asn_data[df, on = "ip"] # left join
+
+  log_step("ASN Enrichment", t, df)
+  t <- Sys.time()
+
+  # cloud ASN repeated range burst
+
+  data.table::setorder(df, date) # sorts by ref
+  df[, is_cloud_asn := grepl(cloud_asn_regex, asn_org, ignore.case = TRUE)]
+  df[, asn_org_clean := data.table::fcoalesce(asn_org, "UNKNOWN_ASN")]
+  df[, ip_16 := sub("\\.[0-9]+\\.[0-9]+$", "", ip)]
+  df[, asn_changed := asn_org_clean != shift(asn_org_clean, 
+                                             type = "lag",
+                                             fill = first(asn_org_clean)
+                                            )
+  ]
+  df[, asn_bucket := cumsum(asn_changed)]
+  
+  #df[, ip_16_occ := .N, by = .(asn_bucket, ip_16)]
+  #df <- df[ip_16_occ == 1 | !is_cloud_asn]
+
+  #df[, if (!first(is_cloud_asn) || .N == 1L) .SD, 
+  #     by = .(asn_bucket, ip_16)
+  #]
+
+  df <- df[df[, if (!first(is_cloud_asn) || .N == 1L) .I, 
+                by = .(asn_bucket, ip_16)
+             ]$V1
+  ]
+
+  df[, c("asn_org_clean",
+         "ip_16",
+         "asn_changed",
+         "asn_bucket") := NULL
+  ]
+
+  log_step("ASN filtering 1", t, df)
+  t <- Sys.time()
+
+  df[, ip_24 := sub("\\.[0-9]+$", "", ip)]
+  df[, half_hour_bucket := lubridate::floor_date(date, unit = "30 minutes")]
+  
+  #df[, ip_24_occ := .N, by = .(half_hour_bucket, ip_24)]
+  #df <- df[ip_24_occ == 1 | !is_cloud_asn]
+
+  #df <- df[
+  #         df[, if (.N == 1L) .I else .I[!is_cloud_asn], 
+  #            by = .(half_hour_bucket, ip_24)
+  #           ]$V1
+  #]
+
+  # Because scalar and vector logical operations can be combined
+  # > FALSE | c(TRUE, FALSE)
+  # [1]  TRUE FALSE
+  # so we can do
+
+  df <- df[
+           df[, .I[.N == 1L | !is_cloud_asn], 
+              by = .(half_hour_bucket, ip_24)
+             ]$V1
+  ]
+
+  df[, c("ip_24",
+         "is_cloud_asn",
+         "half_hour_bucket") := NULL
+  ]
+
+  log_step("ASN filtering 2", t, df)
+  t <- Sys.time()
+
+  df <- df[!grepl(ip_exclude, ip)]
+
+  log_step("IP Exclusion", t, df)
+  t <- Sys.time()
+
+  bad_ip <- df[target %in% honey_pots, unique(ip)]
+  df <- df[!(ip %in% bad_ip)]
+
+  log_step("HONEY POTS", t, df)
+
+  df
+
+})  
+
+```
+
+  </div>
+
+</div>
+
+## Conclusion & Compiled Benchmarks
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1C">readr + dplyr</button>
+    <button class="code-tab" data-tab="read2C">vroom + dplyr</button>
+    <button class="code-tab" data-tab="read3C">fread + data.table</button>
+    <button class="code-tab" data-tab="read4C">vroom + data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+
+cat("\n #### READR + DPLYR #### \n\n")
+
+data <- read.table("dplyr_readr.result", 
+                             sep = ",", 
+                             header = FALSE
+                        )
+
+cat("\n")
+
+seconds <- as.data.frame(matrix(data$V1, 
+                        ncol = length(label),
+                        byrow=TRUE
+                       )
+                 )
+
+colnames(seconds) <- label
+tot <- 0
+
+for (i in 1:length(label)) {
+
+    val <- median(seconds[, i])
+    cat(paste(label[i], 
+              val, 
+              sep = " "))
+    tot <- tot + val
+    cat("\n")
+
+}
+
+cat(paste("TOT:", tot, "\n", sep=" "))
+cat("\n")
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+cat(paste("Data manipulation time:", 
+          median(
+                 rowSums(seconds[, 2:length(label)])
+                ), 
+          "\n", 
+          sep = " "))
+
+
+```
+
+```
+
+ #### READR + DPLYR ####
+
+
+Read First 0.3302
+Time Window 0.0077
+UA AGENT 0.0181
+Asset heuristic 0.075
+Aticle filtering 0.038
+Rate heuristic 0.0316
+Read time heuristic 0.0075
+ASN Enrichment 0.0018
+ASN filtering 1 0.0106
+ASN filtering 2 0.0082
+IP Exclusion 8e-04
+HONEY POTS 0.0017
+KPI MEDIAN READTIME 0.0016
+
+Ingestion time: 0.3302
+Data manipulation time: 0.2142
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+
+cat("\n #### VROOM + DPLYR #### \n\n")
+
+data <- read.table("dplyr_vroom.result", 
+                       sep = ",", 
+                       header = FALSE
+                  )
+
+cat("\n")
+
+seconds <- as.data.frame(matrix(data$V1, 
+                  ncol = length(label),
+                  byrow=TRUE
+                 )
+           )
+
+colnames(seconds) <- label
+tot <- 0
+
+for (i in 1:length(label)) {
+
+    val <- median(seconds[, i])
+    cat(paste(label[i], 
+              val, 
+              sep = " "))
+    tot <- tot + val
+    cat("\n")
+
+}
+
+cat(paste("TOT:", tot, "\n", sep=" "))
+cat("\n")
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+cat(paste("Data manipulation time:", 
+          median(
+                 rowSums(seconds[, 2:length(label)])
+                ), 
+          "\n", 
+          sep = " "))
+
+```
+
+```
+
+ #### VROOM + DPLYR ####
+
+
+Read First 0.3312
+Time Window 0.0087
+UA AGENT 0.3841
+Asset heuristic 0.1326
+Aticle filtering 0.0839
+Rate heuristic 0.0321
+Read time heuristic 0.0077
+ASN Enrichment 0.002
+ASN filtering 1 0.0112
+ASN filtering 2 0.0102
+IP Exclusion 0.0032
+HONEY POTS 0.0322
+KPI MEDIAN READTIME 0.0017
+
+Ingestion time: 0.3312
+Data manipulation time: 0.7161
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read3C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+cat("\n #### FREAD + DATATABLE #### \n\n")
+
+data_datatable <- read.table("data_table.result", 
+                             sep = ",", 
+                             header = FALSE
+                            )
+
+seconds <- as.data.frame(matrix(data_datatable$V1, 
+                            ncol = length(label),
+                            byrow=TRUE
+                           )
+                     )
+
+colnames(seconds) <- label
+tot <- 0
+
+for (i in 1:length(label)) {
+
+    val <- median(seconds[, i])
+    cat(paste(label[i], 
+              val, 
+              sep = " "))
+    tot <- tot + val
+    cat("\n")
+
+}
+
+cat(paste("TOT:", tot, "\n", sep=" "))
+cat("\n")
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+cat(paste("Data manipulation time:", 
+          median(
+                 rowSums(seconds[, 2:length(label)])
+                ), 
+          "\n", 
+          sep = " "))
+
+
+```
+
+```
+
+ #### FREAD + DATATABLE ####
+
+Read First 0.4192
+Time Window 0.0062
+UA AGENT 0.0178
+Asset heuristic 0.0722
+Aticle filtering 0.0368
+Rate heuristic 0.0057
+Read time heuristic 0.0021
+ASN Enrichment 0.0015
+ASN filtering 1 0.0059
+ASN filtering 2 0.0025
+IP Exclusion 3e-04
+HONEY POTS 0.0014
+KPI MEDIAN READTIME 4e-04
+
+Ingestion time: 0.4192
+Data manipulation time: 0.1584
+
+```
+
+  </div>
+  <div class="code-tab-panel" data-panel="read4C">
+
+```r
+
+label <- c(
+    "Read First", 
+    "Time Window", 
+    "UA AGENT",      
+    "Asset heuristic",
+    "Aticle filtering",  
+    "Rate heuristic", 
+    "Read time heuristic",
+    "ASN Enrichment",
+    "ASN filtering 1",   
+    "ASN filtering 2",  
+    "IP Exclusion",  
+    "HONEY POTS",     
+    "KPI MEDIAN READTIME"
+)
+
+
+cat("\n #### VROOM + DATATABLE #### \n\n")
+
+data <- read.table("data_table_vroom.result", 
+                             sep = ",", 
+                             header = FALSE
+                        )
+
+cat("\n")
+
+seconds <- as.data.frame(matrix(data$V1, 
+                        ncol = length(label),
+                        byrow=TRUE
+                       )
+                 )
+
+colnames(seconds) <- label
+tot <- 0
+
+for (i in 1:length(label)) {
+
+    val <- median(seconds[, i])
+    cat(paste(label[i], 
+              val, 
+              sep = " "))
+    tot <- tot + val
+    cat("\n")
+
+}
+
+cat(paste("TOT:", tot, "\n", sep=" "))
+cat("\n")
+cat(paste("Ingestion time:", 
+          median(seconds[, 1]), "\n", 
+          sep = " "))
+cat(paste("Data manipulation time:", 
+          median(
+                 rowSums(seconds[, 2:length(label)])
+                ), 
+          "\n", 
+          sep = " "))
+
+```
+
+```
+
+ #### VROOM + DATATABLE ####
+
+
+Read First 0.3498
+Time Window 0.0066
+UA AGENT 0.026
+Asset heuristic 0.0706
+Aticle filtering 0.0368
+Rate heuristic 0.0054
+Read time heuristic 0.0019
+ASN Enrichment 0.0015
+ASN filtering 1 0.0062
+ASN filtering 2 0.0023
+IP Exclusion 3e-04
+HONEY POTS 0.0013
+KPI MEDIAN READTIME 4e-04
+TOT: 0.5091
+
+Ingestion time: 0.3498
+Data manipulation time: 0.1619
+
+```
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
 
 
 
