@@ -1163,7 +1163,7 @@ filtered_data <- reactive({
     mutate(req_per_sec = n()) %>%
     filter(req_per_sec < 10) %>%
     ungroup() %>%
-    select(-req_per_sec)
+    select(-sec, -req_per_sec)
 
   log_step("Rate heuristic", t, df)
   t <- Sys.time()
@@ -1398,9 +1398,8 @@ filtered_data <- reactive({
                                       -1
                                    )
   ]
-  df <- df[time_on_page == -1 | 
-           (time_on_page > 5 & time_on_page < 3600)
-  ]
+  keep <- df$time_on_page == -1 | (df$time_on_page > 5 & df$time_on_page < 3600)
+  df <- df[keep]
   df[, next_date := NULL]
 
   log_step("Read time heuristic", t, df)
@@ -1504,6 +1503,911 @@ filtered_data <- reactive({
   </div>
 
 </div>
+
+The first thing we will do is apply a time filter, meaning that we only keep the rows that belong to the time interval we want to analyze.
+
+Technically, we can distinguish between the time-filtering step and the later bot-filtering steps.
+
+This distinction matters because these operations do not have the same computational cost. As you can see, the bot-filtering pipeline contains many operations, while the time-filtering step is only one filtering operation.
+
+Therefore, it is much better to first filter the logs on the targeted time period, and then apply the more expensive bot-filtering operations on this smaller subset of the data. The opposite approach would apply computationally heavier operations to the entire log file before finally keeping only the intended time interval.
+
+In terms of final results, the two chains are equivalent:
+
+- `time interval filtering -> bot filtering`
+
+and:
+
+- `bot filtering -> time interval filtering`
+
+However, they are not equivalent in terms of computational cost. The first chain is much lighter because it reduces the dataset before running the expensive filtering steps.
+
+And we will kepp this reasoning for the other bots filtering operations.
+
+Now the time interval filter bencharks:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B5">dplyr</button>
+    <button class="code-tab" data-tab="read2B5">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B5">
+
+```r
+
+Time Window 0.0078
+
+```
+
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B5">
+
+```r
+
+Time Window 0.0066
+
+```
+
+  </div>
+
+</div>
+
+We have a slight advantage on the `data.table` version for this exact filter.
+
+We keep this result in mind to see if all the filtering are always faster on the `data.table` side.
+
+Now, for the UA agent filtering.
+
+Note that in both codes we do exactly the same trick:
+
+```r
+
+    ua_unique <- unique(df$ua)
+
+    ua_is_bot <- setNames(
+      grepl(
+        bot_regex,
+        ua_unique,
+        ignore.case = TRUE,
+        perl = TRUE
+      ),
+      ua_unique
+    )
+
+```
+
+With `bot_regex` being this long ReGex condition (`global.R`):
+
+```r
+
+bot_keywords <- unique(c(
+  # Core bot terms
+  "bot","crawler","spider",
+
+  # SEO / scraping bots
+  "ahrefs","ahrefsbot","semrush","mj12","dotbot",
+
+  # Search engines
+  "googlebot","bingbot","yandex","baiduspider","slurp",
+
+  # Monitoring / uptime
+  "uptime","pingdom","monitor",
+
+  # CLI / scripting
+  "curl","wget","python","python-requests","scrapy",
+
+  # Headless / automation frameworks
+  "headless","phantomjs","selenium",
+  "playwright","puppeteer",
+
+  # Programmatic HTTP clients
+  "node-fetch","axios",
+  "go-http-client","libwww-perl","java/",
+  "httpclient",
+
+  # Social media fetchers
+  "facebookexternalhit",
+
+  # Additional suspicious / automation UAs
+  "okhttp",
+  "httpx",
+  "restsharp",
+  "powershell",
+  "postmanruntime",
+  "insomnia",
+  "apache-httpclient",
+  "ruby",
+  "perl",
+  "mechanize",
+  "feedfetcher",
+  "dataprovider",
+  "masscan",
+  "zgrab",
+  "nmap",
+  "gobuster",
+  "sqlmap"
+))
+
+bot_regex <- paste(bot_keywords, collapse = "|")
+
+```
+
+Meaning that instead of performing the RegeX check on every rows which is computationally heavy (especialy for our ReGex heavy OR), we compute the unique values from the UA agent column, hence the RegEx check will be applied in significantly less values.
+
+After that, this is just simple lookup inside the `hashmap` to see if the UA for he specific row is a bot or not.
+
+The cost of the uniqueness computation plus the nrow lookups is normally amortized compared to the heavy RegEx evaulations on N rows.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B5">dplyr</button>
+    <button class="code-tab" data-tab="read2B5">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B5">
+
+```r
+
+UA AGENT 0.0191
+
+```
+
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B5">
+
+```r
+
+UA AGENT 0.0262
+
+```
+
+  </div>
+
+</div>
+
+Interestingly, here `dplyr` wins.
+
+But wait i want to decompose again more the computations step.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B6">dplyr</button>
+    <button class="code-tab" data-tab="read2B6">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B6">
+
+```r
+
+t <- Sys.time()
+
+ua_unique <- unique(df$ua)
+
+ua_is_bot <- setNames(
+  grepl(
+    bot_regex,
+    ua_unique,
+    ignore.case = TRUE,
+    perl = TRUE
+  ),
+  ua_unique
+)
+
+keep <- !ua_is_bot[df$ua]
+log_step("UA Agent Pre", t, df)
+t <- Sys.time()
+
+df <- df %>%
+  filter(keep)
+
+log_step("UA AGENT Post", t, df)
+
+```
+
+```
+
+UA Agent Pre 0.0136
+UA AGENT Post 0.004
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read1B6">
+
+```r
+
+    t <- Sys.time()
+
+    ua_unique <- unique(df$ua)
+    
+    ua_is_bot <- setNames(
+      grepl(
+        bot_regex,
+        ua_unique,
+        ignore.case = TRUE,
+        perl = TRUE
+      ),
+      ua_unique
+    )
+
+    keep <- !ua_is_bot[df$ua]
+    log_step("UA Agent Pre", t, df)
+    t <- Sys.time()
+
+    df <- df[keep]
+
+    log_step("UA AGENT Post", t, df)
+
+```
+
+```
+
+UA Agent Pre 0.0147
+UA AGENT Post 0.0038
+
+```
+
+  </div>
+
+</div>
+
+For `dplyr`, `0.0136 + 0.004 = 0.0176`, not too different from the combined boolean vector + filter from before.
+
+At first gnlance you can question the goal of decomposing the steps, because anyway R is computing the declaration of the boolean vector before passing it to the filter function.
+
+### Lazy promises
+
+But in fact, that is semantically distnct because in R, function arguments are lazy promises.
+
+If you are coming from Haskell for example, that will be obvious.
+
+Look at this simpe example:
+
+```r
+
+f <- function(x) { print(x) }
+f(2+3)
+[1] 5
+
+```
+
+What happen to `2+3` here ?
+
+R does not necessarily compute `2+3` immediately before entering `f`.
+
+It creates a promise roughly like:
+
+```r
+
+x = promise(expression = 2 + 3, environment = caller environment)
+
+```
+
+Then inside the function:
+
+```r
+
+print(x)
+
+```
+
+Needs the value of `x`, so the promise is forced. At that moment, R evaluates:
+
+```r
+
+2 + 3
+
+```
+
+One more example:
+
+```r
+
+Sys.setenv(LANGUAGE = "en")
+
+f1 <- function(x) { print("ok") }
+f2 <- function(x) { print(x) }
+
+f1(stop("scary error"))
+f2(stop("sacry error"))
+
+print("eding programm")
+
+
+
+```
+
+```
+
+❯ Rscript test.R
+[1] "ok"
+Error in print(x) : sacry error
+Calls: f2 -> print
+Execution halted
+
+```
+
+So you see now that the declaration of the argument is forwarded to when the code really needs it.
+
+By the way, variables declaration are not lazy:
+
+```r
+
+Sys.setenv(LANGUAGE = "en")
+
+f1 <- function(x) { print("ok") }
+f2 <- function(x) { print(x) }
+
+val <- stop("scary error")
+
+f1(val)
+f2(val)
+
+print("eding programm")
+
+```
+
+```
+
+❯ Rscript test.R
+Error: scary error
+Execution halted
+
+```
+
+All that for saying that for predictability and performance reason, it is better to declare the boolean mask as a variable and then use it inside the function (because already computed) than directly giving it to the function as a lazy promise.
+
+And it is EXACTLY what is going on with the `data.table` variant:
+
+```
+
+0.0147 + 0.0038 = 0.0185 < 0.0262 (lazy promise)
+
+```
+
+Now for the asset heuristic.
+
+It is simple, we will just take the ips adresses that at least loaded one `.css` ressource, eleminating most of browserless bots.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B7">dplyr</button>
+    <button class="code-tab" data-tab="read2B7">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B7">
+
+```r
+
+css_clients <- df %>% 
+        filter(endsWith(tolower(target), ".css")) %>%
+        distinct(ip) %>%
+        pull(ip)
+
+df <- df %>% filter(ip %in% css_clients)
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B7">
+
+Version 1:
+
+```r
+
+keep <- endsWith(tolower(df$target), ".css")
+css_clients <- df[keep, 
+                  unique(ip)
+                  ]
+
+
+df <- df[ip %in% css_clients]
+
+```
+
+Version 2:
+
+```r
+
+css_clients <- df[endsWith(tolower(target), ".css"), ip]
+css_clients <- unique(css_clients)
+
+df <- df[ip %in% css_clients]
+
+```
+
+Version 3:
+
+```r
+
+css_clients <- df[endsWith(tolower(target), ".css")]
+css_clients <- unique(css_clients, by="ip")
+css_clients <- css_clients$ip
+
+df <- df[ip %in% css_clients]
+
+```
+
+  </div>
+
+</div>
+
+Since we saw that it was a good thing especialy in `data.table` to compute the boolean mask before, i did it.
+
+Also I show you 3 variants of the `data.table` filtering version to speak a bit about a-priori computational cost.
+
+In fact the best version will be the first, because the intent is clear and compressed, we want all the unique ips that respects the conditions.
+
+While in the second one, we have an unecessary step where we take the whoe ip columns before computing the unique ips of it.
+
+And the third one is the worst because here the unecessary steps are the construction of a temporary filtered dataframe, and once agian after where we filter the dataframe (creating a new temp one) that has unique ips, before extracting its ip column.
+
+So we will keep the first `data.table` version.
+
+Here are the benchmark's result:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B8">dplyr</button>
+    <button class="code-tab" data-tab="read2B8">data.table</button>
+
+   <div class="code-tab-panel active" data-panel="read1B8">
+
+```
+
+Asset heuristic 0.0749
+
+```
+
+   </div>
+
+   <div class="code-tab-panel" data-panel="read2B8">
+ 
+ ```
+
+Asset heuristic 0.0728
+
+```
+
+   </div>
+
+</div>
+
+Not too much different.
+
+And just after the article fltering where we take only the article page:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B9">dplyr</button>
+    <button class="code-tab" data-tab="read2B9">data.table</button>
+
+   <div class="code-tab-panel active" data-panel="read1B9">
+
+```r
+
+df <- df %>%
+  filter(grepl("^/articles/.*\\.html$", target, ignore.case=TRUE))
+
+
+```
+
+```
+
+Aticle filtering 0.0375
+
+```
+
+   </div>
+
+   <div class="code-tab-panel" data-panel="read2B9">
+ 
+```r
+
+df <- df[grepl("^/articles/.*\\.html$", target, ignore.case=TRUE)]
+
+```
+
+```
+
+Aticle filtering 0.037
+
+```
+
+   </div>
+
+</div>
+
+As you see results are pretty much the same.
+
+So, now for the request rate heuristics.
+
+Of course a human won't click like a sickhead on a bunch or articles, so we can filter cheap bots with a simple heuristics.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B10">dplyr</button>
+    <button class="code-tab" data-tab="read2B10">data.table</button>
+
+   <div class="code-tab-panel active" data-panel="read1B10">
+
+```r
+
+df <- df %>%
+  group_by(ip, sec = floor_date(date, "second")) %>%
+  mutate(req_per_sec = n()) %>%
+  filter(req_per_sec < 10) %>%
+  ungroup() %>%
+  select(-sec, -req_per_sec)
+
+```
+
+   </div>
+
+   <div class="code-tab-panel" data-panel="read2B10">
+
+Version 1:
+
+```r
+
+df[, sec := lubridate::floor_date(date, unit="second")]
+df <- df[df[, .I[.N < 10], by = .(ip, sec)]$V1]
+df[, sec := NULL]
+
+```
+
+Version 2:
+
+```r
+
+df[, sec := lubridate::floor_date(date, unit="second")]
+df[, req_per_sec := .N, by = .(ip, sec)]
+df <- df[req_per_sec < 10] 
+df[, c("sec", "req_per_sec") := NULL]
+
+```
+
+   </div>
+
+</div>
+
+First, some apriori speaking regarding the computational cost o thé 2 `data.table` versions.
+
+Both creates the fundamental columns which floors to the current second from the date column.
+
+But afterward, the second version do like the `dplyr` one in the **in-place** mutations, meaning that it creates a whole column design for storing the number of article requests by second, and then it filters out the one that are too high. (i can definitely exclude those who are higher than 1 btw).
+
+And finally ot drops the 2 temporary columns used for the filtering.
+
+While the first version is clever.
+
+It only create the `sec` column (flooring seconds), but after that it directly do the second rate filtering while grouping.
+
+There are 3 special varables in `data.table`.
+
+For each group, we have:
+
+- `.N` -> the number of rows inside one group.
+
+- `.SD` -> the sub-dataframe containing the current rows of the group minus the filtering columns
+
+-  `.I` -> the index vector of the dataframe for the current group
+
+To get the indices of a `data.table`, we do it via grabbing the `V1` column.
+
+Then, here:
+
+```r
+
+df <- df[df[, .I[.N < 10], by = .(ip, sec)]$V1]
+
+```
+
+We just output the index of the matching rows, therefore we can directly use those indices to make the filter which spare the computational cost of the creation of the `req_er_sec` column.
+
+So we wil use the first version.
+
+And look at the benchmark results, that's impressive:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B11">dplyr</button>
+    <button class="code-tab" data-tab="read2B11">data.table</button>
+
+   <div class="code-tab-panel active" data-panel="read1B11">
+
+```
+
+Rate heuristic 0.032
+
+```
+
+   </div>
+
+   <div class="code-tab-panel" data-panel="read2B11">
+
+```
+
+Rate heuristic 0.0056
+
+```
+
+   </div>
+
+</div>
+
+Yess, the `data.table` version is 6 times faster than the `dplyr` one.
+
+But, wait maybe there is something we can do about the `dplyr` version ?
+
+In fact, yess, we have not taken much about the `ungroup()` thing, but it's key.
+
+Because it tells when we can go out of the grouping environment.
+
+And in fact our current filter absolutely does not need to be evaluated inside a grouping environment.
+
+And we want our conditions to be evaluated as fast as possible on all the elements.
+
+It would be cool if it could be vectorized :)
+
+And yess it can be, but if we keep put obstacles to the vectorization by changing groups in the grouping environment, then we waste potential.
+
+So lets test this `dplyr` varant:
+
+```r
+
+df <- df %>%
+  group_by(ip, sec = floor_date(date, "second")) %>%
+  mutate(req_per_sec = n()) %>%
+  ungroup() %>%
+  filter(req_per_sec < 10) %>%
+  select(-sec, -req_per_sec)
+
+```
+
+Where we mooved the `ungroup()` befre the `filter()`.
+
+We can also test the syntactic sugar with `add_count()`:
+
+```r
+
+df <- df %>%
+  mutate(sec = floor_date(date, "second")) %>%
+  add_count(ip, sec, name = "req_per_sec") %>%
+  filter(req_per_sec < 10) %>%
+  select(-sec, -req_per_sec)
+
+```
+
+`add_count(col1, col2, name = "col3")` is to `group_by(col1, col2) %>% mutate(col3 = n()) %>% ungroup()` what `count(col1, col2, name="col3")` is to `group_by(col1, col2) %>% sumarize(col3 = n(), .groups="drop")`
+
+And here the benchmark result:
+
+```
+
+Rate heuristic 0.0215
+
+```
+
+33% quicker than the previous version, but still 4 times slower than the `data.table` version.
+
+Next, the readtime heuristic, we will keep only the connections that lasted more than 5 seconds on the article page and less than 1 hour (360 secs).
+
+This computation is entirely done by checking the next connection to anoter aticle from the same IPV4 and compute the time difference.
+
+If we have only one connection, or we are at the last connection of the IPV4 address on the artice, we will still count it as a valid read.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B12">dplyr</button>
+    <button class="code-tab" data-tab="read2B12">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B12">
+
+```r
+
+df <- df %>%
+  arrange(ip, date) %>%
+  group_by(ip) %>%
+  mutate(
+    next_date = lead(date),
+    time_on_page = as.numeric(difftime(next_date, date, units = "secs")),
+    time_on_page = coalesce(time_on_page, -1)
+  ) %>%
+  ungroup() %>%
+  filter(time_on_page == -1 | time_on_page > 5 & time_on_page < 3600) %>%
+  select(-next_date)
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B12">
+
+Version 1: 
+
+```r
+
+data.table::setorder(df, ip, date)
+df[, next_date := shift(date, type="lead"), by = ip]
+df[, time_on_page := data.table::fcoalesce(
+                                    as.numeric(difftime(next_date, date, units = "secs")), 
+                                    -1
+                                 )
+]
+keep <- df$time_on_page == -1 | (df$time_on_page > 5 & df$time_on_page < 3600)
+df <- df[keep]
+df[, next_date := NULL]
+
+```
+
+Version 2:
+
+```
+
+cur_cmp <- function(x) {
+  x == -1 | (x > 5 & x < 3600)
+}    
+data.table::setorder(df, ip, date)
+df[, next_date := shift(date, type = "lead"), by = ip]
+keep <- cur_cmp(data.table::fcoalesce(
+  as.numeric(difftime(df$next_date, df$date, units = "secs")),
+  -1
+))
+df <- df[keep] 
+df[, next_date := NULL]
+
+```
+
+  </div>
+
+</div>
+
+What is interesting here is the difference between the two `data.table` variants.
+
+Technically we wil need `time_on_page` later in the pipeline, but in thi localized function absolutely not.
+
+That is why i just wanted to show you where lazyness shines.
+
+Let me explain, the goal is just to keep read time connections between 5 and 1 hour or those who can not be yet computed.
+
+For that, both versions do create a column for storing the next readtime for each row, something like that:
+
+```
+date next_date
+120   -1
+99    120
+75    99
+
+```
+
+But the second version does not create a column to store the readtime (difference between current readtime and next one, or `-1` if no data for next because remember `coalesce(x, y) -> ifelse(!is.nul(x), x, y)`), while the first one does and then flter.
+
+In the first version the boolean vector is derived from the `time_on_page` column after `time_on_page` is fuly materialized.
+
+Why in the second, because function argument are lazy primise, no allocations for the "intermediate" value step is ever run, we directly aterialize the boolean vector.
+
+We will keep the first version because even if `time_on_page` is semantically temporary here, we still need it further.
+
+So here are the benchmark results:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B13">dplyr</button>
+    <button class="code-tab" data-tab="read2B13">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read2B13">
+
+```
+
+Read time heuristic 0.0075
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B13">
+
+```
+
+Read time heuristic 0.0019
+
+```
+
+  </div>
+
+</div>
+
+Again, the `data.table` version is faster than the `dplyr` one.
+
+Now, go for the ASN enrichment, meaning the association of a ASN for each IPV4.
+
+An Autonomous System Number is a group of IPs controled by one organizations.
+
+In the early sae of the modern internet with IPV4, a lot of IPs range were attributed to some organizations, like universities, companies.
+
+Now they have a high value, better than bitcoin lol.
+
+We are not fully over IPV6 (whichare basically free because a LOT of combinations possible, so for now we still work with IPV4).
+
+Anyway, here are the code:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B14">dplyr</button>
+    <button class="code-tab" data-tab="read2B14">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read2B14">
+
+```r
+
+ips <- sort(unique(df$ip))
+
+asn_data <- lookup_asns(ips, 
+                        db_path = asn_db_path
+)
+
+df <- df %>% left_join(asn_data, by = "ip")
+
+```
+
+```
+
+ASN Enrichment 0.0019
+
+```
+
+  </div>
+
+   <div class="code-tab-panel" data-panel="read2B14">
+
+```r
+
+ips <- sort(unique(df$ip))
+
+asn_data <- lookup_asns(ips, 
+                        db_path = asn_db_path
+)
+
+df <- asn_data[df, on = "ip"] # left join
+
+```
+
+```
+
+ASN Enrichment 0.0014
+
+```
+
+  </div>
+
+</div>
+
+That's beyond the scope of this video, but `lookup_asns()` returns a `data.table` / `tibble` with this shape:
+
+```r
+
+data.table::data.table(
+  ip = ip,
+  asn = asn_number,
+  asn_org = asn_org
+)
+
+```
+
+Or the equivalent for the `tibble` variant for `dplyr`.
+
+Anyway, again, slight advantage for `data.table` here.
+
+
 
 ## Conclusion & Compiled Benchmarks
 
