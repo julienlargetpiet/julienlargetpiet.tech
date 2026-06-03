@@ -1432,17 +1432,11 @@ filtered_data <- reactive({
   ]
   df[, asn_bucket := cumsum(asn_changed)]
   
-  #df[, ip_16_occ := .N, by = .(asn_bucket, ip_16)]
-  #df <- df[ip_16_occ == 1 | !is_cloud_asn]
-
-  #df[, if (!first(is_cloud_asn) || .N == 1L) .SD, 
-  #     by = .(asn_bucket, ip_16)
-  #]
-
-  df <- df[df[, if (!first(is_cloud_asn) || .N == 1L) .I, 
+  keep <- df[, if (!first(is_cloud_asn) || .N == 1L) .I, 
                 by = .(asn_bucket, ip_16)
              ]$V1
-  ]
+
+  df <- df[keep]
 
   df[, c("asn_org_clean",
          "ip_16",
@@ -2406,6 +2400,307 @@ data.table::data.table(
 Or the equivalent for the `tibble` variant for `dplyr`.
 
 Anyway, again, slight advantage for `data.table` here.
+
+Now we are going to apply a computationally heavier filter.
+
+Let me explain.
+
+A common bot pattern, especially for traffic coming from large hosting or cloud providers, is to make many requests within a relatively short time window from very similar IPv4 addresses.
+
+The key point is very similar: in these request bursts, only the last one or two octets of the IPv4 address may change.
+
+Example:
+
+```
+
+192.168.10.14
+192.168.10.27
+192.168.11.3
+
+```
+
+These addresses are not identical, but they clearly belong to a nearby IP range. That is the pattern this heuristic tries to catch.
+
+We are going to create groups by searching for contiguous rows with same ASN.
+
+Then, we are going to apply an IP filter of 16 bits, meaning we will only keep the first 2 bytes.
+
+Finally, we are going to erase from the data, the rows that are in the same groups and share the same 16 bits masked IPV4 address.
+
+We are going the last filter only if the ASN is cloud oriented.
+
+So here are the codes for both implementations
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B15">dplyr</button>
+    <button class="code-tab" data-tab="read2B15">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B15">
+
+```r
+
+df <- df %>%
+  arrange(date) %>%
+  mutate(
+    is_cloud_asn = grepl(cloud_asn_regex, asn_org, ignore.case = TRUE),
+    asn_org_clean = coalesce(asn_org, "UNKNOWN_ASN"),
+    ip_16 = sub("\\.[0-9]+\\.[0-9]+$", "", ip),
+    asn_changed = asn_org_clean != lag(asn_org_clean, default = first(asn_org_clean)),
+    asn_bucket = cumsum(asn_changed) + 1
+  ) %>%
+  group_by(asn_bucket, ip_16) %>%
+  mutate(ip_16_occ = n()) %>%
+  ungroup() %>%
+  filter(ip_16_occ == 1 | !is_cloud_asn) %>%
+  select(-asn_org_clean, 
+         -ip_16, 
+         -asn_changed, 
+         -asn_bucket, 
+         -ip_16_occ
+  )
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B15">
+
+```r
+
+data.table::setorder(df, date) # sorts by ref
+df[, is_cloud_asn := grepl(cloud_asn_regex, asn_org, ignore.case = TRUE)]
+df[, asn_org_clean := data.table::fcoalesce(asn_org, "UNKNOWN_ASN")]
+df[, ip_16 := sub("\\.[0-9]+\\.[0-9]+$", "", ip)]
+df[, asn_changed := asn_org_clean != shift(asn_org_clean, 
+                                           type = "lag",
+                                           fill = first(asn_org_clean)
+                                          )
+]
+df[, asn_bucket := cumsum(asn_changed)]
+
+```
+
+And after.
+
+Variant 1:
+
+```r
+
+keep <- df[, if (!first(is_cloud_asn) || .N == 1L) .I, 
+              by = .(asn_bucket, ip_16)
+           ]$V1
+
+df <- df[keep]
+
+```
+
+Variant 2:
+
+```r
+
+df <- df[, ip_16_occ := .N, by = .(asn_bucket, ip_16)]
+keep <- !df$is_cloud_asn | df$ip_16_occ == 1
+df <- df[keep]
+
+```
+
+Variant 3:
+
+```r
+
+df <- df[, if (!first(is_cloud_asn) || .N == 1L) .SD, 
+     by = .(asn_bucket, ip_16)
+]
+
+```
+
+Finally.
+
+```r
+
+df[, c("asn_org_clean",
+       "ip_16",
+       "asn_changed",
+       "asn_bucket") := NULL
+]
+
+```
+
+  </div>
+
+</div>
+
+The interesting thing here is the second part where I have presented 3 variants.
+
+The third one is not the best.
+
+Indeed, after computing the index of the groups that respect the conditions, it will literally return sub-dataframes (`.SD`) containing the associated rows for each group.
+
+Compared to the first version which also compute the index of the rows that respects the conditions but does not direclty builds the dataframe with those index (`.I`), it will only use them afterward as a filter.
+
+so the real question regarding the first and third version is:
+
+**Is the filter faster than the direct returns of the .SD and the cost of the temporary index (keep) amortized ?**
+
+Usually, yes. Even though `.SD` avoids the explicit final filter line, it tends to be slower because it builds the result through the grouped mechanism, while `df[keep]` is a plain row subset and has better chance to be vectorized.
+
+On the other hand, it is very simple to tell why the second version is not faster than the first one; it materializes a whole column of `ip_16_occ` before deriving from it the index mask. And also, in average it does more comparisons because it doe snot take advantage of `first(is_cloud_asn)`, because if `TRUE`, no need to evaluate the rest of the conditions.
+
+By the way boolean comparisons such as `&&` and `||` are for comparing scalar to scalar while `&` and `|` are for comparing vecotr to vectors or scalars to vectors.
+
+So, we wil keep the first variant.
+
+Here are the results between `data.table` and `dplyr`:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B16">dplyr</button>
+    <button class="code-tab" data-tab="read2B16">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B16">
+
+```
+
+ASN filtering 1 0.0106
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B16">
+
+```
+
+ASN filtering 1 0.0059
+
+```
+
+  </div>
+
+</div>
+
+Again, the point goes to `data.table`.
+
+Now, we will repeat the same heuristic, but instead of grouping by contiguous identical ASNs, we will group them by half hours :=)
+
+And choose 24 to 32 bits masked IPV4.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B17">dplyr</button>
+    <button class="code-tab" data-tab="read2B17">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B17">
+
+```r
+
+df <- df %>%
+  arrange(date) %>%
+  mutate(
+    ip_24 = sub("\\.[0-9]+$", "", ip),
+    half_hour_bucket = floor_date(date, unit="30 minutes") # ful date + hour
+  ) %>%
+  group_by(half_hour_bucket, ip_24) %>%
+  mutate(ip_24_occ = n()) %>%
+  ungroup() %>%
+  filter(ip_24_occ == 1 | !is_cloud_asn) %>%
+  select(-ip_24, 
+         -ip_24_occ,
+         -is_cloud_asn,
+         -half_hour_bucket
+  )
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B17">
+
+```r
+
+df[, ip_24 := sub("\\.[0-9]+$", "", ip)]
+df[, half_hour_bucket := lubridate::floor_date(date, unit = "30 minutes")]
+
+```
+
+After.
+
+Variant 1:
+
+```r
+
+df <- df[
+         df[, .I[.N == 1L | !is_cloud_asn], 
+            by = .(half_hour_bucket, ip_24)
+           ]$V1
+]
+
+```
+
+Variant 2:
+
+```r
+
+df[, ip_24_occ := .N, by = .(half_hour_bucket, ip_24)]
+df <- df[ip_24_occ == 1 | !is_cloud_asn]
+
+```
+
+Variant 3:
+
+```r
+
+df <- df[
+         df[, if (.N == 1L) .I else .I[!is_cloud_asn], 
+            by = .(half_hour_bucket, ip_24)
+           ]$V1
+]
+
+```
+
+  </div>
+
+</div>
+
+Yet again 3 variants for the second part on the `data.table` side.
+
+And yet again, the second versin is a good candidate to eliminate, because materialization before deriving the index vector.
+
+Now, we about the first and third variant.
+
+They are basically the same, only the way they check the conditions on the groups.
+
+The third one does it very explicitely, like if there is only one `ip_24` on that group, that's ok and/or if they do not belong to a cloudy ASN.
+
+While the first one takes advantage of this pattern in R, example:
+
+```r
+
+> TRUE | c(FALSE, TRUE)
+[1] TRUE TRUE
+
+```
+
+Boolean operations between scalar and vectors are expanded to a vector.
+
+By the way we can even extend this boolean operations on vector whose the size is divisable by the other:
+
+```r
+
+> c(FALSE, TRUE) | c(FALSE, TRUE, TRUE, FALSE)
+[1] FALSE  TRUE  TRUE  TRUE
+
+```
+
+The third one also sometimes avoid the evaluation of a whole boolean vector (`is_cloud_asn`) in `.I` when the first simple boolean scalar condition is respected (`.N == 1L`), while the first versions does it everytime.
+
+But the first one bypasses the `if else`, so apriori that is very close.
+
+So we will keep version 1 and 3 and benchmarks them in addition to `dplyr` version.
 
 
 
