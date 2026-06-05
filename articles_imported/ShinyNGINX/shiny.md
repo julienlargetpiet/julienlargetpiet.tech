@@ -1004,11 +1004,11 @@ To be certain of that, i will again decompose more.
    <div class="code-tab-panel" data-panel="read1B4">  
 
 ```
-Raw Ingestion 0.2916
-Date mutation 0.0068
-Selection 0.0012
-Filtering 0.0345
-Col drop 0.0014
+Raw Ingestion 0.2916 secs on 725 832 rows
+Date mutation 0.0068 secs on 725 832 rows
+Selection 0.0012 secs on 725 832 rows
+Filtering 0.0345 secs on 630 156
+Col drop 0.0014 secs on 630 156 rows
 
 ```
 
@@ -1018,11 +1018,11 @@ Col drop 0.0014
 
 ```
 
-Raw Ingestion 0.2206
-Date mutation 0.0023
-Selection 0.0203
-Filtering 0.0272
-Col drop 7e-04
+Raw Ingestion 0.2206 secs on 725 832 rows
+Date mutation 0.0023 secs on 725 832 rows
+Selection 0.0203 secs on 725 632 rows
+Filtering 0.0272 secs on 630 156 rows
+Col drop 7e-04 secs on 630 156 rows
 
 ```
 
@@ -1069,11 +1069,11 @@ And now, look at that:
 
 ```
 
-Raw Ingestion 0.2204
-Date mutation 0.0035
-Selection 1e-04
-Filtering 0.025
-Col drop 7e-04
+Raw Ingestion 0.2204 secs on 725 832
+Date mutation 0.0035 secs on 725 832
+Selection 1e-04 secs on 725 832 rows
+Filtering 0.025 secs on 630 156 rows
+Col drop 7e-04 secs on 630 156 rows
 
 ```
 
@@ -1478,13 +1478,16 @@ filtered_data <- reactive({
   log_step("ASN filtering 2", t, df)
   t <- Sys.time()
 
+  keep <- !grepl(ip_exclude, df$ip)
   df <- df[!grepl(ip_exclude, ip)]
 
   log_step("IP Exclusion", t, df)
   t <- Sys.time()
 
-  bad_ip <- df[target %in% honey_pots, unique(ip)]
-  df <- df[!(ip %in% bad_ip)]
+  keep <- df$target %in% honey_pots
+  bad_ip <- df[keep, unique(ip)]
+  keep <- !(df$ip %in% bad_ip)
+  df <- df[keep]
 
   log_step("HONEY POTS", t, df)
 
@@ -1516,7 +1519,9 @@ and:
 
 However, they are not equivalent in terms of computational cost. The first chain is much lighter because it reduces the dataset before running the expensive filtering steps.
 
-And we will kepp this reasoning for the other bots filtering operations.
+And we will keep this reasoning for the other bots filtering operations.
+
+Note: in the benchmark, the selected time interval intentionally covers all rows in the dataset. This avoids making the benchmark differences disappear into noise (CPU scheduling, frequency...).
 
 Now the time interval filter bencharks:
 
@@ -1530,7 +1535,7 @@ Now the time interval filter bencharks:
 
 ```r
 
-Time Window 0.0078
+Time Window 0.0078 secs for 296 178 rows
 
 ```
 
@@ -1540,7 +1545,7 @@ Time Window 0.0078
 
 ```r
 
-Time Window 0.0066
+Time Window 0.0066 secs for 296 178 rows
 
 ```
 
@@ -1644,7 +1649,7 @@ The cost of the uniqueness computation plus the nrow lookups is normally amortiz
 
 ```r
 
-UA AGENT 0.0191
+UA AGENT 0.0191 secs for 296 178 rows
 
 ```
 
@@ -1654,7 +1659,7 @@ UA AGENT 0.0191
 
 ```r
 
-UA AGENT 0.0262
+UA AGENT 0.0262 secs for 296 178 rows
 
 ```
 
@@ -1703,8 +1708,8 @@ log_step("UA AGENT Post", t, df)
 
 ```
 
-UA Agent Pre 0.0136
-UA AGENT Post 0.004
+UA Agent Pre 0.0136 secs for 296 178 rows
+UA AGENT Post 0.004 secs for 160 064 rows
 
 ```
 
@@ -1740,8 +1745,8 @@ UA AGENT Post 0.004
 
 ```
 
-UA Agent Pre 0.0147
-UA AGENT Post 0.0038
+UA Agent Pre 0.0147 secs for 296 178 rows
+UA Agent Post 0.0038 secs for 160 064 rows
 
 ```
 
@@ -1954,7 +1959,7 @@ Here are the benchmark's result:
 
 ```
 
-Asset heuristic 0.0749
+Asset heuristic 0.0749 secs for 132 368 rows
 
 ```
 
@@ -1964,7 +1969,7 @@ Asset heuristic 0.0749
  
  ```
 
-Asset heuristic 0.0728
+Asset heuristic 0.0728 secs for 132 368 rows
 
 ```
 
@@ -1993,7 +1998,7 @@ df <- df %>%
 
 ```
 
-Aticle filtering 0.0375
+Aticle filtering 0.0375 secs for 16 354 rows
 
 ```
 
@@ -2009,7 +2014,7 @@ df <- df[grepl("^/articles/.*\\.html$", target, ignore.case=TRUE)]
 
 ```
 
-Aticle filtering 0.037
+Aticle filtering 0.037 secs for 16 354 rows
 
 ```
 
@@ -2117,7 +2122,7 @@ And look at the benchmark results, that's impressive:
 
 ```
 
-Rate heuristic 0.032
+Rate heuristic 0.032 secs for 3 391 rows
 
 ```
 
@@ -2127,7 +2132,7 @@ Rate heuristic 0.032
 
 ```
 
-Rate heuristic 0.0056
+Rate heuristic 0.0056 secs for 3 391 rows
 
 ```
 
@@ -2151,7 +2156,7 @@ It would be cool if it could be vectorized :)
 
 And yess it can be, but if we keep put obstacles to the vectorization by changing groups in the grouping environment, then we waste potential.
 
-So lets test this `dplyr` varant:
+So let's test this `dplyr` varant:
 
 ```r
 
@@ -2184,7 +2189,7 @@ And here the benchmark result:
 
 ```
 
-Rate heuristic 0.0215
+Rate heuristic 0.0215 secs for 3 391 rows
 
 ```
 
@@ -2263,9 +2268,15 @@ df[, next_date := NULL]
 
 </div>
 
+Note:
+
+- When we use the `data.table::setorder(df, col1, col2)` it does a real sort, meaning that it actualy changes the physical row order for each column of `df`
+
+- It won't just change the physical row order of a potential `view index vector` used for accessing the row in the dataframe. (not lazy)
+
 What is interesting here is the difference between the two `data.table` variants.
 
-Technically we wil need `time_on_page` later in the pipeline, but in thi localized function absolutely not.
+Technically we wil need `time_on_page` later in the pipeline, but in this localized function absolutely not.
 
 That is why i just wanted to show you where lazyness shines.
 
@@ -2301,7 +2312,7 @@ So here are the benchmark results:
 
 ```
 
-Read time heuristic 0.0075
+Read time heuristic 0.0075 secs for 990 rows
 
 ```
 
@@ -2311,7 +2322,7 @@ Read time heuristic 0.0075
 
 ```
 
-Read time heuristic 0.0019
+Read time heuristic 0.0019 secs for 990 rows
 
 ```
 
@@ -2355,7 +2366,7 @@ df <- df %>% left_join(asn_data, by = "ip")
 
 ```
 
-ASN Enrichment 0.0019
+ASN Enrichment 0.0019 secs for 990 rows
 
 ```
 
@@ -2377,7 +2388,7 @@ df <- asn_data[df, on = "ip"] # left join
 
 ```
 
-ASN Enrichment 0.0014
+ASN Enrichment 0.0014 secs for 90 rows
 
 ```
 
@@ -2564,7 +2575,7 @@ Here are the results between `data.table` and `dplyr`:
 
 ```
 
-ASN filtering 1 0.0106
+ASN filtering 1 0.0106 secs for 990 rows
 
 ```
 
@@ -2574,7 +2585,7 @@ ASN filtering 1 0.0106
 
 ```
 
-ASN filtering 1 0.0059
+ASN filtering 1 0.0059 secs for 990 rows
 
 ```
 
@@ -2662,6 +2673,17 @@ df <- df[
 
 ```
 
+And after:
+
+```r
+
+df[, c("ip_24",
+       "is_cloud_asn",
+       "half_hour_bucket") := NULL
+]
+
+```
+
   </div>
 
 </div>
@@ -2702,7 +2724,310 @@ But the first one bypasses the `if else`, so apriori that is very close.
 
 So we will keep version 1 and 3 and benchmarks them in addition to `dplyr` version.
 
+Here are the results:
 
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B18">rdplyr</button>
+    <button class="code-tab" data-tab="read2B18">data.table version 1</button>
+    <button class="code-tab" data-tab="read3B18">data.table version 3</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B18">
+
+```
+ASN filtering 2 0.0081 secs for 990 rows
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B18">
+
+```
+
+ASN filtering 2 0.0023 secs for 990 rows
+
+```
+
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read3B18">
+
+```
+
+ASN filtering 2 0.0022 secs for 990 rows
+
+```
+
+  </div>
+
+</div>
+
+
+Yet again, advantage on the `data.table` versions.
+
+And we clearly see that both `data.table` variants are super close, almost identical in term of execution speed. (and we can take a good guess that also equivalent in term of memory consumption)
+
+After that we will just filter on the IPV4 we know we do not want based on a vector defined in `global.R`.
+
+For the sake of it, here are the results:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B19">readr + dplyr</button>
+    <button class="code-tab" data-tab="read2B19">vroom + dplyr</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B19">
+
+```r
+
+df <- df %>% filter(!grepl(ip_exclude, ip))
+
+```
+
+```
+
+IP Exclusion 8e-04 secs for  278 rows
+
+```
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B19">
+
+```r
+
+keep <- !grepl(ip_exclude, df$ip)
+df <- df[keep]
+
+```
+
+```
+
+IP Exclusion 3e-04 secs for  278 rows
+
+```
+
+  </div>
+
+</div>
+
+Now, we are going to use our beloved honey pots.
+
+Meaning that I have several articles published in private (AI slop), so no one can access it apart from a bot reading the `sitemap.xml` and getting the exact link.
+
+So i will just exclude the connection (IPV4) that accessed to those honey pots.
+
+Here is the code and their benchmark results:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B20">dplyr</button>
+    <button class="code-tab" data-tab="read2B20">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B20">
+
+```r
+
+bad_ip <- df %>%
+  filter(target %in% honey_pots) %>%
+  distinct(ip) %>%
+  pull(ip)
+
+df <- df %>%
+  filter(!(ip %in% bad_ip))
+
+```
+
+```
+
+HONEY POTS 0.0017 secs for  278 rows
+
+```
+
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B20">
+
+```r
+
+keep <- df$target %in% honey_pots
+bad_ip <- df[keep, unique(ip)]
+keep <- !(df$ip %in% bad_ip)
+df <- df[keep]
+
+```
+
+```
+
+HONEY POTS 3e-04 secs for  278 rows
+
+```
+
+  </div>
+
+</div>
+
+Again, the same point applies to the `data.table` version. Even though the benchmark uses the median of 9 consecutive runs, at this low number of rows in the pipeline, the results may still be polluted by CPU scheduling noise and other small runtime variations.
+
+That's all for the main pipeline.
+
+We have another operation that runs after that, to compute the median readtime KPI of all articles.
+
+That is located inside this function or its `dplyr` equivalent:
+
+```r
+
+output$kpi_med_readtime <- renderText({
+
+  df <- filtered_data()
+
+  t <- Sys.time()
+
+  req(nrow(df) > 0)
+
+  keep <- !is.na(df$time_on_page) & 
+          df$time_on_page > 0 & 
+          df$time_on_page < 3600
+
+  median_time <- df[keep, median(time_on_page)]
+
+  if (is.na(median_time)) return("—")
+
+  mins <- floor(median_time / 60)
+  secs <- round(median_time %% 60)
+
+  log_step("KPI MEDIAN READTIME", t, df)
+
+  sprintf("%02d:%02d", mins, secs)
+})
+
+```
+
+Here are the code and the results:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B21">dplyr</button>
+    <button class="code-tab" data-tab="read2B21">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B21">
+
+```r
+
+median_time <- df %>%
+  filter(
+    !is.na(time_on_page),
+    time_on_page > 0,
+    time_on_page < 3600   # safety cap (1 hour max)
+  ) %>%
+  summarise(med = median(time_on_page)) %>%
+  pull(med)
+
+```
+
+```
+
+KPI MEDIAN READTIME 0.0016 secs for  278 rows
+
+```
+
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B21">
+
+```r
+
+keep <- !is.na(df$time_on_page) & 
+        df$time_on_page > 0 & 
+        df$time_on_page < 3600
+
+median_time <- df[keep, median(time_on_page)]
+
+```
+
+```
+
+KPI MEDIAN READTIME 3e-04 secs for  278 rows
+
+```
+
+  </div>
+
+</div>
+
+That's the same music.
+
+Finally, in one of the table, we output the median readtime per article, so we do:
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1B22">dplyr</button>
+    <button class="code-tab" data-tab="read2B22">data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1B22">
+
+```r
+
+df <- df %>%
+         filter(
+               time_on_page > 3 & time_on_page < 3600
+               ) %>%
+         group_by(target) %>%
+         summarise(median_readtime = median(time_on_page),
+                   valid_reads = n(),
+                   .groups = "drop") %>%
+         arrange(desc(median_readtime))
+
+```
+
+```
+
+[filtered_data] READTIME STATS            0.0061 sec | rows: # (278 before grouping)
+
+```
+
+
+  </div>
+
+  <div class="code-tab-panel" data-panel="read2B22">
+
+```r
+
+keep <- df$time_on_page > 3 & df$time_on_page < 3600
+df <- df[keep] 
+df <- df[, .(
+       median_readtime = median(time_on_page),
+       valid_reads = .N
+      ), 
+   by = target
+]
+data.table::setorder(df, -median_readtime)
+
+```
+
+```
+
+READTIME STATS            0.0012 sec | rows: 6 # (278 before the grouoping)
+
+```
+
+  </div>
+
+</div>
+
+Same music.
+
+Note: 
+
+- When 
 
 ## Conclusion & Compiled Benchmarks
 
@@ -3081,5 +3406,5 @@ Data manipulation time: 0.1619
 
 
 
-
+ 
 
