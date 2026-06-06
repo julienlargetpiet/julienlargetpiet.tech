@@ -2455,7 +2455,7 @@ So here are the benchmark results:
     <button class="code-tab" data-tab="read2B13">data.table</button>
   </div>
 
-  <div class="code-tab-panel active" data-panel="read2B13">
+  <div class="code-tab-panel active" data-panel="read1B13">
 
 Version 1:
 
