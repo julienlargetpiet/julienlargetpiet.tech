@@ -1758,27 +1758,27 @@ UA AGENT Post 0.004 secs for 160 064 rows
 
 ```r
 
-    t <- Sys.time()
+t <- Sys.time()
 
-    ua_unique <- unique(df$ua)
-    
-    ua_is_bot <- setNames(
-      grepl(
-        bot_regex,
-        ua_unique,
-        ignore.case = TRUE,
-        perl = TRUE
-      ),
-      ua_unique
-    )
+ua_unique <- unique(df$ua)
 
-    keep <- !ua_is_bot[df$ua]
-    log_step("UA Agent Pre", t, df)
-    t <- Sys.time()
+ua_is_bot <- setNames(
+  grepl(
+    bot_regex,
+    ua_unique,
+    ignore.case = TRUE,
+    perl = TRUE
+  ),
+  ua_unique
+)
 
-    df <- df[keep]
+keep <- !ua_is_bot[df$ua]
+log_step("UA Agent Pre", t, df)
+t <- Sys.time()
 
-    log_step("UA AGENT Post", t, df)
+df <- df[keep]
+
+log_step("UA AGENT Post", t, df)
 
 ```
 
