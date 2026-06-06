@@ -1680,7 +1680,7 @@ UA AGENT 0.0191 secs for 296 178 rows
 
 ```r
 
-_unique <- unique(df$ua)
+ua_unique <- unique(df$ua)
 
 ua_is_bot <- setNames(
   grepl(
