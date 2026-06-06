@@ -2439,7 +2439,6 @@ date next_date
 
 ```
 
-But the second version does not create a column to store the readtime (difference between current readtime and next one, or `-1` if no data for next because remember `coalesce(x, y)` is roughly like `ifelse(!is.na(x), x, y)`: it keeps `x` when `x` is not missing, otherwise it falls back to `y`).
 
 In the first version the boolean vector is derived from the `time_on_page` column after `time_on_page` is fully materialized.
 
