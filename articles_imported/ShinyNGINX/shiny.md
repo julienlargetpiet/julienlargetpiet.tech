@@ -2511,7 +2511,7 @@ Anyway, here are the code:
     <button class="code-tab" data-tab="read2B14">data.table</button>
   </div>
 
-  <div class="code-tab-panel active" data-panel="read2B14">
+  <div class="code-tab-panel active" data-panel="read1B14">
 
 ```r
 
