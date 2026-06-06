@@ -13,13 +13,13 @@ One important distinction in this benchmark is the difference between data inges
 
 This distinction matters because a pipeline can be fast at reading but slower once real transformations start, or the opposite. So I will benchmark both the ingestion layer and the actual transformation layer separately.
 
-So we will fairly benchmark `dplyr` and `data.table` manipulation functions in data manipulatin steps and `readr`, `vroom` and `data.table` ingestion functions in the ingestion step.
+So we will benchmark `dplyr` and `data.table` for the manipulation steps, and `readr`, `vroom`, and `data.table` for the ingestion step.
 
-But also the transition step, which is important, especially for lazy parsing.
+We will also benchmark the transition step, which matters a lot when lazy parsing is involved.
 
 ## What are we even talking about
 
-We define the log format in `/etc/nginx/nginx.conf`, in the `http {...}` block as a tsv:
+We define the log format in `/etc/nginx/nginx.conf`, in the `http {...}` block as a TSV:
 
 ```
 
@@ -30,7 +30,7 @@ log_format statix_tsv '$remote_addr\t'
                       '$http_user_agent';
 ```
 
-And i tell my blog to use this format for the log in the associated `server {...}` block:
+And I tell my blog to use this format for the log in the associated `server {...}` block:
 
 ```
 
@@ -41,13 +41,13 @@ access_log /var/log/nginx/statix.log statix_tsv;
 So we got all columns we need to perform our bot filtering heuristics and analysis.
 
 
-- `$remote_addr` -> IPV4 address
+- `$remote_addr` -> IPv4 address
 
 - `$msec` -> seconds since 1st January 1970 (Unix timestamp)
 
 - `uri` -> The targeted URL
 
-- `status` -> Status of the request, basicaly we will only filtr on success (code: 200)
+- `status` -> Status of the request, basicaly we will only filter on success (code: 200)
 
 - `$http_user_agent` -> The user agent sent by the client. It is a text string that usually identifies the browser, operating system, device, or bot making the request
 
@@ -57,11 +57,11 @@ Fields are separated by a tab character `\\t` -> TSV.
 
 In a typical RShiny application, you have 3 files.
 
-- `global.R` -> set up the global ressources that can be accessible from anywhere in the application (variables, functions...)
+- `global.R` -> set up the global resources that can be accessible from anywhere in the application (variables, functions...)
 
-- `ui.R` -> describe in R the layouts and send input values to the server / recieves computed objects from the server and render them
+- `ui.R` -> describe in R the layouts and send input values to the server / receives computed objects from the server and render them
 
-- `server.R` -> Runs for each session / is charged to compute valies according to `global.R` ressources and `ui.R` input values
+- `server.R` -> Runs for each session / is charged to compute values according to `global.R` resources and `ui.R` input values
 
 ### Reactive variables
 
@@ -179,11 +179,11 @@ numericInput(
 
 ```
 
-Default values say we want to get the dashboard on the vists on the last 72 hours, but what hapen when i change the units or the number ?
+The default values mean that we want the dashboard to display visits from the last 72 hours. But what happens when I change the time unit or the number?
 
 Of course visualizations will be obsolete.
 
-Then, the client will wai for the new ressoures to be computed once again since the beginning of the session from the server.
+Then, the client will wait for the new resources to be computed once again since the beginning of the session from the server.
 
 For example KPIs:
 
@@ -201,11 +201,11 @@ layout_column_wrap(
 
 Will respectively wait for the `"kpi_hits"`, `"kpi_ips"`, `"kpi_pages"` and `"kpi_med_readtime"` variable from the server.
 
-At the time we change inputs, a new request is made to `server.R` to recompute the reactive ressources according to the new inputs.
+At the time we change inputs, a new request is made to `server.R` to recompute the reactive resources according to the new inputs.
 
-A reactive ressource is defined in the server.
+A reactive resource is defined in the server.
 
-This one for example is a reactive ressource:
+This one for example is a reactive resource:
 
 ```r
 
@@ -292,15 +292,15 @@ geo_enriched_data <- reactive({
 
 ```
 
-We see that its definition is wraped inside a `reactive()`, because it is a reactive ressource.
+We see that its definition is wraped inside a `reactive()`, because it is a reactive resource.
 
 Meaning it will read and its result will be cached.
 
 If one of the upstream reactive dependencies / node changes, the current reactive resource is marked as invalid. Then, the next time it is read, Shiny recomputes the invalidated part of the dependency graph, while unchanged reactive resources can still return their cached values.
 
-In this case, if `filtered_data` (a reactive ressource) was invalidated / recomputed before, then `geo_enriched_data` will be invalidated (cache not up to date) and the computation inside the `geo_enriched_data` will be run again when R will call `geo_enriched_data()`.
+In this case, if `filtered_data` (a reactive resource) was invalidated / recomputed before, then `geo_enriched_data` will be invalidated (cache not up to date) and the computation inside the `geo_enriched_data` will be run again when R will call `geo_enriched_data()`.
 
-Also lok at what i hve in the `filtered_data` definition:
+Also look at what i have in the `filtered_data` definition:
 
 ```r
 
@@ -348,7 +348,7 @@ That is just a dependency graph.
 
 We do not want a live update of the logs in the dashboard.
 
-We just want that in each session / connnection to the dashboard, last connections since the last session to be taken in count.
+We just want that in each session / connection to the dashboard, last connections since the last session to be taken in count.
 
 We can't interpolate the number of connections from the time interval of the analysis.
 
@@ -360,7 +360,7 @@ Because each line length changes we can't infer on the total amount of connectio
 
 Neither on the maximum time interval, because oftenwe got a huge increase of connections in a short range of time (2 to one week for example) and then it come back to normal status.
 
-But in comon situations, those won't be a problem.
+But in common situations, those won't be a problem.
 
 From my experience, for example i can go as far as last 360 hours.
 
@@ -581,11 +581,11 @@ The eager like ingestion engines here are `readr::read_tsv()` and `data.table::f
 
 In the other hand, we have `vroom::vroom` which is a lazy ingestion function, meaning it will not parse the full file and only cache the log file as plain text data. It is only when the next functions will ask for operation on specific subset of the dataframe, like certain cols, that the specific columns will be parsed / materialized, thus creating a delayed performance cost.
 
-So lazy ingestion function are very powerfull when we need to perform operations on a small subset of a huge data file, because only the concerned part will be parsed instead of the whole file which is a waste of computations in those cases.
+So lazy ingestion function are very powerful when we need to perform operations on a small subset of a huge data file, because only the concerned part will be parsed instead of the whole file which is a waste of computations in those cases.
 
 But is that the case here ?
 
-Not really, you see that just after readin the log file we perform a mutation, creating a column based on the `ts` column, hence we have to read this col, so parse it.
+Not really, you see that just after reading the log file we perform a mutation, creating a column based on the `ts` column, hence we have to read this col, so parse it.
 
 And if it were only one column why not, but just after that we also perform filtering operations that require parsing `target` and `status`.
 
@@ -607,25 +607,25 @@ From raw file:
 
   <div class="code-tab-panel active" data-panel="read1B">
 
-[dplyr_readr.txt](/assets/comon_files/shiny_nginx/dplyr_readr.txt)
+[dplyr_readr.txt](/assets/common_files/shiny_nginx/dplyr_readr.txt)
 
   </div>
 
   <div class="code-tab-panel" data-panel="read2B">
 
-[dplyr_vroom.txt](/assets/comon_files/shiny_nginx/dplyr_vroom.txt)
+[dplyr_vroom.txt](/assets/common_files/shiny_nginx/dplyr_vroom.txt)
 
   </div>
 
   <div class="code-tab-panel" data-panel="read3B">
 
-[data_table.txt](/assets/comon_files/shiny_nginx/data_table.txt)
+[data_table.txt](/assets/common_files/shiny_nginx/data_table.txt)
 
   </div>
 
   <div class="code-tab-panel" data-panel="read4B">
 
-[data_table_vroom.txt](/assets/comon_files/shiny_nginx/data_table_vroom.txt)
+[data_table_vroom.txt](/assets/common_files/shiny_nginx/data_table_vroom.txt)
 
   </div>
 
@@ -651,7 +651,7 @@ label <- c(
     "Time Window", 
     "UA AGENT",      
     "Asset heuristic",
-    "Aticle filtering",  
+    "Article filtering",  
     "Rate heuristic", 
     "Read time heuristic",
     "ASN Enrichment",
@@ -706,7 +706,7 @@ label <- c(
     "Time Window", 
     "UA AGENT",      
     "Asset heuristic",
-    "Aticle filtering",  
+    "Article filtering",  
     "Rate heuristic", 
     "Read time heuristic",
     "ASN Enrichment",
@@ -760,7 +760,7 @@ label <- c(
     "Time Window", 
     "UA AGENT",      
     "Asset heuristic",
-    "Aticle filtering",  
+    "Article filtering",  
     "Rate heuristic", 
     "Read time heuristic",
     "ASN Enrichment",
@@ -810,7 +810,7 @@ label <- c(
     "Time Window", 
     "UA AGENT",      
     "Asset heuristic",
-    "Aticle filtering",  
+    "Article filtering",  
     "Rate heuristic", 
     "Read time heuristic",
     "ASN Enrichment",
@@ -873,7 +873,7 @@ It looks like the `readr::read_tsv()` + `dplyr` is actually roughly 25% faster.
 
 You know what, that is intriguing, so lets' decompose the step further and measure raw eager ingestion.
 
-Just tweaking a bit the fuctions.
+Just tweaking a bit the functions.
 
 <div class="code-tabs">
   <div class="code-tabs-header">
@@ -1033,7 +1033,7 @@ It looks like mutation operations on `data.table` is faster (x3), maybe vectoriz
 
 In a marginal way, we have the same thing for the filtering (x1.25).
 
-But, when it comes to the operatins that change the structure of the dataframe like select or column drop, `dplyr` wins here.
+But, when it comes to the operations that change the structure of the dataframe like select or column drop, `dplyr` wins here.
 
 It is surely the case because in the select for example, it surely  creates a new object that points to existing column vectors. It does not necessarily copy all column data while `data.table` do it.
 
@@ -1077,11 +1077,11 @@ Col drop 7e-04 secs on 630 156 rows
 
 ```
 
-Selection is now basicaly free, we already beat `data.table` on this function at every step !
+Selection is now basicaly free, we already beat `dplyr` on this function at every step !
 
 It literally just changes the order of the references in the internal column list, just what we want :=)
 
-## Bots fitering
+## Bots filtering Pipeline
 
 Now the real work begins:
 
@@ -1152,7 +1152,7 @@ filtered_data <- reactive({
   df <- df %>%
     filter(grepl("^/articles/.*\\.html$", target, ignore.case=TRUE))
 
-  log_step("Aticle filtering", t, df)
+  log_step("Article filtering", t, df)
   t <- Sys.time()
 
   if (nrow(df) == 0) return(df)
@@ -1345,11 +1345,13 @@ filtered_data <- reactive({
 
   # Asset heuristic
 
-  css_clients <- df[endsWith(tolower(target), ".css"), 
+  keep <- endsWith(tolower(df$target), ".css")
+  css_clients <- df[keep, 
                     unique(ip)
                     ]
-
-  df <- df[ip %in% css_clients]
+    
+  keep <- df$ip %in% css_clients
+  df <- df[keep]
 
   #df <- df[
   #  ,
@@ -1369,7 +1371,7 @@ filtered_data <- reactive({
 
   df <- df[grepl("^/articles/.*\\.html$", target, ignore.case=TRUE)]
 
-  log_step("Aticle filtering", t, df)
+  log_step("Article filtering", t, df)
   t <- Sys.time()
 
   if (nrow(df) == 0) return(df)
@@ -1649,6 +1651,25 @@ The cost of the uniqueness computation plus the nrow lookups is normally amortiz
 
 ```r
 
+ua_unique <- unique(df$ua)
+
+ua_is_bot <- setNames(
+  grepl(
+    bot_regex,
+    ua_unique,
+    ignore.case = TRUE,
+    perl = TRUE
+  ),
+  ua_unique
+)
+
+df <- df %>%
+  filter(!ua_is_bot[ua])
+
+```
+
+```
+
 UA AGENT 0.0191 secs for 296 178 rows
 
 ```
@@ -1658,6 +1679,24 @@ UA AGENT 0.0191 secs for 296 178 rows
   <div class="code-tab-panel active" data-panel="read1B5">
 
 ```r
+
+_unique <- unique(df$ua)
+
+ua_is_bot <- setNames(
+  grepl(
+    bot_regex,
+    ua_unique,
+    ignore.case = TRUE,
+    perl = TRUE
+  ),
+  ua_unique
+)
+
+df <- df[!ua_is_bot[ua]]
+
+```
+
+```
 
 UA AGENT 0.0262 secs for 296 178 rows
 
@@ -1754,9 +1793,9 @@ UA Agent Post 0.0038 secs for 160 064 rows
 
 </div>
 
-For `dplyr`, `0.0136 + 0.004 = 0.0176`, not too different from the combined boolean vector + filter from before.
+For `dplyr`, `0.0136 + 0.004 = 0.0176`, not too different from the combined boolean vector + filter from before, but on the `data.table` size it is a huge improvment.
 
-At first gnlance you can question the goal of decomposing the steps, because anyway R is computing the declaration of the boolean vector before passing it to the filter function.
+At first glance you can question the goal of decomposing the steps, because anyway R is computing the declaration of the boolean vector before passing it to the filter function.
 
 ### Lazy promises
 
@@ -1860,7 +1899,7 @@ Execution halted
 
 All that for saying that for predictability and performance reason, it is better to declare the boolean mask as a variable and then use it inside the function (because already computed) than directly giving it to the function as a lazy promise.
 
-And it is EXACTLY what is going on with the `data.table` variant:
+This is probably part of what is going on here, combined with the way `data.table` evaluates expressions inside `i`. In practice, precomputing the mask makes the evaluation boundary explicit: the condition is computed first, then the already-materialized logical vector is used for filtering.
 
 ```
 
@@ -1868,9 +1907,11 @@ And it is EXACTLY what is going on with the `data.table` variant:
 
 ```
 
+Since precomputing the boolean mask proved especially beneficial in data.table, we will use this pattern by default for the data.table implementation. For dplyr, we will benchmark it as an additional variant, because constructing the mask outside the filtering call still helps, but the gain is smaller / less clear.
+
 Now for the asset heuristic.
 
-It is simple, we will just take the ips adresses that at least loaded one `.css` ressource, eleminating most of browserless bots.
+It is simple, we will just take the ips adresses that at least loaded one `.css` resource, eliminating most of browserless bots.
 
 <div class="code-tabs">
   <div class="code-tabs-header">
@@ -1880,6 +1921,8 @@ It is simple, we will just take the ips adresses that at least loaded one `.css`
 
   <div class="code-tab-panel active" data-panel="read1B7">
 
+Version 1:
+
 ```r
 
 css_clients <- df %>% 
@@ -1888,6 +1931,21 @@ css_clients <- df %>%
         pull(ip)
 
 df <- df %>% filter(ip %in% css_clients)
+
+```
+
+Version 2:
+
+```r
+
+
+keep <- endsWith(tolower(df$target), ".css")
+css_clients <- df[keep, 
+                  unique(ip)
+                  ]
+
+keep <- df$ip %in% css_clients
+df <- df[keep]
 
 ```
 
@@ -1905,7 +1963,8 @@ css_clients <- df[keep,
                   ]
 
 
-df <- df[ip %in% css_clients]
+keep <- df$ip %in% css_clients
+df <- df[keep]
 
 ```
 
@@ -1916,7 +1975,9 @@ Version 2:
 css_clients <- df[endsWith(tolower(target), ".css"), ip]
 css_clients <- unique(css_clients)
 
-df <- df[ip %in% css_clients]
+keep <- df$ip %in% css_clients
+df <- df[keep]
+
 
 ```
 
@@ -1928,7 +1989,8 @@ css_clients <- df[endsWith(tolower(target), ".css")]
 css_clients <- unique(css_clients, by="ip")
 css_clients <- css_clients$ip
 
-df <- df[ip %in% css_clients]
+keep <- df$ip %in% css_clients
+df <- df[keep]
 
 ```
 
@@ -1936,15 +1998,13 @@ df <- df[ip %in% css_clients]
 
 </div>
 
-Since we saw that it was a good thing especialy in `data.table` to compute the boolean mask before, i did it.
-
 Also I show you 3 variants of the `data.table` filtering version to speak a bit about a-priori computational cost.
 
 In fact the best version will be the first, because the intent is clear and compressed, we want all the unique ips that respects the conditions.
 
-While in the second one, we have an unecessary step where we take the whoe ip columns before computing the unique ips of it.
+While in the second one, we have an unnecessary step where we take the whoe ip columns before computing the unique ips of it.
 
-And the third one is the worst because here the unecessary steps are the construction of a temporary filtered dataframe, and once agian after where we filter the dataframe (creating a new temp one) that has unique ips, before extracting its ip column.
+And the third one is the worst because here the unnecessary steps are the construction of a temporary filtered dataframe, and once again after where we filter the dataframe (creating a new temp one) that has unique ips, before extracting its ip column.
 
 So we will keep the first `data.table` version.
 
@@ -1963,13 +2023,21 @@ Asset heuristic 0.0749 secs for 132 368 rows
 
 ```
 
+Version 2
+
+```
+
+Asset heuristic 0.0708 secs for  132 368 rows
+
+```
+
    </div>
 
    <div class="code-tab-panel" data-panel="read2B8">
  
  ```
 
-Asset heuristic 0.0728 secs for 132 368 rows
+Asset heuristic 0.0704 secs for  132 368 rows
 
 ```
 
@@ -1979,6 +2047,8 @@ Asset heuristic 0.0728 secs for 132 368 rows
 
 Not too much different.
 
+However, we can begin to distinguish a pattern, externally constructed filtering vector provides a little bit more performance.
+
 And just after the article fltering where we take only the article page:
 
 <div class="code-tabs">
@@ -1987,6 +2057,8 @@ And just after the article fltering where we take only the article page:
     <button class="code-tab" data-tab="read2B9">data.table</button>
 
    <div class="code-tab-panel active" data-panel="read1B9">
+
+Version 1:
 
 ```r
 
@@ -1998,9 +2070,26 @@ df <- df %>%
 
 ```
 
-Aticle filtering 0.0375 secs for 16 354 rows
+Article filtering 0.0375 secs for 16 354 rows
 
 ```
+
+Version 2:
+
+```r
+
+keep <- grepl("^/articles/.*\\.html$", df$target, ignore.case=TRUE)
+df <- df %>%
+  filter(keep)
+
+```
+
+```
+
+Article filtering 0.0367 secs for  16 354 rows
+
+```
+
 
    </div>
 
@@ -2008,13 +2097,14 @@ Aticle filtering 0.0375 secs for 16 354 rows
  
 ```r
 
-df <- df[grepl("^/articles/.*\\.html$", target, ignore.case=TRUE)]
+keep <- grepl("^/articles/.*\\.html$", df$target, ignore.case=TRUE)
+df <- df[keep]
 
 ```
 
 ```
 
-Aticle filtering 0.037 secs for 16 354 rows
+Article filtering 0.033 secs for 16 354 rows
 
 ```
 
@@ -2022,7 +2112,7 @@ Aticle filtering 0.037 secs for 16 354 rows
 
 </div>
 
-As you see results are pretty much the same.
+As you see results are pretty much the same, but still confirming that constructing the boolean vector outside is slightly better (and surely more predictable).
 
 So, now for the request rate heuristics.
 
@@ -2035,6 +2125,8 @@ Of course a human won't click like a sickhead on a bunch or articles, so we can 
 
    <div class="code-tab-panel active" data-panel="read1B10">
 
+Version 1:
+
 ```r
 
 df <- df %>%
@@ -2042,6 +2134,23 @@ df <- df %>%
   mutate(req_per_sec = n()) %>%
   filter(req_per_sec < 10) %>%
   ungroup() %>%
+  select(-sec, -req_per_sec)
+
+```
+
+Version 2:
+
+```r
+
+df <- df %>%
+  group_by(ip, sec = floor_date(date, "second")) %>%
+  mutate(req_per_sec = n()) %>%
+  ungroup()
+
+keep <- df$req_per_sec < 10
+
+df <- df %>%
+  filter(keep) %>%
   select(-sec, -req_per_sec)
 
 ```
@@ -2066,7 +2175,8 @@ Version 2:
 
 df[, sec := lubridate::floor_date(date, unit="second")]
 df[, req_per_sec := .N, by = .(ip, sec)]
-df <- df[req_per_sec < 10] 
+keep <- df$req_per_sec < 10
+df <- df[keep] 
 df[, c("sec", "req_per_sec") := NULL]
 
 ```
@@ -2075,7 +2185,7 @@ df[, c("sec", "req_per_sec") := NULL]
 
 </div>
 
-First, some apriori speaking regarding the computational cost o thé 2 `data.table` versions.
+First, some apriori speaking regarding the computational cost o the 2 `data.table` versions.
 
 Both creates the fundamental columns which floors to the current second from the date column.
 
@@ -2087,7 +2197,7 @@ While the first version is clever.
 
 It only create the `sec` column (flooring seconds), but after that it directly do the second rate filtering while grouping.
 
-There are 3 special varables in `data.table`.
+There are 3 special variables in `data.table`.
 
 For each group, we have:
 
@@ -2109,7 +2219,7 @@ df <- df[df[, .I[.N < 10], by = .(ip, sec)]$V1]
 
 We just output the index of the matching rows, therefore we can directly use those indices to make the filter which spare the computational cost of the creation of the `req_er_sec` column.
 
-So we wil use the first version.
+So we will use the first version.
 
 And look at the benchmark results, that's impressive:
 
@@ -2123,6 +2233,14 @@ And look at the benchmark results, that's impressive:
 ```
 
 Rate heuristic 0.032 secs for 3 391 rows
+
+```
+
+Version 2:
+
+```
+
+Rate heuristic 0.021 secs for  3 391 rows
 
 ```
 
@@ -2140,7 +2258,7 @@ Rate heuristic 0.0056 secs for 3 391 rows
 
 </div>
 
-Yess, the `data.table` version is 6 times faster than the `dplyr` one.
+Yess, the `data.table` version is 6 times faster than the `dplyr` first version.
 
 But, wait maybe there is something we can do about the `dplyr` version ?
 
@@ -2148,7 +2266,7 @@ In fact, yess, we have not taken much about the `ungroup()` thing, but it's key.
 
 Because it tells when we can go out of the grouping environment.
 
-And in fact our current filter absolutely does not need to be evaluated inside a grouping environment.
+And in fact our current filter absolutely does **not** need to be evaluated inside a grouping environment.
 
 And we want our conditions to be evaluated as fast as possible on all the elements.
 
@@ -2156,7 +2274,7 @@ It would be cool if it could be vectorized :)
 
 And yess it can be, but if we keep put obstacles to the vectorization by changing groups in the grouping environment, then we waste potential.
 
-So let's test this `dplyr` varant:
+So let's test this `dplyr` variant:
 
 ```r
 
@@ -2169,7 +2287,7 @@ df <- df %>%
 
 ```
 
-Where we mooved the `ungroup()` befre the `filter()`.
+Where we moved the `ungroup()` before the `filter()`.
 
 We can also test the syntactic sugar with `add_count()`:
 
@@ -2195,11 +2313,13 @@ Rate heuristic 0.0215 secs for 3 391 rows
 
 33% quicker than the previous version, but still 4 times slower than the `data.table` version.
 
+And overall, very close to the `dplyr` version 2 (because same architecture when it comes to the `ungroup()` and `filter()`).
+
 Next, the readtime heuristic, we will keep only the connections that lasted more than 5 seconds on the article page and less than 1 hour (360 secs).
 
-This computation is entirely done by checking the next connection to anoter aticle from the same IPV4 and compute the time difference.
+This computation is entirely done by checking the next connection to another aticle from the same IPv4 and compute the time difference.
 
-If we have only one connection, or we are at the last connection of the IPV4 address on the artice, we will still count it as a valid read.
+If we have only one connection, or we are at the last connection of the IPv4 address on the artice, we will still count it as a valid read.
 
 <div class="code-tabs">
   <div class="code-tabs-header">
@@ -2208,6 +2328,8 @@ If we have only one connection, or we are at the last connection of the IPV4 add
   </div>
 
   <div class="code-tab-panel active" data-panel="read1B12">
+
+Version 1:
 
 ```r
 
@@ -2221,6 +2343,29 @@ df <- df %>%
   ) %>%
   ungroup() %>%
   filter(time_on_page == -1 | time_on_page > 5 & time_on_page < 3600) %>%
+  select(-next_date)
+
+```
+
+Version 2:
+
+```r
+
+df <- df %>%
+  arrange(ip, date) %>%
+  group_by(ip) %>%
+  mutate(
+    next_date = lead(date),
+    time_on_page = as.numeric(difftime(next_date, date, units = "secs")),
+    time_on_page = coalesce(time_on_page, -1)
+  ) %>%
+  ungroup()
+
+keep <- df$time_on_page == -1 | 
+        (df$time_on_page > 5 & df$time_on_page < 3600)
+
+df <- df %>%
+  filter(keep) %>%
   select(-next_date)
 
 ```
@@ -2276,9 +2421,11 @@ Note:
 
 What is interesting here is the difference between the two `data.table` variants.
 
-Technically we wil need `time_on_page` later in the pipeline, but in this localized function absolutely not.
+Technically we will need `time_on_page` later in the pipeline, but in this localized function absolutely not.
 
-That is why i just wanted to show you where lazyness shines.
+So speaking about `data.table` versions here:
+
+That is why I just wanted to show you where lazyness shines.
 
 Let me explain, the goal is just to keep read time connections between 5 and 1 hour or those who can not be yet computed.
 
@@ -2292,11 +2439,11 @@ date next_date
 
 ```
 
-But the second version does not create a column to store the readtime (difference between current readtime and next one, or `-1` if no data for next because remember `coalesce(x, y) -> ifelse(!is.nul(x), x, y)`), while the first one does and then flter.
+But the second version does not create a column to store the readtime (difference between current readtime and next one, or `-1` if no data for next because remember `coalesce(x, y)` is roughly like `ifelse(!is.na(x), x, y)`: it keeps `x` when `x` is not missing, otherwise it falls back to `y`).
 
-In the first version the boolean vector is derived from the `time_on_page` column after `time_on_page` is fuly materialized.
+In the first version the boolean vector is derived from the `time_on_page` column after `time_on_page` is fully materialized.
 
-Why in the second, because function argument are lazy primise, no allocations for the "intermediate" value step is ever run, we directly aterialize the boolean vector.
+Why in the second, because function argument are lazy promises, no allocations for the "intermediate" value step is ever run, we directly materialize the boolean vector.
 
 We will keep the first version because even if `time_on_page` is semantically temporary here, we still need it further.
 
@@ -2310,9 +2457,19 @@ So here are the benchmark results:
 
   <div class="code-tab-panel active" data-panel="read2B13">
 
+Version 1:
+
 ```
 
 Read time heuristic 0.0075 secs for 990 rows
+
+```
+
+Version 2:
+
+```
+
+Read time heuristic 0.0073 secs for  990 rows
 
 ```
 
@@ -2330,17 +2487,17 @@ Read time heuristic 0.0019 secs for 990 rows
 
 </div>
 
-Again, the `data.table` version is faster than the `dplyr` one.
+Again, the `data.table` version is faster than the `dplyr` one, and `dplyr` version 2 very slightly wins over the first `dplyr` version.
 
-Now, go for the ASN enrichment, meaning the association of a ASN for each IPV4.
+Now, go for the ASN enrichment, meaning the association of a ASN for each IPv4.
 
-An Autonomous System Number is a group of IPs controled by one organizations.
+An Autonomous System Number is a group of IPs controlled by one organizations.
 
-In the early sae of the modern internet with IPV4, a lot of IPs range were attributed to some organizations, like universities, companies.
+In the early age of the modern internet with IPv4, a lot of IPs range were attributed to some organizations, like universities, companies.
 
 Now they have a high value, better than bitcoin lol.
 
-We are not fully over IPV6 (whichare basically free because a LOT of combinations possible, so for now we still work with IPV4).
+IPv6 adoption is still not universal, so a lot of traffic analysis still has to deal with IPv4 addresses.
 
 Anyway, here are the code:
 
@@ -2388,7 +2545,7 @@ df <- asn_data[df, on = "ip"] # left join
 
 ```
 
-ASN Enrichment 0.0014 secs for 90 rows
+ASN Enrichment 0.0014 secs for 990 rows
 
 ```
 
@@ -2436,7 +2593,7 @@ We are going to create groups by searching for contiguous rows with same ASN.
 
 Then, we are going to apply an IP filter of 16 bits, meaning we will only keep the first 2 bytes.
 
-Finally, we are going to erase from the data, the rows that are in the same groups and share the same 16 bits masked IPV4 address.
+Finally, we are going to erase from the data, the rows that are in the same groups and share the same 16 bits masked IPv4 address.
 
 We are going the last filter only if the ASN is cloud oriented.
 
@@ -2449,6 +2606,8 @@ So here are the codes for both implementations
   </div>
 
   <div class="code-tab-panel active" data-panel="read1B15">
+
+Version 1:
 
 ```r
 
@@ -2465,6 +2624,36 @@ df <- df %>%
   mutate(ip_16_occ = n()) %>%
   ungroup() %>%
   filter(ip_16_occ == 1 | !is_cloud_asn) %>%
+  select(-asn_org_clean, 
+         -ip_16, 
+         -asn_changed, 
+         -asn_bucket, 
+         -ip_16_occ
+  )
+
+```
+
+Version 2:
+
+```r
+
+df <- df %>%
+  arrange(date) %>%
+  mutate(
+    is_cloud_asn = grepl(cloud_asn_regex, asn_org, ignore.case = TRUE),
+    asn_org_clean = coalesce(asn_org, "UNKNOWN_ASN"),
+    ip_16 = sub("\\.[0-9]+\\.[0-9]+$", "", ip),
+    asn_changed = asn_org_clean != lag(asn_org_clean, default = first(asn_org_clean)),
+    asn_bucket = cumsum(asn_changed) + 1
+  ) %>%
+  group_by(asn_bucket, ip_16) %>%
+  mutate(ip_16_occ = n()) %>%
+  ungroup()
+
+keep <- df$ip_16_occ == 1 | !df$is_cloud_asn
+
+df <- df %>%
+  filter(keep) %>%
   select(-asn_org_clean, 
          -ip_16, 
          -asn_changed, 
@@ -2549,7 +2738,7 @@ The third one is not the best.
 
 Indeed, after computing the index of the groups that respect the conditions, it will literally return sub-dataframes (`.SD`) containing the associated rows for each group.
 
-Compared to the first version which also compute the index of the rows that respects the conditions but does not direclty builds the dataframe with those index (`.I`), it will only use them afterward as a filter.
+Compared to the first version which also compute the index of the rows that respects the conditions but does not directly builds the dataframe with those index (`.I`), it will only use them afterward as a filter.
 
 so the real question regarding the first and third version is:
 
@@ -2557,11 +2746,11 @@ so the real question regarding the first and third version is:
 
 Usually, yes. Even though `.SD` avoids the explicit final filter line, it tends to be slower because it builds the result through the grouped mechanism, while `df[keep]` is a plain row subset and has better chance to be vectorized.
 
-On the other hand, it is very simple to tell why the second version is not faster than the first one; it materializes a whole column of `ip_16_occ` before deriving from it the index mask. And also, in average it does more comparisons because it doe snot take advantage of `first(is_cloud_asn)`, because if `TRUE`, no need to evaluate the rest of the conditions.
+On the other hand, it is very simple to tell why the second version is not faster than the first one; it materializes a whole column of `ip_16_occ` before deriving from it the index mask. And also, in average it does more comparisons because it does not take advantage of `first(is_cloud_asn)`, because if `TRUE`, no need to evaluate the rest of the conditions.
 
-By the way boolean comparisons such as `&&` and `||` are for comparing scalar to scalar while `&` and `|` are for comparing vecotr to vectors or scalars to vectors.
+By the way boolean comparisons such as `&&` and `||` are for comparing scalar to scalar while `&` and `|` are for comparing vector to vectors or scalars to vectors.
 
-So, we wil keep the first variant.
+So, we will keep the first variant.
 
 Here are the results between `data.table` and `dplyr`:
 
@@ -2573,9 +2762,19 @@ Here are the results between `data.table` and `dplyr`:
 
   <div class="code-tab-panel active" data-panel="read1B16">
 
+Version 1:
+
 ```
 
 ASN filtering 1 0.0106 secs for 990 rows
+
+```
+
+Version 2:
+
+```
+
+ASN filtering 1 0.0103 secs for  990 rows
 
 ```
 
@@ -2595,9 +2794,11 @@ ASN filtering 1 0.0059 secs for 990 rows
 
 Again, the point goes to `data.table`.
 
+And slight advantage for second `dplyr` version, confirming its pattern is micro-optimization (literally lol).
+
 Now, we will repeat the same heuristic, but instead of grouping by contiguous identical ASNs, we will group them by half hours :=)
 
-And choose 24 to 32 bits masked IPV4.
+And choose 24 to 32 bits masked IPv4.
 
 <div class="code-tabs">
   <div class="code-tabs-header">
@@ -2606,6 +2807,8 @@ And choose 24 to 32 bits masked IPV4.
   </div>
 
   <div class="code-tab-panel active" data-panel="read1B17">
+
+Version 1:
 
 ```r
 
@@ -2619,6 +2822,32 @@ df <- df %>%
   mutate(ip_24_occ = n()) %>%
   ungroup() %>%
   filter(ip_24_occ == 1 | !is_cloud_asn) %>%
+  select(-ip_24, 
+         -ip_24_occ,
+         -is_cloud_asn,
+         -half_hour_bucket
+  )
+
+```
+
+Version 2:
+
+```r
+
+df <- df %>%
+  arrange(date) %>%
+  mutate(
+    ip_24 = sub("\\.[0-9]+$", "", ip),
+    half_hour_bucket = floor_date(date, unit="30 minutes") # ful date + hour
+  ) %>%
+  group_by(half_hour_bucket, ip_24) %>%
+  mutate(ip_24_occ = n()) %>%
+  ungroup()
+
+keep <- df$ip_24_occ == 1 | !df$is_cloud_asn
+
+df <- df %>%
+  filter(keep) %>%
   select(-ip_24, 
          -ip_24_occ,
          -is_cloud_asn,
@@ -2690,13 +2919,13 @@ df[, c("ip_24",
 
 Yet again 3 variants for the second part on the `data.table` side.
 
-And yet again, the second versin is a good candidate to eliminate, because materialization before deriving the index vector.
+And yet again, the second version is a good candidate to eliminate, because materialization before deriving the index vector.
 
-Now, we about the first and third variant.
+Now, what about the first and third variant ?
 
 They are basically the same, only the way they check the conditions on the groups.
 
-The third one does it very explicitely, like if there is only one `ip_24` on that group, that's ok and/or if they do not belong to a cloudy ASN.
+The third one does it very explicitly, like if there is only one `ip_24` on that group, that's ok and/or if they do not belong to a cloudy ASN.
 
 While the first one takes advantage of this pattern in R, example:
 
@@ -2709,7 +2938,7 @@ While the first one takes advantage of this pattern in R, example:
 
 Boolean operations between scalar and vectors are expanded to a vector.
 
-By the way we can even extend this boolean operations on vector whose the size is divisable by the other:
+By the way we can even extend this boolean operations on vector whose the size is divisible by the other:
 
 ```r
 
@@ -2730,13 +2959,22 @@ Here are the results:
   <div class="code-tabs-header">
     <button class="code-tab active" data-tab="read1B18">rdplyr</button>
     <button class="code-tab" data-tab="read2B18">data.table version 1</button>
-    <button class="code-tab" data-tab="read3B18">data.table version 3</button>
   </div>
 
   <div class="code-tab-panel active" data-panel="read1B18">
 
+Version 1:
+
 ```
 ASN filtering 2 0.0081 secs for 990 rows
+
+```
+
+Version 2:
+
+```
+
+ASN filtering 2 0.0082 secs for  990 rows
 
 ```
 
@@ -2750,9 +2988,7 @@ ASN filtering 2 0.0023 secs for 990 rows
 
 ```
 
-  </div>
-
-  <div class="code-tab-panel active" data-panel="read3B18">
+Version 2:
 
 ```
 
@@ -2765,11 +3001,11 @@ ASN filtering 2 0.0022 secs for 990 rows
 </div>
 
 
-Yet again, advantage on the `data.table` versions.
+Yet again, advantage on the `data.table` versions. And basically a no-diff for the 2 `dplyr` versions.
 
 And we clearly see that both `data.table` variants are super close, almost identical in term of execution speed. (and we can take a good guess that also equivalent in term of memory consumption)
 
-After that we will just filter on the IPV4 we know we do not want based on a vector defined in `global.R`.
+After that we will just filter on the IPv4 we know we do not want based on a vector defined in `global.R`.
 
 For the sake of it, here are the results:
 
@@ -2781,6 +3017,8 @@ For the sake of it, here are the results:
 
   <div class="code-tab-panel active" data-panel="read1B19">
 
+Version 1:
+
 ```r
 
 df <- df %>% filter(!grepl(ip_exclude, ip))
@@ -2790,6 +3028,21 @@ df <- df %>% filter(!grepl(ip_exclude, ip))
 ```
 
 IP Exclusion 8e-04 secs for  278 rows
+
+```
+
+Version 2:
+
+```r
+
+keep <- !grepl(ip_exclude, df$ip)
+df <- df %>% filter(keep)
+
+```
+
+```
+
+IP Exclusion 7e-04 secs for  278 rows
 
 ```
 
@@ -2818,7 +3071,7 @@ Now, we are going to use our beloved honey pots.
 
 Meaning that I have several articles published in private (AI slop), so no one can access it apart from a bot reading the `sitemap.xml` and getting the exact link.
 
-So i will just exclude the connection (IPV4) that accessed to those honey pots.
+So i will just exclude the connection (IPv4) that accessed to those honey pots.
 
 Here is the code and their benchmark results:
 
@@ -2829,6 +3082,8 @@ Here is the code and their benchmark results:
   </div>
 
   <div class="code-tab-panel active" data-panel="read1B20">
+
+Version 1:
 
 ```r
 
@@ -2848,6 +3103,27 @@ HONEY POTS 0.0017 secs for  278 rows
 
 ```
 
+Version 2:
+
+```r
+
+keep <- df$target %in% honey_pots
+bad_ip <- df %>%
+  filter(keep) %>%
+  distinct(ip) %>%
+  pull(ip)
+
+keep <- !(df$ip %in% bad_ip)
+df <- df %>%
+  filter(keep)
+
+```
+
+```
+
+HONEY POTS 0.0016 secs for  278 rows
+
+```
 
   </div>
 
@@ -2876,7 +3152,7 @@ Again, the same point applies to the `data.table` version. Even though the bench
 
 That's all for the main pipeline.
 
-We have another operation that runs after that, to compute the median readtime KPI of all articles.
+We have another operation that runs after that, to compute the median readtime of all articles.
 
 That is located inside this function or its `dplyr` equivalent:
 
@@ -2918,6 +3194,8 @@ Here are the code and the results:
 
   <div class="code-tab-panel active" data-panel="read1B21">
 
+Version 1:
+
 ```r
 
 median_time <- df %>%
@@ -2937,6 +3215,26 @@ KPI MEDIAN READTIME 0.0016 secs for  278 rows
 
 ```
 
+Version 2:
+
+```r
+
+keep <- !is.na(df$time_on_page) &
+        df$time_on_page > 0 &
+        df$time_on_page < 3600
+
+median_time <- df %>%
+  filter(keep) %>%
+  summarise(med = median(time_on_page)) %>%
+  pull(med)
+
+```
+
+```
+
+KPI MEDIAN READTIME 0.0015 secs for  278 rows
+
+```
 
   </div>
 
@@ -2974,6 +3272,8 @@ Finally, in one of the table, we output the median readtime per article, so we d
 
   <div class="code-tab-panel active" data-panel="read1B22">
 
+Version 1:
+
 ```r
 
 df <- df %>%
@@ -2994,6 +3294,27 @@ df <- df %>%
 
 ```
 
+Version 2:
+
+```r
+
+keep <- df$time_on_page > 3 & df$time_on_page < 3600
+
+df <- df %>%
+         filter(keep) %>%
+         group_by(target) %>%
+         summarise(median_readtime = median(time_on_page),
+                   valid_reads = n(),
+                   .groups = "drop") %>%
+         arrange(desc(median_readtime))
+
+```
+
+```
+
+[filtered_data] READTIME STATS            0.0048 sec | rows: # (278 before grouping)
+
+```
 
   </div>
 
@@ -3015,7 +3336,7 @@ data.table::setorder(df, -median_readtime)
 
 ```
 
-READTIME STATS            0.0012 sec | rows: 6 # (278 before the grouoping)
+READTIME STATS            0.0012 sec | rows: 6 # (278 before the grouping)
 
 ```
 
@@ -3027,384 +3348,173 @@ Same music.
 
 Note: 
 
-- When 
+- In `data.table`, when we group rows and want to return one summarized row per group, we write the aggregation expressions in the `j` position, using syntax like `.(new_col1 = median(col1), new_col2 = mean(col2))`
 
 ## Conclusion & Compiled Benchmarks
 
-<div class="code-tabs">
-  <div class="code-tabs-header">
-    <button class="code-tab active" data-tab="read1C">readr + dplyr</button>
-    <button class="code-tab" data-tab="read2C">vroom + dplyr</button>
-    <button class="code-tab" data-tab="read3C">fread + data.table</button>
-    <button class="code-tab" data-tab="read4C">vroom + data.table</button>
-  </div>
+Here is a compact view of the benchmark results.
 
-  <div class="code-tab-panel active" data-panel="read1C">
+The benchmark was run on the same 124M NGINX TSV log file, containing 725 832 rows. Each reported time is the median of 9 runs.
 
-```r
+## Ingestion and first cleaning step
 
-label <- c(
-    "Read First", 
-    "Time Window", 
-    "UA AGENT",      
-    "Asset heuristic",
-    "Aticle filtering",  
-    "Rate heuristic", 
-    "Read time heuristic",
-    "ASN Enrichment",
-    "ASN filtering 1",   
-    "ASN filtering 2",  
-    "IP Exclusion",  
-    "HONEY POTS",     
-    "KPI MEDIAN READTIME"
-)
+| Variant | Raw ingestion | Full first step | Notes |
+|---|---:|---:|---|
+| `readr::read_tsv()` + `dplyr` | `0.2912s` | `0.3302s` | Fast full first step before `data.table` optimization |
+| `vroom::vroom()` + `dplyr` | — | `0.3312s` | Lazy ingestion, but laziness does not really help here |
+| `data.table::fread()` + bad column selection | `0.2193s` | `0.4192s` | Fast raw ingestion, but slow structural copy |
+| `data.table::fread()` + `setcolorder()` | `0.2204s` | `~0.2497s` | Best eager ingestion path |
+| `vroom::vroom()` + `as.data.table()` | — | `0.3498s` | Materialization cost appears during conversion |
 
+The first surprising result was that `readr + dplyr` initially looked faster than `fread + data.table` for the first step.
 
-cat("\n #### READR + DPLYR #### \n\n")
-
-data <- read.table("dplyr_readr.result", 
-                             sep = ",", 
-                             header = FALSE
-                        )
-
-cat("\n")
-
-seconds <- as.data.frame(matrix(data$V1, 
-                        ncol = length(label),
-                        byrow=TRUE
-                       )
-                 )
-
-colnames(seconds) <- label
-tot <- 0
-
-for (i in 1:length(label)) {
-
-    val <- median(seconds[, i])
-    cat(paste(label[i], 
-              val, 
-              sep = " "))
-    tot <- tot + val
-    cat("\n")
-
-}
-
-cat(paste("TOT:", tot, "\n", sep=" "))
-cat("\n")
-cat(paste("Ingestion time:", 
-          median(seconds[, 1]), "\n", 
-          sep = " "))
-cat(paste("Data manipulation time:", 
-          median(
-                 rowSums(seconds[, 2:length(label)])
-                ), 
-          "\n", 
-          sep = " "))
-
-
-```
-
-```
-
- #### READR + DPLYR ####
-
-
-Read First 0.3302
-Time Window 0.0077
-UA AGENT 0.0181
-Asset heuristic 0.075
-Aticle filtering 0.038
-Rate heuristic 0.0316
-Read time heuristic 0.0075
-ASN Enrichment 0.0018
-ASN filtering 1 0.0106
-ASN filtering 2 0.0082
-IP Exclusion 8e-04
-HONEY POTS 0.0017
-KPI MEDIAN READTIME 0.0016
-
-Ingestion time: 0.3302
-Data manipulation time: 0.2142
-
-```
-
-  </div>
-
-  <div class="code-tab-panel" data-panel="read2C">
+But after decomposing the operation, the reason became clear: `fread()` was not the problem. The expensive part was this `data.table` line:
 
 ```r
 
-label <- c(
-    "Read First", 
-    "Time Window", 
-    "UA AGENT",      
-    "Asset heuristic",
-    "Aticle filtering",  
-    "Rate heuristic", 
-    "Read time heuristic",
-    "ASN Enrichment",
-    "ASN filtering 1",   
-    "ASN filtering 2",  
-    "IP Exclusion",  
-    "HONEY POTS",     
-    "KPI MEDIAN READTIME"
-)
-
-
-cat("\n #### VROOM + DPLYR #### \n\n")
-
-data <- read.table("dplyr_vroom.result", 
-                       sep = ",", 
-                       header = FALSE
-                  )
-
-cat("\n")
-
-seconds <- as.data.frame(matrix(data$V1, 
-                  ncol = length(label),
-                  byrow=TRUE
-                 )
-           )
-
-colnames(seconds) <- label
-tot <- 0
-
-for (i in 1:length(label)) {
-
-    val <- median(seconds[, i])
-    cat(paste(label[i], 
-              val, 
-              sep = " "))
-    tot <- tot + val
-    cat("\n")
-
-}
-
-cat(paste("TOT:", tot, "\n", sep=" "))
-cat("\n")
-cat(paste("Ingestion time:", 
-          median(seconds[, 1]), "\n", 
-          sep = " "))
-cat(paste("Data manipulation time:", 
-          median(
-                 rowSums(seconds[, 2:length(label)])
-                ), 
-          "\n", 
-          sep = " "))
+df <- df[, .(ip, date, target, status, ua)]
 
 ```
 
-```
-
- #### VROOM + DPLYR ####
-
-
-Read First 0.3312
-Time Window 0.0087
-UA AGENT 0.3841
-Asset heuristic 0.1326
-Aticle filtering 0.0839
-Rate heuristic 0.0321
-Read time heuristic 0.0077
-ASN Enrichment 0.002
-ASN filtering 1 0.0112
-ASN filtering 2 0.0102
-IP Exclusion 0.0032
-HONEY POTS 0.0322
-KPI MEDIAN READTIME 0.0017
-
-Ingestion time: 0.3312
-Data manipulation time: 0.7161
-
-```
-
-  </div>
-
-  <div class="code-tab-panel" data-panel="read3C">
+This creates a new `data.table` object. Replacing it with:
 
 ```r
 
-label <- c(
-    "Read First", 
-    "Time Window", 
-    "UA AGENT",      
-    "Asset heuristic",
-    "Aticle filtering",  
-    "Rate heuristic", 
-    "Read time heuristic",
-    "ASN Enrichment",
-    "ASN filtering 1",   
-    "ASN filtering 2",  
-    "IP Exclusion",  
-    "HONEY POTS",     
-    "KPI MEDIAN READTIME"
-)
-
-cat("\n #### FREAD + DATATABLE #### \n\n")
-
-data_datatable <- read.table("data_table.result", 
-                             sep = ",", 
-                             header = FALSE
-                            )
-
-seconds <- as.data.frame(matrix(data_datatable$V1, 
-                            ncol = length(label),
-                            byrow=TRUE
-                           )
-                     )
-
-colnames(seconds) <- label
-tot <- 0
-
-for (i in 1:length(label)) {
-
-    val <- median(seconds[, i])
-    cat(paste(label[i], 
-              val, 
-              sep = " "))
-    tot <- tot + val
-    cat("\n")
-
-}
-
-cat(paste("TOT:", tot, "\n", sep=" "))
-cat("\n")
-cat(paste("Ingestion time:", 
-          median(seconds[, 1]), "\n", 
-          sep = " "))
-cat(paste("Data manipulation time:", 
-          median(
-                 rowSums(seconds[, 2:length(label)])
-                ), 
-          "\n", 
-          sep = " "))
-
+data.table::setcolorder(df, c("ip", "date", "target", "status", "ua"))
 
 ```
 
+Makes the operation almost free, because it only changes the internal column order by reference.
+
+So the real conclusion for ingestion is:
+
+- `fread()` is faster than `readr::read_tsv()` for raw parsing
+
+- `data.table` can be slower if used in a copy-oriented way
+
+- once written in the intended `data.table` style, `fread() + data.table` becomes the fastest first step
+
+## Main filtering Pipeline
+
+| Step | `dplyr` version 1 | `dplyr` optimized | `data.table` | Fastest |
+|---|---:|---:|---:|---|
+| Time Window | `0.0078s` | — | `0.0066s` | `data.table` |
+| UA Agent | `0.0191s` | `0.0176s` | `0.0185s` | `dplyr` optimized |
+| Asset heuristic | `0.0749s` | `0.0708s` | `0.0704s` | `data.table`, but almost equal |
+| Article filtering | `0.0375s` | `0.0367s` | `0.0330s` | `data.table` |
+| Rate heuristic | `0.0320s` | `0.0210s` | `0.0056s` | `data.table` |
+| Read time heuristic | `0.0075s` | `0.0073s` | `0.0019s` | `data.table` |
+| ASN Enrichment | `0.0019s` | — | `0.0014s` | `data.table` |
+| ASN filtering 1 | `0.0106s` | `0.0103s` | `0.0059s` | `data.table` |
+| ASN filtering 2 | `0.0081s` | `0.0081s` | `0.0022s` | `data.table` |
+| IP Exclusion | `0.0008s` | `0.0007s` | `0.0003s` | `data.table` |
+| HONEY POTS | `0.0017s` | `0.0016s` | `0.0003s` | `data.table` |
+| KPI Median Read Time | `0.0016s` | `0.0015s` | `0.0003s` | `data.table` |
+| Readtime Stats | `0.0061s` | `0.0048s` | `0.0012s` | `data.table` |
+
+The total for the best dplyr variants across these measured steps is roughly:
+
 ```
 
- #### FREAD + DATATABLE ####
-
-Read First 0.4192
-Time Window 0.0062
-UA AGENT 0.0178
-Asset heuristic 0.0722
-Aticle filtering 0.0368
-Rate heuristic 0.0057
-Read time heuristic 0.0021
-ASN Enrichment 0.0015
-ASN filtering 1 0.0059
-ASN filtering 2 0.0025
-IP Exclusion 3e-04
-HONEY POTS 0.0014
-KPI MEDIAN READTIME 4e-04
-
-Ingestion time: 0.4192
-Data manipulation time: 0.1584
+0.1901 seconds
 
 ```
 
-  </div>
-  <div class="code-tab-panel" data-panel="read4C">
+The total for the data.table variants is roughly:
+
+```
+
+0.1476 seconds
+
+```
+
+So, on this measured part of the pipeline, data.table is about:
+
+```
+
+0.1901 / 0.1476 = 1.29x faster
+
+```
+
+`data.table` does not win every single isolated micro-benchmark. 
+
+For example, the optimized `dplyr` UA filtering version is slightly faster than the `data.table` one. 
+
+The asset heuristic is also basically a tie.
+
+But the important point is the global pattern.
+
+As soon as the pipeline starts using:
+
+- grouped operations
+
+- by-reference mutations
+
+- index-based filtering
+
+- aggregations
+
+Then, `data.table` becomes consistently stronger.
+
+## The mask pattern
+
+A second important result is the advantage of constructing boolean vectors explicitly before filtering.
+
+Instead of writing:
 
 ```r
 
-label <- c(
-    "Read First", 
-    "Time Window", 
-    "UA AGENT",      
-    "Asset heuristic",
-    "Aticle filtering",  
-    "Rate heuristic", 
-    "Read time heuristic",
-    "ASN Enrichment",
-    "ASN filtering 1",   
-    "ASN filtering 2",  
-    "IP Exclusion",  
-    "HONEY POTS",     
-    "KPI MEDIAN READTIME"
-)
-
-
-cat("\n #### VROOM + DATATABLE #### \n\n")
-
-data <- read.table("data_table_vroom.result", 
-                             sep = ",", 
-                             header = FALSE
-                        )
-
-cat("\n")
-
-seconds <- as.data.frame(matrix(data$V1, 
-                        ncol = length(label),
-                        byrow=TRUE
-                       )
-                 )
-
-colnames(seconds) <- label
-tot <- 0
-
-for (i in 1:length(label)) {
-
-    val <- median(seconds[, i])
-    cat(paste(label[i], 
-              val, 
-              sep = " "))
-    tot <- tot + val
-    cat("\n")
-
-}
-
-cat(paste("TOT:", tot, "\n", sep=" "))
-cat("\n")
-cat(paste("Ingestion time:", 
-          median(seconds[, 1]), "\n", 
-          sep = " "))
-cat(paste("Data manipulation time:", 
-          median(
-                 rowSums(seconds[, 2:length(label)])
-                ), 
-          "\n", 
-          sep = " "))
+df <- df[grepl(pattern, col)]
 
 ```
 
-```
+or:
 
- #### VROOM + DATATABLE ####
+```r
 
-
-Read First 0.3498
-Time Window 0.0066
-UA AGENT 0.026
-Asset heuristic 0.0706
-Aticle filtering 0.0368
-Rate heuristic 0.0054
-Read time heuristic 0.0019
-ASN Enrichment 0.0015
-ASN filtering 1 0.0062
-ASN filtering 2 0.0023
-IP Exclusion 3e-04
-HONEY POTS 0.0013
-KPI MEDIAN READTIME 4e-04
-TOT: 0.5091
-
-Ingestion time: 0.3498
-Data manipulation time: 0.1619
+df <- df %>% filter(grepl(pattern, col))
 
 ```
 
-  </div>
+I increasingly used this pattern:
 
-</div>
+```r
 
+keep <- grepl(pattern, df$col)
+df <- df[keep]
 
+```
 
+This has several advantages.
 
+First, it separates the cost of computing the condition from the cost of applying the filter. This makes benchmarks easier to understand.
 
+Second, it is more predictable. The condition is computed once, stored in a normal R vector, and then reused by the filtering operation.
 
+Third, it often performs better, especially in data.table . The clearest example was the UA agent filtering step:
 
+```
 
- 
+data.table inline condition: 0.0262s
+data.table precomputed mask: 0.0185s
+
+```
+
+That is a meaningful improvement for such a small operation.
+
+The same pattern also helped slightly in several `dplyr` steps, but the gain was usually smaller. 
+
+This makes the code closer to the actual execution model: compute a boolean vector, then subset rows
+
+## Final conclusion
+
+`dplyr` is very expressive and pleasant for writing dataframe transformations, and for some simple operations it is extremely competitive. 
+
+However, `data.table` gives deeper control / understanding over execution, memory behavior, column mutation, row filtering, grouping, and intermediate allocations.
+
+In this benchmark, that control matters. It allows the pipeline to avoid unnecessary copies, express grouped filters through indices, mutate columns by reference, and make filtering logic more explicit.
+
+For this kind of server-side Shiny dashboard, where the same reactive resources may be recomputed many times, I would clearly choose:
+
+`fread()` for ingestion, `data.table` for transformation, and explicit boolean masks for filtering.
 

@@ -1,6 +1,6 @@
 {
   "shiny": {
-    "title": "R data pipeline",
+    "title": "data.table VS dplyr in a data pipeline",
     "subject_id": 7,
     "is_public": false,
     "article_id": 223
