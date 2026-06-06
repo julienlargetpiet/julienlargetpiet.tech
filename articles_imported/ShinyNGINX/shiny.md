@@ -632,7 +632,7 @@ From raw file:
 
 </div>
 
-Here are he results:
+Here are the results:
 
 <div class="code-tabs">
   <div class="code-tabs-header">
@@ -642,7 +642,7 @@ Here are he results:
     <button class="code-tab" data-tab="read4C">vroom + data.table</button>
   </div>
 
-  <div class="code-tab-panel" data-panel="read1C">
+  <div class="code-tab-panel active" data-panel="read1C">
 
 ```r
 
@@ -881,7 +881,7 @@ Just tweaking a bit the functions.
     <button class="code-tab" data-tab="read2B2">fread + data.table</button>
   </div>
 
-  <div class="code-tab-panel" data-panel="read1B2">
+  <div class="code-tab-panel active" data-panel="read1B2">
 
 ```r
 
@@ -968,7 +968,7 @@ And look at the results:
     <button class="code-tab" data-tab="read2B3">fread + data.table</button>
   </div>
 
-   <div class="code-tab-panel" data-panel="read1B3">  
+   <div class="code-tab-panel active" data-panel="read1B3">  
 
 ```
 
@@ -1001,7 +1001,7 @@ To be certain of that, i will again decompose more.
     <button class="code-tab" data-tab="read2B4">fread + data.table</button>
   </div>
 
-   <div class="code-tab-panel" data-panel="read1B4">  
+   <div class="code-tab-panel active" data-panel="read1B4">  
 
 ```
 Raw Ingestion 0.2916 secs on 725 832 rows
@@ -1300,7 +1300,7 @@ geo_enriched_data <- reactive({
 
   </div>
 
-  <div class="code-tab-panel active" data-panel="read2B4">
+  <div class="code-tab-panel" data-panel="read2B4">
 
 ```r
 
@@ -1543,7 +1543,7 @@ Time Window 0.0078 secs for 296 178 rows
 
   </div>
 
-  <div class="code-tab-panel active" data-panel="read1B5">
+  <div class="code-tab-panel" data-panel="read1B5">
 
 ```r
 
@@ -1676,7 +1676,7 @@ UA AGENT 0.0191 secs for 296 178 rows
 
   </div>
 
-  <div class="code-tab-panel active" data-panel="read1B5">
+  <div class="code-tab-panel" data-panel="read1B5">
 
 ```r
 
