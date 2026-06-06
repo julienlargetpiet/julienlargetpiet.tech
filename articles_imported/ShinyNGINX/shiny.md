@@ -2056,6 +2056,7 @@ And just after the article fltering where we take only the article page:
   <div class="code-tabs-header">
     <button class="code-tab active" data-tab="read1B9">dplyr</button>
     <button class="code-tab" data-tab="read2B9">data.table</button>
+  </div>
 
    <div class="code-tab-panel active" data-panel="read1B9">
 
@@ -2123,6 +2124,7 @@ Of course a human won't click like a sickhead on a bunch or articles, so we can 
   <div class="code-tabs-header">
     <button class="code-tab active" data-tab="read1B10">dplyr</button>
     <button class="code-tab" data-tab="read2B10">data.table</button>
+  </div>
 
    <div class="code-tab-panel active" data-panel="read1B10">
 
@@ -2228,6 +2230,7 @@ And look at the benchmark results, that's impressive:
   <div class="code-tabs-header">
     <button class="code-tab active" data-tab="read1B11">dplyr</button>
     <button class="code-tab" data-tab="read2B11">data.table</button>
+  </div>
 
    <div class="code-tab-panel active" data-panel="read1B11">
 
