@@ -2,7 +2,7 @@
   "shiny": {
     "title": "data.table VS dplyr in a data pipeline",
     "subject_id": 7,
-    "is_public": false,
+    "is_public": true,
     "article_id": 223
   }
 }
