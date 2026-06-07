@@ -371,7 +371,8 @@ I'm gonna define these functions:
 ```r
 
 bench_data <- data.frame("seconds" = numeric(),
-                         "nrows" = numeric()
+                         "nrows" = numeric(),
+                         "name" = character()
                         )
 
 log_step <- function(name, start, df = NULL) {
@@ -396,7 +397,8 @@ log_step <- function(name, start, df = NULL) {
   }
 
   bench_data <<- rbind(bench_data, data.frame("seconds" = elapsed,
-                                              "nrows" = nrows
+                                              "nrows" = nrows,
+                                              "character" = name
                                              )
                       )
 }
@@ -404,13 +406,14 @@ log_step <- function(name, start, df = NULL) {
 write_benchs <- function() {
 
     write.table(x = bench_data, 
-                file = "data_table.result",
+                file = "data_table.result", # or "dplyr_readr.result"
                 sep = ",", 
                 row.names = FALSE,
                 col.names = FALSE
                )
 
 }
+
 
 ```
 
@@ -467,6 +470,71 @@ The log file is made of `725832` rows and it size is `124M`.
 The log file is available here if you want to reproduce the benchmark [logs.tsv](/assets/common_files/shiny_bench/logs.tsv)
 
 The execution time of each function is computed from the median of 9 runs.
+
+After that I just erase the first ingestion call because it is dupplicated due to the connection session that first load `global.R` -> ingesting data, then when conection succeeds, it reloads `global.R` -> hence reloading the data ingestion.
+
+So from this:
+
+```
+
+0.355073213577271,725832,"RAW Ingestion"
+0.0164694786071777,725832,"Date mutation"
+0.000160455703735352,725832,"Selection"
+0.157821416854858,630156,"Filtering"
+0.000390052795410156,630156,"Status drop"
+0.543130159378052,630156,"Read First"   # END OF FIRST INGESTION HERE
+0.222374200820923,725832,"RAW Ingestion"
+0.0074620246887207,725832,"Date mutation"
+5.07831573486328e-05,725832,"Selection"
+0.160036563873291,630156,"Filtering"
+0.000440120697021484,630156,"Status drop"
+0.393628835678101,630156,"Read First"
+0.0153741836547852,296178,"Time Window"
+0.0221734046936035,296178,"UA Agent Pre"
+0.12898850440979,160064,"UA AGENT"
+0.0681912899017334,132368,"Asset heuristic"
+0.0364055633544922,16354,"Aticle filtering"
+0.0061194896697998,3391,"Rate heuristic"
+0.00260376930236816,990,"Read time heuristic"
+0.00266528129577637,990,"ASN Enrichment"
+0.00577926635742188,990,"ASN filtering 1"
+0.00215840339660645,990,"ASN filtering 2"
+0.000262737274169922,278,"IP Exclusion"
+0.000316619873046875,278,"HONEY POTS"
+0.00047755241394043,278,"KPI MEDIAN READTIME"
+0.0011904239654541,6,"READTIME STATS"
+
+```
+
+I convert to:
+
+```
+
+0.238284111022949,725832,"RAW Ingestion"
+0.00752401351928711,725832,"Date mutation"
+5.48362731933594e-05,725832,"Selection"
+0.154783725738525,630156,"Filtering"
+0.00042271614074707,630156,"Status drop"
+0.404343128204346,630156,"Read First"
+0.014697790145874,296178,"Time Window"
+0.0220913887023926,296178,"UA Agent Pre"
+0.128525018692017,160064,"UA AGENT"
+0.0676510334014893,132368,"Asset heuristic"
+0.0375986099243164,16354,"Aticle filtering"
+0.00586986541748047,3391,"Rate heuristic"
+0.00234007835388184,990,"Read time heuristic"
+0.00271892547607422,990,"ASN Enrichment"
+0.0056302547454834,990,"ASN filtering 1"
+0.00212287902832031,990,"ASN filtering 2"
+0.00026249885559082,278,"IP Exclusion"
+0.000333786010742188,278,"HONEY POTS"
+0.000478506088256836,278,"KPI MEDIAN READTIME"
+0.00117015838623047,6,"READTIME STATS"
+.
+.
+.
+
+```
 
 ### Setup
 
