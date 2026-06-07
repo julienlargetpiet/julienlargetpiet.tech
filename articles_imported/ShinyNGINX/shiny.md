@@ -27,6 +27,24 @@ The code whole code is available here as a zip:
 
 [code.zip](/assets/common_files/shiny_bench/code.zip)
 
+**Important note:** this article is not meant to be a universal `dplyr` vs `data.table` benchmark.
+
+ The timings are placed directly around the pipeline steps:
+
+ ```r
+ t <- Sys.time()
+ function_call()
+ log_step("name of the step", t, df)
+ ```
+
+ So the measured numbers are for the data pipeline itself: ingestion, filtering, grouping, joins, and aggregations. They are not measuring Shiny UI rendering or plot rendering.
+
+ Shiny is mentioned because it is the real environment where this pipeline runs, and because it explains why recomputation latency matters. In an interactive dashboard, even differences that may look small in isolation can affect responsiveness.
+
+ The dataset is also not meant to represent “big data”. It contains around 725k rows for a 124 MB TSV file, which is representative of my actual production log file because it is capped with `logrotate`.
+
+ The point of the article is therefore not to produce a universal ranking of R dataframe tools, but to analyze this specific real-world workload and understand where the performance differences come from.
+
 ## What are we even talking about
 
 We define the log format in `/etc/nginx/nginx.conf`, in the `http {...}` block as a TSV:
