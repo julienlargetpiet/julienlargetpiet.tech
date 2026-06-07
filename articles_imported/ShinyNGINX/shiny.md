@@ -37,6 +37,8 @@ The code whole code is available here as a zip:
  log_step("name of the step", t, df)
  ```
 
+As you see here [how-ill-benchmark-](#how-ill-benchmark-)
+
  So the measured numbers are for the data pipeline itself: ingestion, filtering, grouping, joins, and aggregations. They are not measuring Shiny UI rendering or plot rendering.
 
  Shiny is mentioned because it is the real environment where this pipeline runs, and because it explains why recomputation latency matters. In an interactive dashboard, even differences that may look small in isolation can affect responsiveness.
