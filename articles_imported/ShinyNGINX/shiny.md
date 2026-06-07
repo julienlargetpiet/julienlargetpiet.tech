@@ -417,7 +417,8 @@ write_benchs <- function() {
                 file = "data_table.result", # or "dplyr_readr.result"
                 sep = ",", 
                 row.names = FALSE,
-                col.names = FALSE
+                col.names = FALSE,
+                append = TRUe
                )
 
 }
@@ -462,6 +463,10 @@ article_readtime_stats <- reactive({
   log_step("READTIME STATS", t, df)
 
   write_benchs() # HERE
+  bench_data <<- data.frame("seconds" = numeric(),
+                            "nrows" = numeric(),
+                            "name" = character()
+                           )
 
   print(df)
 
