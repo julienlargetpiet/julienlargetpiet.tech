@@ -17,6 +17,10 @@ So we will benchmark `dplyr` and `data.table` for the manipulation steps, and `r
 
 We will also benchmark the transition step, which matters a lot when lazy parsing is involved.
 
+We will see that `data.table` slightly wins (by 29% in execution time) and why.
+
+We wil also see how `dplyr` and `data.table` codes can be optimized.
+
 The code whole code is available here as a zip:
 
 [code.zip](/assets/common_files/shiny_bench/code.zip)
@@ -471,7 +475,7 @@ The `data.table` and `dplyr` variant will be executed on the same log file, on t
 
 The log file is made of `725832` rows and it size is `124M`.
 
-The log file is available here if you want to reproduce the benchmark [logs.tsv](/assets/common_files/shiny_bench/logs.tsv)
+The log file is available here if you want to reproduce the benchmark [out2.log](/assets/common_files/shiny_bench/logs.tsv)
 
 The execution time of each function is computed from the median of 9 runs.
 
