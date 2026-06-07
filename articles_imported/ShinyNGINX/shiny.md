@@ -364,7 +364,7 @@ But in common situations, those won't be a problem.
 
 From my experience, for example i can go as far as last 360 hours.
 
-## How i'll benchmark ?
+## How I'll benchmark ?
 
 I'm gonna define this function:
 
@@ -406,6 +406,35 @@ The log file is made of `725832` rows and it size is `124M`.
 The log file is available here if you want to reproduce the benchmark [logs.tsv](/assets/common_files/shiny_bench/logs.tsv)
 
 The execution time of each function is computed from the median of 9 runs.
+
+### Setup
+
+For this article, i'm using this version of R:
+
+```
+
+❯ R
+
+R version 4.3.3 (2024-02-29) -- "Angel Food Cake"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+```
+
+And here are the package version I'll use:
+
+```
+
+> packageVersion("data.table")
+[1] ‘1.18.4’
+> packageVersion("dplyr")
+[1] ‘1.2.1’
+> packageVersion("vroom")
+[1] ‘1.7.1’
+> packageVersion("readr")
+[1] ‘2.2.0’
+
+```
 
 ## Bots noise reducer
 
