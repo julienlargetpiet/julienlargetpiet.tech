@@ -2019,7 +2019,7 @@ UA AGENT 0.0262 secs for 296 178 rows
 
 Interestingly, here `dplyr` wins.
 
-But wait i want to decompose again more the computations step.
+But wait i want to decompose again more the computations step. 
 
 <div class="code-tabs">
   <div class="code-tabs-header">
