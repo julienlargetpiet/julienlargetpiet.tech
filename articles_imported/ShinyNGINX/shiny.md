@@ -19,6 +19,8 @@ We will also benchmark the transition step, which matters a lot when lazy parsin
 
 We will see that `data.table` slightly wins (by 29% in execution time) and why.
 
+The memory consumptions of ingestion and data manipulation backends will also be compared (lazy VS eager etcetera).
+
 We wil also see how `dplyr` and `data.table` codes can be optimized.
 
 The code whole code is available here as a zip:
