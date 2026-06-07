@@ -450,7 +450,7 @@ article_readtime_stats <- reactive({
 
   log_step("READTIME STATS", t, df)
 
-  write_benchs()
+  write_benchs() # HERE
 
   print(df)
 
