@@ -57,7 +57,7 @@ So we got all columns we need to perform our bot filtering heuristics and analys
 
 - `uri` -> The targeted URL
 
-- `status` -> Status of the request, basicaly we will only filter on success (code: 200)
+- `status` -> Status of the request, basically we will only filter on success (code: 200)
 
 - `$http_user_agent` -> The user agent sent by the client. It is a text string that usually identifies the browser, operating system, device, or bot making the request
 
@@ -1213,7 +1213,7 @@ Col drop 7e-04 secs on 630 156 rows
 
 ```
 
-Selection is now basicaly free, we already beat `dplyr` on this function at every step !
+Selection is now basically free, we already beat `dplyr` on this function at every step !
 
 It literally just changes the order of the references in the internal column list, just what we want :=)
 
@@ -1836,7 +1836,7 @@ And we will keep this reasoning for the other bots filtering operations.
 
 Note: in the benchmark, the selected time interval intentionally covers all rows in the dataset. This avoids making the benchmark differences disappear into noise (CPU scheduling, frequency...).
 
-Now the time interval filter bencharks:
+Now the time interval filter benchmarks:
 
 <div class="code-tabs">
   <div class="code-tabs-header">
@@ -1946,7 +1946,7 @@ bot_regex <- paste(bot_keywords, collapse = "|")
 
 ```
 
-Meaning that instead of performing the RegeX check on every rows which is computationally heavy (especialy for our ReGex heavy OR), we compute the unique values from the UA agent column, hence the RegEx check will be applied in significantly less values.
+Meaning that instead of performing the RegeX check on every rows which is computationally heavy (especially for our ReGex heavy OR), we compute the unique values from the UA agent column, hence the RegEx check will be applied in significantly less values.
 
 After that, this is just simple lookup inside the `hashmap` to see if the UA for he specific row is a bot or not.
 
@@ -2313,7 +2313,7 @@ Also I show you 3 variants of the `data.table` filtering version to speak a bit 
 
 In fact the best version will be the first, because the intent is clear and compressed, we want all the unique ips that respects the conditions.
 
-While in the second one, we have an unnecessary step where we take the whoe ip columns before computing the unique ips of it.
+While in the second one, we have an unnecessary step where we take the whole ip columns before computing the unique ips of it.
 
 And the third one is the worst because here the unnecessary steps are the construction of a temporary filtered dataframe, and once again after where we filter the dataframe (creating a new temp one) that has unique ips, before extracting its ip column.
 
@@ -2361,7 +2361,7 @@ Not too much different.
 
 However, we can begin to distinguish a pattern, externally constructed filtering vector provides a little bit more performance.
 
-And just after the article fltering where we take only the article page:
+And just after the article filtering where we take only the article page:
 
 <div class="code-tabs">
   <div class="code-tabs-header">
@@ -2730,7 +2730,7 @@ df[, next_date := NULL]
 
 Note:
 
-- When we use the `data.table::setorder(df, col1, col2)` it does a real sort, meaning that it actualy changes the physical row order for each column of `df`
+- When we use the `data.table::setorder(df, col1, col2)` it does a real sort, meaning that it actually changes the physical row order for each column of `df`
 
 - It won't just change the physical row order of a potential `view index vector` used for accessing the row in the dataframe. (not lazy)
 
@@ -2812,7 +2812,7 @@ In the early age of the modern internet with IPv4, a lot of IPs range were attri
 
 Now they have a high value, better than bitcoin lol.
 
-IPv6 adoption is still not universal, so a lot of traffic analysis still has to deal with IPv4 addresses.
+IPv6 adoption is still not universal, so a lot of traffic analysis still has to deal with IPv4 adresses.
 
 Anyway, here are the code:
 
@@ -2888,7 +2888,7 @@ Now we are going to apply a computationally heavier filter.
 
 Let me explain.
 
-A common bot pattern, especially for traffic coming from large hosting or cloud providers, is to make many requests within a relatively short time window from very similar IPv4 addresses.
+A common bot pattern, especially for traffic coming from large hosting or cloud providers, is to make many requests within a relatively short time window from very similar IPv4 adresses.
 
 The key point is very similar: in these request bursts, only the last one or two octets of the IPv4 address may change.
 
@@ -2902,7 +2902,7 @@ Example:
 
 ```
 
-These addresses are not identical, but they clearly belong to a nearby IP range. That is the pattern this heuristic tries to catch.
+These adresses are not identical, but they clearly belong to a nearby IP range. That is the pattern this heuristic tries to catch.
 
 We are going to create groups by searching for contiguous rows with same ASN.
 
