@@ -17,6 +17,10 @@ So we will benchmark `dplyr` and `data.table` for the manipulation steps, and `r
 
 We will also benchmark the transition step, which matters a lot when lazy parsing is involved.
 
+The code whole code is available here as a zip:
+
+[code.zip](/assets/common_files/shiny_bench/code.zip)
+
 ## What are we even talking about
 
 We define the log format in `/etc/nginx/nginx.conf`, in the `http {...}` block as a TSV:
@@ -752,43 +756,6 @@ And if we extrapolate all along the pipeline, we will eventually need to parse a
 So here lazy ingestion is at first glance useless and counter productive.
 
 But we need to look further and measure where the materialization cost actually happens. In particular, we need to compare the cost of using the lazy output of `vroom::vroom()` directly with `dplyr` transformations, which materialize columns as they are touched, versus forcing materialization upfront with `data.table::as.data.table()` and then running the `data.table` pipeline.
-
-From raw file:
-
-<div class="code-tabs">
-  <div class="code-tabs-header">
-    <button class="code-tab active" data-tab="read1B">reader + dplyr</button>
-    <button class="code-tab" data-tab="read2B">vroom + dplyr</button>
-    <button class="code-tab" data-tab="read3B">fread + data.table</button>
-    <button class="code-tab" data-tab="read4B">vroom + data.table</button>
-  </div>
-
-  <div class="code-tab-panel active" data-panel="read1B">
-
-[dplyr_readr.txt](/assets/common_files/shiny_nginx/dplyr_readr.txt)
-
-  </div>
-
-  <div class="code-tab-panel" data-panel="read2B">
-
-[dplyr_vroom.txt](/assets/common_files/shiny_nginx/dplyr_vroom.txt)
-
-  </div>
-
-  <div class="code-tab-panel" data-panel="read3B">
-
-[data_table.txt](/assets/common_files/shiny_nginx/data_table.txt)
-
-  </div>
-
-  <div class="code-tab-panel" data-panel="read4B">
-
-[data_table_vroom.txt](/assets/common_files/shiny_nginx/data_table_vroom.txt)
-
-  </div>
-
-
-</div>
 
 Here are the results:
 
