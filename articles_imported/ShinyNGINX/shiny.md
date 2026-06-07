@@ -3744,7 +3744,7 @@ The benchmark was run on the same 124M NGINX TSV log file, containing 725 832 ro
 
 | Variant | Raw ingestion | Full first step | Notes |
 |---|---:|---:|---|
-| `readr::read_tsv()` + `dplyr` | `0.2912s` | `0.3302s` | Fast full first step before `data.table` optimization |
+| `readr::read_tsv()` + `dplyr` | `0.2912s` | `0.3302s` |  |
 | `vroom::vroom()` + `dplyr` | — | `0.3312s` | Lazy ingestion, but laziness does not really help here |
 | `data.table::fread()` + bad column selection | `0.2193s` | `0.4192s` | Fast raw ingestion, but slow structural copy |
 | `data.table::fread()` + `setcolorder()` | `0.2204s` | `~0.2497s` | Best eager ingestion path |
