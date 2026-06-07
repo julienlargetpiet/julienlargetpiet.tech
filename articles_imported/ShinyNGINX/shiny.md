@@ -1215,6 +1215,181 @@ Selection is now basicaly free, we already beat `dplyr` on this function at ever
 
 It literally just changes the order of the references in the internal column list, just what we want :=)
 
+And you know what, at his stage i also want to do a counter-nature thing benchmark `readr + data.table` VS `fread + dplyr`.
+
+<div class="code-tabs">
+  <div class="code-tabs-header">
+    <button class="code-tab active" data-tab="read1Special">fread + dplyr</button>
+    <button class="code-tab" data-tab="read2Special">readr + data.table</button>
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read1Special">
+
+```r
+
+load_raw_data <- function(file_path) {
+  
+  t <- Sys.time()
+
+  df <- tibble::as_tibble(data.table::fread(input = file_path,
+                    sep="\t",
+                    quote = "\"",
+                    col.names = c("ip", "ts", "target", "status", "ua"),
+                    header = FALSE,
+                    colClasses = list(
+                                      character = c(1, 3, 5),
+                                      double = 2,
+                                      integer = 4
+                                     ),
+                    showProgress = FALSE
+        ))
+
+  log_step("RAW Ingestion", t, df)
+  t <- Sys.time()
+
+  df <- df %>%
+    mutate(
+      date = as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")
+    )
+
+  log_step("Date mutation", t, df)
+  t <- Sys.time()
+
+  df <- df %>%  select(ip, date, target, status, ua)
+
+  log_step("Selection", t, df)
+  t <- Sys.time()
+
+  df <- df %>% filter(
+      !is.na(date),
+      !is.na(target),
+      !is.na(status),
+      status == 200
+    )
+
+  log_step("Filtering", t, df)
+  t <- Sys.time()
+
+  df <- df %>% select(-status)
+
+  log_step("Col drop", t, df)
+
+  df
+
+}
+
+```
+
+```
+
+Raw Ingestion 0.224993705749512 secs for 725832 rows
+Date mutation 0.00334882736206055 secs for 725832 rows
+Selection 0.00122451782226562 secs for 725832 rows
+Filtering 0.0235671997070312 secs for 630156 rows
+Col drop 0.0010983943939209 secs for 630156 rows
+
+```
+
+  </div>
+
+  <div class="code-tab-panel active" data-panel="read2Special">
+
+```r
+
+
+load_raw_data <- function(file_path) {
+
+   t <- Sys.time()
+
+   df <-  data.table::as.data.table(readr::read_tsv(
+      file_path,
+      col_names = c("ip", "ts", "target", "status", "ua"),
+      col_types = readr::cols(
+        ip = readr::col_character(),
+        ts = readr::col_double(),
+        target = readr::col_character(),
+        status = readr::col_integer(),
+        ua = readr::col_character()
+      ),
+      progress = FALSE
+    ))
+
+    log_step("RAW Ingestion", t, df)
+    t <- Sys.time()
+
+    df[, date := as.POSIXct(ts, origin = "1970-01-01", tz = "UTC")]
+
+    log_step("Date mutation", t, df)
+    t <- Sys.time()
+
+    data.table::setcolorder(df, c("ip", "ts", "target", "status", "ua"))
+
+
+    log_step("Selection", t, df)
+    t <- Sys.time()
+
+    df <- df[!is.na(date) & 
+             !is.na(target) & 
+             !is.na(status) & 
+             status == 200]
+
+    log_step("Filtering", t, df)
+    t <- Sys.time()
+
+    df[, status := NULL]
+
+    log_step("Status drop", t, df)
+
+    df
+
+}
+
+```
+
+```
+
+Raw Ingestion 0.304720878601074 secs for 725832 rows
+Date mutation 0.00857686996459961 secs for 725832 rows
+Selection 5.10215759277344e-05 secs for 725832 rows
+Filtering 0.0382397174835205 secs for 630156 rows
+Col drop 0.000472068786621094 secs for 630156 rows
+
+```
+
+  </div>
+
+</div>
+
+This comparison of incoherent ecosystem parts:
+
+- `fread + dplyr`
+
+- `readr + data.table`
+
+confirms that this first cleaning step, `fread + dplyr` beats `readr + data.table` almost everywhere.
+
+The places where `readr + data.table` is very fast are structural operations:
+
+- column reordering with `setcolorder()`
+
+- column deletion by reference with `:= NULL`
+
+This makes sense. These are exactly the kind of operations where `data.table` shines, because they can be done by reference.
+
+But globally, the `readr + data.table` path is still limited by the ingestion backend. Once we already paid the `readr::read_tsv()` parsing cost, converting the result to a `data.table` cannot magically erase that initial cost.
+
+On the other side, `fread + dplyr` is surprisingly strong.
+
+It combines:
+
+- the fast raw ingestion of `data.table::fread()`
+
+- the cheap column selection semantics of `dplyr`
+
+- a very competitive filtering step
+
+But still not the best.
+
 ## Bots filtering Pipeline
 
 Now the real work begins:
@@ -3487,6 +3662,77 @@ Same music.
 Note: 
 
 - In `data.table`, when we group rows and want to return one summarized row per group, we write the aggregation expressions in the `j` position, using syntax like `.(new_col1 = median(col1), new_col2 = mean(col2))`
+
+## Memory consuption
+
+Memory consumption was measured with:
+
+```bash
+
+/usr/bin/time -v Rscript -e 'shiny::runApp(".", host="127.0.0.1", port = 7665, launch.browser = FALSE)'
+
+```
+
+The value reported here is the peak RSS of the R process, taken from `Maximum resident set size`.
+
+RSS means **Resident Set Size**.
+
+It is the amount of physical RAM currently resident for a process.
+
+Here, I use **peak RSS**, reported by `/usr/bin/time -v` as `Maximum resident set size`.
+
+So this is not the size of a single R object like `object.size(df)`. It is the maximum resident memory reached by the whole R process during the run, including:
+
+- the R runtime
+- loaded packages
+- Shiny
+- parsed data
+- temporary allocations
+- reactive objects
+- dataframe copies / materializations
+
+This makes it a good real-world metric for this benchmark, because the dashboard runs as a full R/Shiny process, not as an isolated dataframe object.
+
+
+| Variant | Peak RSS (KB) | Peak RSS (MB) |
+|---|---:|---:|
+| `fread + data.table` | `487460` | `476.0 MB` |
+| `fread + dplyr` | `500200` | `488.5 MB` |
+| `readr + dplyr` | `548272` | `535.4 MB` |
+| `readr + data.table` | `549028` | `536.2 MB` |
+| `vroom + data.table` | `554600` | `541.6 MB` |
+| `vroom + dplyr` | `705436` | `688.9 MB` |
+
+The memory results are interesting because they are mostly grouped by ingestion backend.
+
+The two `fread` variants are the most memory-efficient:
+
+- `fread + data.table` -> `476.0 MB`
+- `fread + dplyr` -> `488.5 MB`
+
+The two `readr` variants are very close to each other:
+
+- `readr + dplyr` -> `535.4 MB`
+- `readr + data.table` -> `536.2 MB`
+
+This suggests that, in this benchmark, the ingestion engine has a stronger impact on peak RSS than the later manipulation API.
+
+The `vroom` results are also revealing. `vroom + data.table` reaches `541.6 MB`, while `vroom + dplyr` reaches `688.9 MB`.
+
+This is consistent with the earlier performance conclusion: lazy ingestion is not automatically beneficial. In this pipeline, most columns are eventually touched, so the delayed materialization cost has to be paid anyway. In this workload, `vroom` does not really fit the access pattern, because the pipeline does not read only a small subset of a huge file; it progressively touches almost the whole dataframe.
+
+A secondary pattern is that, for the same ingestion backend, `data.table` tends to use slightly less memory than `dplyr`, but the effect is smaller than the ingestion effect:
+
+- `fread + data.table` is `12.5 MB` lower than `fread + dplyr`
+- `readr + data.table` is basically equal to `readr + dplyr`
+- `vroom + data.table` is much lower than `vroom + dplyr`
+
+So the final memory conclusion is:
+
+1. `fread` is the best ingestion backend for peak memory in this benchmark.
+2. `vroom` is not a good fit here because the pipeline eventually touches most columns.
+3. `data.table` is generally more memory-efficient, but the ingestion backend explains most of the memory difference.
+4. The best overall memory result is `fread + data.table`.
 
 ## Conclusion & Compiled Benchmarks
 
