@@ -366,23 +366,50 @@ From my experience, for example i can go as far as last 360 hours.
 
 ## How I'll benchmark ?
 
-I'm gonna define this function:
+I'm gonna define these functions:
 
 ```r
+
+bench_data <- data.frame("seconds" = numeric(),
+                         "nrows" = numeric()
+                        )
 
 log_step <- function(name, start, df = NULL) {
   elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
 
   if (!is.null(df)) {
+
+    nrows <- nrow(df)
+
     cat(sprintf("[filtered_data] %-25s %.4f sec | rows: %s\n",
                 name,
                 elapsed,
-                format(nrow(df), big.mark = " ")))
+                format(nrows, big.mark = " ")))
+
   } else {
+
+    nrows <- NA_integer_
+
     cat(sprintf("[filtered_data] %-25s %.4f sec\n",
                 name,
                 elapsed))
   }
+
+  bench_data <<- rbind(bench_data, data.frame("seconds" = elapsed,
+                                              "nrows" = nrows
+                                             )
+                      )
+}
+
+write_benchs <- function() {
+
+    write.table(x = bench_data, 
+                file = "data_table.result",
+                sep = ",", 
+                row.names = FALSE,
+                col.names = FALSE
+               )
+
 }
 
 ```
@@ -396,6 +423,40 @@ t <- Sys.time()
 FUNCTION_CALL
 
 log_step("FUNCTION CALL 1", t, df)
+
+```
+
+And the data will be written after al the data ingestion and manipulation functions have been evaluated, in there:
+
+```r
+
+article_readtime_stats <- reactive({
+
+  df <- filtered_data()
+
+  t <- Sys.time()
+
+  req(nrow(df) > 0)
+
+  keep <- df$time_on_page > 3 & df$time_on_page < 3600
+  df <- df[keep] 
+  df <- df[, .(
+         median_readtime = median(time_on_page),
+         valid_reads = .N
+        ), 
+     by = target
+  ]
+  data.table::setorder(df, -median_readtime)
+
+  log_step("READTIME STATS", t, df)
+
+  write_benchs()
+
+  print(df)
+
+  df
+
+})
 
 ```
 
