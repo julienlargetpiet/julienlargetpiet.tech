@@ -3897,12 +3897,12 @@ First, it separates the cost of computing the condition from the cost of applyin
 
 Second, it is more predictable. The condition is computed once, stored in a normal R vector, and then reused by the filtering operation.
 
-Third, it often performs better, especially in data.table . The clearest example was the UA agent filtering step:
+Third, it often performs better, especially in `data.table`. The clearest example was the UA agent filtering step:
 
 ```
 
 data.table inline condition: 0.0262s
-data.table precomputed mask: 0.0185s
+data.table precomputed mask: 0.0147s
 
 ```
 
