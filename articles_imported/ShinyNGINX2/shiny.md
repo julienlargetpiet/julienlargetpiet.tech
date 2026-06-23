@@ -3804,20 +3804,29 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
 <div class="matrix-tabs-header">
 
-<div class="matrix-tabs-row">
-<span class="matrix-tabs-label">Metric</span>
+ <div class="matrix-tabs-grid">
 
-<button class="matrix-tab-row active" data-row="system">system</button>
-<button class="matrix-tab-row" data-row="user">user</button>
-<button class="matrix-tab-row" data-row="elapsed">elapsed</button>
-</div>
+  <div class="matrix-tabs-corner"></div>
 
-<div class="matrix-tabs-row">
-<span class="matrix-tabs-label">Backend</span>
+  <button class="matrix-tab-col active" data-col="readr">readr::read_tsv()</button>
+  <button class="matrix-tab-col" data-col="vroom">vroom::vroom()</button>
+  <button class="matrix-tab-col" data-col="fread">fread()</button>
 
-<button class="matrix-tab-col active" data-col="readr">readr::read_tsv()</button>
-<button class="matrix-tab-col" data-col="vroom">vroom::vroom()</button>
-<button class="matrix-tab-col" data-col="fread">fread()</button>
+  <button class="matrix-tab-row active" data-row="system">system</button>
+  <button class="matrix-cell" data-row="system" data-col="readr">system × readr</button>
+  <button class="matrix-cell" data-row="system" data-col="vroom">system × vroom</button>
+  <button class="matrix-cell" data-row="system" data-col="fread">system × fread</button>
+
+  <button class="matrix-tab-row" data-row="user">user</button>
+  <button class="matrix-cell" data-row="user" data-col="readr">user × readr</button>
+  <button class="matrix-cell" data-row="user" data-col="vroom">user × vroom</button>
+  <button class="matrix-cell" data-row="user" data-col="fread">user × fread</button>
+
+  <button class="matrix-tab-row" data-row="elapsed">elapsed</button>
+  <button class="matrix-cell" data-row="elapsed" data-col="readr">elapsed × readr</button>
+  <button class="matrix-cell" data-row="elapsed" data-col="vroom">elapsed × vroom</button>
+  <button class="matrix-cell" data-row="elapsed" data-col="fread">elapsed × fread</button>
+
 </div>
 
 </div>
