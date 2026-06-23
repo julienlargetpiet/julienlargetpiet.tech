@@ -3754,6 +3754,8 @@ And the execution time is lower than the following `dplyr` variant as you'll see
 
   <div class="code-tab-panel active" data-panel="dpT1E">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![129.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_read_time_heuristic.png)
 
 ![130.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_read_time_heuristic.png)
