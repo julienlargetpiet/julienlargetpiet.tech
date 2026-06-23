@@ -2654,7 +2654,7 @@ Max NCells:
 
 Max VCells:
 
-![22.png](/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/max_vcells_ingestion.png)
+![22.png](/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/max_vcells_raw_ingestion.png)
 
   </div>
 
@@ -2674,7 +2674,7 @@ Max NCells:
 
 Max VCells:
 
-![26.png](/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/max_vcells_ingestion.png)
+![26.png](/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/max_vcells_raw_ingestion.png)
 
   </div>
 
@@ -2694,7 +2694,7 @@ Max NCells:
 
 Max VCells:
 
-![30.png](/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/max_vcells_ingestion.png)
+![30.png](/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/max_vcells_raw_ingestion.png)
 
   </div>
 
