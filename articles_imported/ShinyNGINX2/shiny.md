@@ -3486,7 +3486,7 @@ log_step("Filtering", {
 
   <div class="code-tab-panel active" data-panel="dtT1D">
 
-![99.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/system_fitering.png)
+![99.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/system_filtering.png)
 
 ![100.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/user_filtering.png)
 
