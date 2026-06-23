@@ -2238,7 +2238,7 @@ draw_total_boxplot(
 
 Example:
 
-![tot_pipeline_elapsed.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/tot_pipeline_elapsed.png)
+![tot_pipeline_elapsed.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/total_pipeline_elapsed.png)
 
 Finally, for the type 3 graph.
 
