@@ -3608,6 +3608,8 @@ Because at this pointthe column we are working on is mlready materialized, we ca
 
 ![122.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/elapsed_time_window.png)
 
+  </div>
+
 </div>
 
 #### data.table
