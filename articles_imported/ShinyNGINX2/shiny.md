@@ -2331,6 +2331,8 @@ Example:
 
   <div class="code-tab-panel active" data-panel="dtT1A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![1.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/system_raw_ingestion.png)
 
 ![2.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/user_raw_ingestion.png)
@@ -2341,6 +2343,8 @@ Example:
 
   <div class="code-tab-panel" data-panel="dtT2A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![4.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/system_raw_ingestion.png)
 
 ![5.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/user_raw_ingestion.png)
@@ -2350,6 +2354,8 @@ Example:
   </div>
 
   <div class="code-tab-panel" data-panel="dtT3A">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![7.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_raw_ingestion.png)
 
@@ -2484,6 +2490,8 @@ We will confirm thatlater with `dplyr` variant.
 
   <div class="code-tab-panel active" data-panel="dpT1A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![10.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_raw_ingestion.png)
 
 ![11.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_raw_ingestion.png)
@@ -2494,6 +2502,8 @@ We will confirm thatlater with `dplyr` variant.
 
   <div class="code-tab-panel" data-panel="dpT2A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![13.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_raw_ingestion.png)
 
 ![14.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_raw_ingestion.png)
@@ -2503,6 +2513,8 @@ We will confirm thatlater with `dplyr` variant.
   </div>
 
   <div class="code-tab-panel" data-panel="dpT3A">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![16.png](/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_raw_ingestion.png)
 
@@ -2640,6 +2652,8 @@ The following nine runs benefit from a warm cache and already initialized runtim
 
   <div class="code-tab-panel active" data-panel="dtM1A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current NCells:
 
 ![19.png](/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/current_ncells_raw_ingestion.png)
@@ -2660,6 +2674,8 @@ Max VCells:
 
   <div class="code-tab-panel" data-panel="dtM2A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current NCells:
 
 ![23.png](/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/current_ncells_raw_ingestion.png)
@@ -2679,6 +2695,8 @@ Max VCells:
   </div>
 
   <div class="code-tab-panel" data-panel="dtM3A">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 Current NCells:
 
@@ -2731,6 +2749,8 @@ The cold run is therefore slower because of initialization and filesystem-cache 
 
   <div class="code-tab-panel active" data-panel="dpM1A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current NCells:
 
 ![31.png](/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/current_ncells_raw_ingestion.png)
@@ -2751,6 +2771,8 @@ Max VCells:
 
   <div class="code-tab-panel" data-panel="dpM2A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current NCells:
 
 ![35.png](/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/current_ncells_raw_ingestion.png)
@@ -2770,6 +2792,8 @@ Max VCells:
   </div>
 
   <div class="code-tab-panel" data-panel="dpM3A">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 Current NCells:
 
@@ -2937,6 +2961,8 @@ df <-  data.table::as.data.table(df)
 
   <div class="code-tab-panel active" data-panel="dtT1B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![43.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/system_date_mutation.png)
 
 ![44.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/user_date_mutation.png)
@@ -2947,6 +2973,8 @@ df <-  data.table::as.data.table(df)
 
   <div class="code-tab-panel" data-panel="dtT2B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![46.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/system_date_mutation.png)
 
 ![47.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/user_date_mutation.png)
@@ -2956,6 +2984,8 @@ df <-  data.table::as.data.table(df)
   </div>
 
   <div class="code-tab-panel" data-panel="dtT3B">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![49.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_date_mutation.png)
 
@@ -2984,6 +3014,8 @@ Now, we will compare to `dplyr`.
 
   <div class="code-tab-panel active" data-panel="dpT1B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![52.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_date_mutation.png)
 
 ![53.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_date_mutation.png)
@@ -2994,6 +3026,8 @@ Now, we will compare to `dplyr`.
 
   <div class="code-tab-panel" data-panel="dpT2B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![55.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_date_mutation.png)
 
 ![56.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_date_mutation.png)
@@ -3003,6 +3037,8 @@ Now, we will compare to `dplyr`.
   </div>
 
   <div class="code-tab-panel" data-panel="dpT3B">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![58.png](/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_date_mutation.png)
 
@@ -3158,6 +3194,8 @@ Now, what the memory consumption tell ?
 
   <div class="code-tab-panel active" data-panel="dtM1B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current `NCells`:
 
 ![61.png](/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/current_ncells_date_mutation.png)
@@ -3178,6 +3216,8 @@ Max `VCells`:
 
   <div class="code-tab-panel" data-panel="dtM2B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current `NCells`:
 
 ![64.png](/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/current_ncells_date_mutation.png)
@@ -3197,6 +3237,8 @@ Max `VCells`:
   </div>
 
   <div class="code-tab-panel" data-panel="dtM3B">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 Current `NCells`:
 
@@ -3269,6 +3311,8 @@ Anyway, here is the link of the files containing all the plots if you want (zip)
 
   <div class="code-tab-panel active" data-panel="dpM1B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current `NCells`:
 
 ![72.png](/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/current_ncells_date_mutation.png)
@@ -3289,6 +3333,8 @@ Max `VCells`:
 
   <div class="code-tab-panel" data-panel="dpM2B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 Current `NCells`:
 
 ![73.png](/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/current_ncells_date_mutation.png)
@@ -3308,6 +3354,8 @@ Max `VCells`:
   </div>
 
   <div class="code-tab-panel" data-panel="dpM3B">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 Current `NCells`:
 
@@ -3377,6 +3425,8 @@ data.table::setcolorder(df, c("ip", "ts", "target", "status", "ua"))
 
   <div class="code-tab-panel active" data-panel="dtT1C">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![81.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/system_selection.png)
 
 ![82.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/user_selection.png)
@@ -3387,6 +3437,8 @@ data.table::setcolorder(df, c("ip", "ts", "target", "status", "ua"))
 
   <div class="code-tab-panel" data-panel="dtT2C">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![84.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/system_selection.png)
 
 ![85.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/user_selection.png)
@@ -3396,6 +3448,8 @@ data.table::setcolorder(df, c("ip", "ts", "target", "status", "ua"))
   </div>
 
   <div class="code-tab-panel" data-panel="dtT3C">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![87.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_selection.png)
 
@@ -3420,6 +3474,8 @@ No surpises, all have roughly the same profile, the interresting thing is tom co
 
   <div class="code-tab-panel active" data-panel="dpT1C">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![90.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_selection.png)
 
 ![91.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_selection.png)
@@ -3430,6 +3486,8 @@ No surpises, all have roughly the same profile, the interresting thing is tom co
 
   <div class="code-tab-panel" data-panel="dpT2C">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![93.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_selection.png)
 
 ![94.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_selection.png)
@@ -3439,6 +3497,8 @@ No surpises, all have roughly the same profile, the interresting thing is tom co
   </div>
 
   <div class="code-tab-panel" data-panel="dpT3C">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![96.png](/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_selection.png)
 
@@ -3486,6 +3546,8 @@ log_step("Filtering", {
 
   <div class="code-tab-panel active" data-panel="dtT1D">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![99.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/system_filtering.png)
 
 ![100.png](/assets/common_files/shiny_bench2/plots/datatable_readr_plots/user_filtering.png)
@@ -3496,6 +3558,8 @@ log_step("Filtering", {
 
   <div class="code-tab-panel" data-panel="dtT2D">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![102.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/system_filtering.png)
 
 ![103.png](/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/user_filtering.png)
@@ -3505,6 +3569,8 @@ log_step("Filtering", {
   </div>
 
   <div class="code-tab-panel" data-panel="dtT3D">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![105.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_filtering.png)
 
@@ -3529,6 +3595,8 @@ Roughly same profile.
 
   <div class="code-tab-panel active" data-panel="dpT1D">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![108.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_filtering.png)
 
 ![109.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_filtering.png)
@@ -3539,6 +3607,8 @@ Roughly same profile.
 
   <div class="code-tab-panel" data-panel="dpT2D">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![111.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_filtering.png)
 
 ![112.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_filtering.png)
@@ -3548,6 +3618,8 @@ Roughly same profile.
   </div>
 
   <div class="code-tab-panel" data-panel="dpT3D">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![114.png](/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_filtering.png)
 
@@ -3592,6 +3664,8 @@ Because at this pointthe column we are working on is mlready materialized, we ca
 
   <div class="code-tab-panel active" data-panel="cmp1A">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![117.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_filtering.png)
 
 ![118.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/user_filtering.png)
@@ -3601,6 +3675,8 @@ Because at this pointthe column we are working on is mlready materialized, we ca
   </div>
 
   <div class="code-tab-panel" data-panel="cmp2A">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![120.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_time_window.png)
 
@@ -3648,6 +3724,8 @@ It also drops a temp col.
 
   <div class="code-tab-panel active" data-panel="cmp1B">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![123.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_rate_heuristic.png)
 
 ![124.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/user_rate_heuristic.png)
@@ -3657,6 +3735,8 @@ It also drops a temp col.
   </div>
 
   <div class="code-tab-panel" data-panel="cmp2B">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![126.png](/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_rate_heuristic.png)
 
