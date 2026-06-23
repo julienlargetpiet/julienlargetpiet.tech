@@ -2765,7 +2765,7 @@ Max NCells:
 
 Max VCells:
 
-![38.png](/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/max_vcells_ingestion.png)
+![38.png](/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/max_vcells_raw_ingestion.png)
 
   </div>
 
