@@ -3803,7 +3803,7 @@ But this is another story for the `dplyr` path -> the ingestion backend still ha
 
 #### data.table
 
-When it comes to the carinality, it is the same story as the previous operation.
+When it comes to the cardinality, it is the same story as the previous operation.
 
 <div class="lone-img-container">
 
