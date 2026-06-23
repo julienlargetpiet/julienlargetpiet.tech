@@ -3766,6 +3766,8 @@ And the execution time is lower than the following `dplyr` variant as you'll see
 
   <div class="code-tab-panel" data-panel="dpT2E">
 
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![132.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_read_time_heuristic.png)
 
 ![133.png](/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_read_time_heuristic.png)
@@ -3775,6 +3777,8 @@ And the execution time is lower than the following `dplyr` variant as you'll see
   </div>
 
   <div class="code-tab-panel" data-panel="dpT3E">
+
+<div class="matrix-loader" aria-hidden="true"></div>
 
 ![135.png](/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_read_time_heuristic.png)
 
