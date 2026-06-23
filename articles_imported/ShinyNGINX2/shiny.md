@@ -2312,7 +2312,13 @@ for (i in 1:length(overlay_memory_df)) {
 
 Example:
 
+<div class="lone-img-container">
+
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![elapsed_metric.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/elapsed_metric.png)
+
+</div>
 
 ## The Results
 
@@ -3799,11 +3805,17 @@ But this is another story for the `dplyr` path -> the ingestion backend still ha
 
 When it comes to the carinality, it is the same story as the previous operation.
 
+<div class="lone-img-container">
+
+<div class="matrix-loader" aria-hidden="true"></div>
+
 ![129Pre.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_read_time_heuristic.png)
 
 ![130Pre.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/user_read_time_heuristic.png)
 
 ![131Pre.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/elapsed_read_time_heuristic.png)
+
+</div>
 
 We can still say that the operation is multithreaded, because `user >> elapsed`.
 
