@@ -3801,23 +3801,26 @@ So, here are a per-operation and per-configuration metrics box-plots:
 #### `elapsed_time`
 
 <div class="matrix-tabs" data-matrix-tabs>
-  <div class="matrix-tabs-header">
-    <div class="matrix-tabs-row">
-      <span class="matrix-tabs-label">Metric</span>
 
-      <button class="matrix-tab-row active" data-row="system">system</button>
-      <button class="matrix-tab-row" data-row="user">user</button>
-      <button class="matrix-tab-row" data-row="elapsed">elapsed</button>
-    </div>
+<div class="matrix-tabs-header">
 
-    <div class="matrix-tabs-row">
-      <span class="matrix-tabs-label">Backend</span>
+<div class="matrix-tabs-row">
+<span class="matrix-tabs-label">Metric</span>
 
-      <button class="matrix-tab-col active" data-col="readr">readr::read_tsv()</button>
-      <button class="matrix-tab-col" data-col="vroom">vroom::vroom()</button>
-      <button class="matrix-tab-col" data-col="fread">fread()</button>
-    </div>
-  </div>
+<button class="matrix-tab-row active" data-row="system">system</button>
+<button class="matrix-tab-row" data-row="user">user</button>
+<button class="matrix-tab-row" data-row="elapsed">elapsed</button>
+</div>
+
+<div class="matrix-tabs-row">
+<span class="matrix-tabs-label">Backend</span>
+
+<button class="matrix-tab-col active" data-col="readr">readr::read_tsv()</button>
+<button class="matrix-tab-col" data-col="vroom">vroom::vroom()</button>
+<button class="matrix-tab-col" data-col="fread">fread()</button>
+</div>
+
+</div>
 
   <div class="matrix-tab-panel active" data-row="system" data-col="readr">
     <img src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_read_time_heuristic.png" alt="system readr">
