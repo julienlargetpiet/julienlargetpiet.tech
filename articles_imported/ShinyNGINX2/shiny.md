@@ -285,25 +285,25 @@ Here are the cardinalities plotted on graphs:
 
 Unique `ip`:
 
-![unique_ip.png](/assets/common_files/shiny2/describes/unique_ip.png)
+![unique_ip.png](/assets/common_files/shiny_bench2/describes/unique_ip.png)
 
 Unique `status`:
 
-![unique_status.png](/assets/common_files/shiny2/describes/unique_status.png)
+![unique_status.png](/assets/common_files/shiny_bench2/describes/unique_status.png)
 
 Unique `target`:
 
-![unique_target.png](/assets/common_files/shiny2/describes/unique_target.png)
+![unique_target.png](/assets/common_files/shiny_bench2/describes/unique_target.png)
 
 Unique `ts`:
 
-![unique_ts.png](/assets/common_files/shiny2/describes/unique_ts.png)
+![unique_ts.png](/assets/common_files/shiny_bench2/describes/unique_ts.png)
 
 Unique `UA`:
 
-![unique_ua.png](/assets/common_files/shiny2/describes/unique_ua.png)
+![unique_ua.png](/assets/common_files/shiny_bench2/describes/unique_ua.png)
 
-Which is expected, i mean we already stated that the representation of `UA`, `status` and `target` was representatives for my raw `557230` log file...
+Which is expected, I mean we already stated that the representation of `UA`, `status` and `target` was representatives for my raw `557230` log file...
 
 ## The benchmarks
 
@@ -2185,7 +2185,7 @@ for (i in seq_along(label)) {
 
 Example:
 
-![user_rate_heuristic.png](/assets/common_files/shiny2/plots/datatable_fread_plots/user_rate_heuristic.png)
+![user_rate_heuristic.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/user_rate_heuristic.png)
 
 Now, the type 2 graph:
 
@@ -2238,7 +2238,7 @@ draw_total_boxplot(
 
 Example:
 
-![tot_pipeline_elapsed.png](/assets/common_files/shiny2/plots/datatable_fread_plots/tot_pipeline_elapsed.png)
+![tot_pipeline_elapsed.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/tot_pipeline_elapsed.png)
 
 Finally, for the type 3 graph.
 
@@ -2312,7 +2312,7 @@ for (i in 1:length(overlay_memory_df)) {
 
 Example:
 
-![elapsed_metric.png](/assets/common_files/shiny2/plots/datatable_fread_plots/elapsed_metric.png)
+![elapsed_metric.png](/assets/common_files/shiny_bench2/plots/datatable_fread_plots/elapsed_metric.png)
 
 ## The Results
 
