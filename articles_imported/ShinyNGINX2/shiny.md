@@ -3830,42 +3830,52 @@ So, here are a per-operation and per-configuration metrics box-plots:
   </div>
 
   <div class="matrix-tab-panel active" data-row="system" data-col="readr">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_read_time_heuristic.png" alt="system readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_read_time_heuristic.png" alt="system readr">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="user" data-col="readr">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_read_time_heuristic.png" alt="user readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_read_time_heuristic.png" alt="user readr">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="elapsed" data-col="readr">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/elapsed_read_time_heuristic.png" alt="elapsed readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/elapsed_read_time_heuristic.png" alt="elapsed readr">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="system" data-col="vroom">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_read_time_heuristic.png" alt="system vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_read_time_heuristic.png" alt="system vroom">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="user" data-col="vroom">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_read_time_heuristic.png" alt="user vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_read_time_heuristic.png" alt="user vroom">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="elapsed" data-col="vroom">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/elapsed_read_time_heuristic.png" alt="elapsed vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/elapsed_read_time_heuristic.png" alt="elapsed vroom">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="system" data-col="fread">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_read_time_heuristic.png" alt="system fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_read_time_heuristic.png" alt="system fread">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="user" data-col="fread">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/user_read_time_heuristic.png" alt="user fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/user_read_time_heuristic.png" alt="user fread">
   </div>
-
+  
   <div class="matrix-tab-panel" data-row="elapsed" data-col="fread">
-    <img src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/elapsed_read_time_heuristic.png" alt="elapsed fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/elapsed_read_time_heuristic.png" alt="elapsed fread">
   </div>
 
 </div>
+
 #### `user_time`
 
 #### `system_time`
