@@ -3256,7 +3256,7 @@ For the rest of the article, I will avoid interpreting memory usage as a strict 
 
 Anyway, here is the link of the files containing all the plots if you want (zip) :
 
-[zip_plots](/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/all_plots.zip)
+[zip_plots](/assets/common_files/shiny_bench2/all_mem.zip)
 
 #### dplyr
 
