@@ -3902,7 +3902,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 <div class="matrix-tabs" data-matrix-tabs>
 
   <div class="matrix-tabs-header">
-    <div class="matrix-tabs-grid matrix-tabs-grid-6">
+    <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
       <div class="matrix-tabs-corner"></div>
       <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
       <div class="matrix-tab-col">vroom::vroom() + dplyr</div>
