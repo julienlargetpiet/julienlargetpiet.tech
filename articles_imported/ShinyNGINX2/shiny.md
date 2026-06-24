@@ -36,7 +36,7 @@ For those benchmarks, I'll use those package versions:
 
 I will run all configurations across 20 log files, from 1× to 20× the original file size.
 
-For that I will my real `NGINX` log file for my blog, that will be the first log-file.
+For this benchmark, I use the real `NGINX` log file from my blog as the base dataset.
 
 But then I'll have to double its size.
 
@@ -2485,7 +2485,7 @@ So none of them is `ALTREP`, meaning al of them is fuly materialized.
 | `ua` | character | `STRSXP` | `STRSXP` | Materialized R character vector containing references to cached `CHARSXP` strings |
 
 
-That is surely due to `as.data.table`. 
+That is most likely due to `as.data.table`. 
 
 We will confirm thatlater with `dplyr` variant.
 
@@ -2536,7 +2536,7 @@ We will confirm thatlater with `dplyr` variant.
 
 </div>
 
-We see that here `vroom` clearly wins, surely because it is really being lazy here.
+We see that here `vroom` clearly wins, most likely because it is really being lazy here.
 
 Also, here we totally see that all operations are multithreaded. 
 
