@@ -275,7 +275,7 @@ for (cl in cur_colnames) {
 
 ```
 
-Synthax note:
+Syntax note:
 
 Because `cl` is a string, I use the `.data` pronoun inside ggplot2 to refer to a column programmatically.
 
@@ -412,7 +412,7 @@ The reported allocation is more likely related to R's evaluation machinery, resu
 
 ### microbenchmark
 
-On a more 'execution time' oriented benchark, we can use `microbenchmark`.
+On a more 'execution time' oriented benchmark, we can use `microbenchmark`.
 
 Example:
 
@@ -2827,7 +2827,7 @@ Max VCells:
 
 Regarding the lower-value outliers, this is the same explanation as before.
 
-But first, we note that `vroom` is allocating susbstantially less (`VCells`), which is normal because it can be lazy here.
+But first, we note that `vroom` is allocating substantially less (`VCells`), which is normal because it can be lazy here.
 
 Also, the first native `vroom` ingestion run is measured before the process has ever materialized the dataset. It therefore reflects a very low lazy-object allocation floor.
 
@@ -2934,7 +2934,7 @@ df <-  data.table::as.data.table(vroom::vroom(
 
 Where the expression wil be evaluated according to `data.table::as.data.table`, when it will need to get the actual value returned by the expression (eventually not too long after the call) .
 
-Contrary to direclty evaluating the expression assigning it to a temporary value (it can be more predictible):
+Contrary to directly evaluating the expression assigning it to a temporary value (it can be more predictible):
 
 ```r
 
@@ -3471,7 +3471,7 @@ data.table::setcolorder(df, c("ip", "ts", "target", "status", "ua"))
 
 </div>
 
-No surpises, all have roughly the same profile, the interresting thing is tom compare them to the `dplyr` variant.
+No surpises, all have roughly the same profile, the interesting thing is tom compare them to the `dplyr` variant.
 
 #### dplyr
 
