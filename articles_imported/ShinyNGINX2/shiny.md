@@ -15,6 +15,10 @@ The entire raw work behind this article is available here:
 
 [https://github.com/julienlargetpiet/Article_RSHINY](https://github.com/julienlargetpiet/Article_RSHINY)
 
+If you can't wait to see the results, here they are:
+
+[#speedelapsed](#speedelapsed)
+
 ## Packages version
 
 For those benchmarks, I'll use those package versions:
