@@ -1,8 +1,8 @@
 {
   "shiny": {
-    "title": "Test",
+    "title": "Where R Data Pipelines Pay Their Cost: data.table, dplyr, fread, readr, and vroom",
     "subject_id": 7,
-    "is_public": false,
+    "is_public": true,
     "article_id": 224
   }
 }
