@@ -4067,17 +4067,1011 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
 #### `user_time`
 
+<h3>speed / user</h3>
+<div class="matrix-tabs" data-matrix-tabs>
+
+  <div class="matrix-tabs-header">
+  <div class="matrix-tabs-scroll">
+    <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
+      <div class="matrix-tabs-corner"></div>
+      <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
+      <div class="matrix-tab-col">vroom::vroom() + dplyr</div>
+      <div class="matrix-tab-col">fread() + dplyr</div>
+      <div class="matrix-tab-col">readr::read_tsv() + data.table</div>
+      <div class="matrix-tab-col">vroom::vroom() + data.table</div>
+      <div class="matrix-tab-col">fread() + data.table</div>
+      <div class="matrix-tab-row">readr::read_tsv() + dplyr</div>
+      <button class="matrix-cell active" data-row="dplyr_readr" data-col="dplyr_readr">readr::read_tsv() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_vroom">readr::read_tsv() + dplyr × vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_fread">readr::read_tsv() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_readr">readr::read_tsv() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_vroom">readr::read_tsv() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_fread">readr::read_tsv() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_vroom">vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_fread">vroom::vroom() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_readr">vroom::vroom() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_vroom">vroom::vroom() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_fread">vroom::vroom() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="dplyr_fread">fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_readr">fread() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_vroom">fread() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_fread">fread() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">readr::read_tsv() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_readr">readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_vroom">readr::read_tsv() + data.table × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_fread">readr::read_tsv() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="datatable_readr">×</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_vroom">vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_fread">vroom::vroom() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_vroom">×</button>
+      <button class="matrix-cell" data-row="datatable_fread" data-col="datatable_fread">fread() + data.table</button>
+    </div>
+  </div>
+  </div>
+
+  <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/user_metric.png" alt="user - readr::read_tsv() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_dplyr_readr_user.png" alt="user - readr::read_tsv() + dplyr vs vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_dplyr_fread_user.png" alt="user - readr::read_tsv() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_datatable_readr_user.png" alt="user - readr::read_tsv() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_datatable_vroom_user.png" alt="user - readr::read_tsv() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_datatable_fread_user.png" alt="user - readr::read_tsv() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/user_metric.png" alt="user - vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_dplyr_fread_user.png" alt="user - vroom::vroom() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_datatable_readr_user.png" alt="user - vroom::vroom() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_datatable_vroom_user.png" alt="user - vroom::vroom() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_datatable_fread_user.png" alt="user - vroom::vroom() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/user_metric.png" alt="user - fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_fread_vs_datatable_readr_user.png" alt="user - fread() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_fread_vs_datatable_vroom_user.png" alt="user - fread() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_fread_vs_datatable_fread_user.png" alt="user - fread() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_readr_plots/user_metric.png" alt="user - readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/datatable_vroom_vs_datatable_readr_user.png" alt="user - readr::read_tsv() + data.table vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/datatable_readr_vs_datatable_fread_user.png" alt="user - readr::read_tsv() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/user_metric.png" alt="user - vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/datatable_vroom_vs_datatable_fread_user.png" alt="user - vroom::vroom() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_fread_plots/user_metric.png" alt="user - fread() + data.table">
+  </div>
+
+</div>
+
 #### `system_time`
+
+<h3>speed / system</h3>
+<div class="matrix-tabs" data-matrix-tabs>
+
+  <div class="matrix-tabs-header">
+  <div class="matrix-tabs-scroll">
+    <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
+      <div class="matrix-tabs-corner"></div>
+      <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
+      <div class="matrix-tab-col">vroom::vroom() + dplyr</div>
+      <div class="matrix-tab-col">fread() + dplyr</div>
+      <div class="matrix-tab-col">readr::read_tsv() + data.table</div>
+      <div class="matrix-tab-col">vroom::vroom() + data.table</div>
+      <div class="matrix-tab-col">fread() + data.table</div>
+      <div class="matrix-tab-row">readr::read_tsv() + dplyr</div>
+      <button class="matrix-cell active" data-row="dplyr_readr" data-col="dplyr_readr">readr::read_tsv() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_vroom">readr::read_tsv() + dplyr × vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_fread">readr::read_tsv() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_readr">readr::read_tsv() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_vroom">readr::read_tsv() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_fread">readr::read_tsv() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_vroom">vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_fread">vroom::vroom() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_readr">vroom::vroom() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_vroom">vroom::vroom() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_fread">vroom::vroom() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="dplyr_fread">fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_readr">fread() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_vroom">fread() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_fread">fread() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">readr::read_tsv() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_readr">readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_vroom">readr::read_tsv() + data.table × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_fread">readr::read_tsv() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="datatable_readr">×</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_vroom">vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_fread">vroom::vroom() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_vroom">×</button>
+      <button class="matrix-cell" data-row="datatable_fread" data-col="datatable_fread">fread() + data.table</button>
+    </div>
+  </div>
+  </div>
+
+  <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/system_metric.png" alt="system - readr::read_tsv() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_dplyr_readr_system.png" alt="system - readr::read_tsv() + dplyr vs vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_dplyr_fread_system.png" alt="system - readr::read_tsv() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_datatable_readr_system.png" alt="system - readr::read_tsv() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_datatable_vroom_system.png" alt="system - readr::read_tsv() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_readr_vs_datatable_fread_system.png" alt="system - readr::read_tsv() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/system_metric.png" alt="system - vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_dplyr_fread_system.png" alt="system - vroom::vroom() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_datatable_readr_system.png" alt="system - vroom::vroom() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_datatable_vroom_system.png" alt="system - vroom::vroom() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_vroom_vs_datatable_fread_system.png" alt="system - vroom::vroom() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/system_metric.png" alt="system - fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_fread_vs_datatable_readr_system.png" alt="system - fread() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_fread_vs_datatable_vroom_system.png" alt="system - fread() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/dplyr_fread_vs_datatable_fread_system.png" alt="system - fread() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_readr_plots/system_metric.png" alt="system - readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/datatable_vroom_vs_datatable_readr_system.png" alt="system - readr::read_tsv() + data.table vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/datatable_readr_vs_datatable_fread_system.png" alt="system - readr::read_tsv() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/system_metric.png" alt="system - vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/speed/datatable_vroom_vs_datatable_fread_system.png" alt="system - vroom::vroom() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_fread_plots/system_metric.png" alt="system - fread() + data.table">
+  </div>
+
+</div>
 
 #### `current_vcells`
 
+<h3>mem / current_vcells</h3>
+<div class="matrix-tabs" data-matrix-tabs>
+
+  <div class="matrix-tabs-header">
+  <div class="matrix-tabs-scroll">
+    <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
+      <div class="matrix-tabs-corner"></div>
+      <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
+      <div class="matrix-tab-col">vroom::vroom() + dplyr</div>
+      <div class="matrix-tab-col">fread() + dplyr</div>
+      <div class="matrix-tab-col">readr::read_tsv() + data.table</div>
+      <div class="matrix-tab-col">vroom::vroom() + data.table</div>
+      <div class="matrix-tab-col">fread() + data.table</div>
+      <div class="matrix-tab-row">readr::read_tsv() + dplyr</div>
+      <button class="matrix-cell active" data-row="dplyr_readr" data-col="dplyr_readr">readr::read_tsv() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_vroom">readr::read_tsv() + dplyr × vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_fread">readr::read_tsv() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_readr">readr::read_tsv() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_vroom">readr::read_tsv() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_fread">readr::read_tsv() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_vroom">vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_fread">vroom::vroom() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_readr">vroom::vroom() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_vroom">vroom::vroom() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_fread">vroom::vroom() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="dplyr_fread">fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_readr">fread() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_vroom">fread() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_fread">fread() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">readr::read_tsv() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_readr">readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_vroom">readr::read_tsv() + data.table × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_fread">readr::read_tsv() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="datatable_readr">×</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_vroom">vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_fread">vroom::vroom() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_vroom">×</button>
+      <button class="matrix-cell" data-row="datatable_fread" data-col="datatable_fread">fread() + data.table</button>
+    </div>
+  </div>
+  </div>
+
+  <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/current_vcells_metric.png" alt="current_vcells - readr::read_tsv() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_readr_current_vcells.png" alt="current_vcells - readr::read_tsv() + dplyr vs vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_dplyr_fread_current_vcells.png" alt="current_vcells - readr::read_tsv() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_readr_current_vcells.png" alt="current_vcells - readr::read_tsv() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_vroom_current_vcells.png" alt="current_vcells - readr::read_tsv() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_fread_current_vcells.png" alt="current_vcells - readr::read_tsv() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/current_vcells_metric.png" alt="current_vcells - vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_fread_current_vcells.png" alt="current_vcells - vroom::vroom() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_readr_current_vcells.png" alt="current_vcells - vroom::vroom() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_vroom_current_vcells.png" alt="current_vcells - vroom::vroom() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_fread_current_vcells.png" alt="current_vcells - vroom::vroom() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/current_vcells_metric.png" alt="current_vcells - fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_readr_current_vcells.png" alt="current_vcells - fread() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_vroom_current_vcells.png" alt="current_vcells - fread() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_fread_current_vcells.png" alt="current_vcells - fread() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/current_vcells_metric.png" alt="current_vcells - readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_readr_current_vcells.png" alt="current_vcells - readr::read_tsv() + data.table vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_readr_vs_datatable_fread_current_vcells.png" alt="current_vcells - readr::read_tsv() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/current_vcells_metric.png" alt="current_vcells - vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_fread_current_vcells.png" alt="current_vcells - vroom::vroom() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/current_vcells_metric.png" alt="current_vcells - fread() + data.table">
+  </div>
+
+</div>
+
 #### `current_ncells`
+
+<h3>mem / current_ncells</h3>
+<div class="matrix-tabs" data-matrix-tabs>
+
+  <div class="matrix-tabs-header">
+  <div class="matrix-tabs-scroll">
+    <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
+      <div class="matrix-tabs-corner"></div>
+      <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
+      <div class="matrix-tab-col">vroom::vroom() + dplyr</div>
+      <div class="matrix-tab-col">fread() + dplyr</div>
+      <div class="matrix-tab-col">readr::read_tsv() + data.table</div>
+      <div class="matrix-tab-col">vroom::vroom() + data.table</div>
+      <div class="matrix-tab-col">fread() + data.table</div>
+      <div class="matrix-tab-row">readr::read_tsv() + dplyr</div>
+      <button class="matrix-cell active" data-row="dplyr_readr" data-col="dplyr_readr">readr::read_tsv() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_vroom">readr::read_tsv() + dplyr × vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_fread">readr::read_tsv() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_readr">readr::read_tsv() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_vroom">readr::read_tsv() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_fread">readr::read_tsv() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_vroom">vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_fread">vroom::vroom() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_readr">vroom::vroom() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_vroom">vroom::vroom() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_fread">vroom::vroom() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="dplyr_fread">fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_readr">fread() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_vroom">fread() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_fread">fread() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">readr::read_tsv() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_readr">readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_vroom">readr::read_tsv() + data.table × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_fread">readr::read_tsv() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="datatable_readr">×</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_vroom">vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_fread">vroom::vroom() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_vroom">×</button>
+      <button class="matrix-cell" data-row="datatable_fread" data-col="datatable_fread">fread() + data.table</button>
+    </div>
+  </div>
+  </div>
+
+  <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/current_ncells_metric.png" alt="current_ncells - readr::read_tsv() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_readr_current_ncells.png" alt="current_ncells - readr::read_tsv() + dplyr vs vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_dplyr_fread_current_ncells.png" alt="current_ncells - readr::read_tsv() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_readr_current_ncells.png" alt="current_ncells - readr::read_tsv() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_vroom_current_ncells.png" alt="current_ncells - readr::read_tsv() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_fread_current_ncells.png" alt="current_ncells - readr::read_tsv() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/current_ncells_metric.png" alt="current_ncells - vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_fread_current_ncells.png" alt="current_ncells - vroom::vroom() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_readr_current_ncells.png" alt="current_ncells - vroom::vroom() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_vroom_current_ncells.png" alt="current_ncells - vroom::vroom() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_fread_current_ncells.png" alt="current_ncells - vroom::vroom() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/current_ncells_metric.png" alt="current_ncells - fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_readr_current_ncells.png" alt="current_ncells - fread() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_vroom_current_ncells.png" alt="current_ncells - fread() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_fread_current_ncells.png" alt="current_ncells - fread() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/current_ncells_metric.png" alt="current_ncells - readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_readr_current_ncells.png" alt="current_ncells - readr::read_tsv() + data.table vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_readr_vs_datatable_fread_current_ncells.png" alt="current_ncells - readr::read_tsv() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/current_ncells_metric.png" alt="current_ncells - vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_fread_current_ncells.png" alt="current_ncells - vroom::vroom() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/current_ncells_metric.png" alt="current_ncells - fread() + data.table">
+  </div>
+
+</div>
 
 #### `max_vcells`
 
+<h3>mem / max_vcells</h3>
+<div class="matrix-tabs" data-matrix-tabs>
+
+  <div class="matrix-tabs-header">
+  <div class="matrix-tabs-scroll">
+    <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
+      <div class="matrix-tabs-corner"></div>
+      <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
+      <div class="matrix-tab-col">vroom::vroom() + dplyr</div>
+      <div class="matrix-tab-col">fread() + dplyr</div>
+      <div class="matrix-tab-col">readr::read_tsv() + data.table</div>
+      <div class="matrix-tab-col">vroom::vroom() + data.table</div>
+      <div class="matrix-tab-col">fread() + data.table</div>
+      <div class="matrix-tab-row">readr::read_tsv() + dplyr</div>
+      <button class="matrix-cell active" data-row="dplyr_readr" data-col="dplyr_readr">readr::read_tsv() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_vroom">readr::read_tsv() + dplyr × vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_fread">readr::read_tsv() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_readr">readr::read_tsv() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_vroom">readr::read_tsv() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_fread">readr::read_tsv() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_vroom">vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_fread">vroom::vroom() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_readr">vroom::vroom() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_vroom">vroom::vroom() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_fread">vroom::vroom() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="dplyr_fread">fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_readr">fread() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_vroom">fread() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_fread">fread() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">readr::read_tsv() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_readr">readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_vroom">readr::read_tsv() + data.table × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_fread">readr::read_tsv() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="datatable_readr">×</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_vroom">vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_fread">vroom::vroom() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_vroom">×</button>
+      <button class="matrix-cell" data-row="datatable_fread" data-col="datatable_fread">fread() + data.table</button>
+    </div>
+  </div>
+  </div>
+
+  <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/max_vcells_metric.png" alt="max_vcells - readr::read_tsv() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_readr_max_vcells.png" alt="max_vcells - readr::read_tsv() + dplyr vs vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_dplyr_fread_max_vcells.png" alt="max_vcells - readr::read_tsv() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_readr_max_vcells.png" alt="max_vcells - readr::read_tsv() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_vroom_max_vcells.png" alt="max_vcells - readr::read_tsv() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_fread_max_vcells.png" alt="max_vcells - readr::read_tsv() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/max_vcells_metric.png" alt="max_vcells - vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_fread_max_vcells.png" alt="max_vcells - vroom::vroom() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_readr_max_vcells.png" alt="max_vcells - vroom::vroom() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_vroom_max_vcells.png" alt="max_vcells - vroom::vroom() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_fread_max_vcells.png" alt="max_vcells - vroom::vroom() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/max_vcells_metric.png" alt="max_vcells - fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_readr_max_vcells.png" alt="max_vcells - fread() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_vroom_max_vcells.png" alt="max_vcells - fread() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_fread_max_vcells.png" alt="max_vcells - fread() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/max_vcells_metric.png" alt="max_vcells - readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_readr_max_vcells.png" alt="max_vcells - readr::read_tsv() + data.table vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_readr_vs_datatable_fread_max_vcells.png" alt="max_vcells - readr::read_tsv() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/max_vcells_metric.png" alt="max_vcells - vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_fread_max_vcells.png" alt="max_vcells - vroom::vroom() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/max_vcells_metric.png" alt="max_vcells - fread() + data.table">
+  </div>
+
+</div>
+
 #### `max_ncells`
 
+<h3>mem / max_ncells</h3>
+<div class="matrix-tabs" data-matrix-tabs>
 
+  <div class="matrix-tabs-header">
+  <div class="matrix-tabs-scroll">
+    <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
+      <div class="matrix-tabs-corner"></div>
+      <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
+      <div class="matrix-tab-col">vroom::vroom() + dplyr</div>
+      <div class="matrix-tab-col">fread() + dplyr</div>
+      <div class="matrix-tab-col">readr::read_tsv() + data.table</div>
+      <div class="matrix-tab-col">vroom::vroom() + data.table</div>
+      <div class="matrix-tab-col">fread() + data.table</div>
+      <div class="matrix-tab-row">readr::read_tsv() + dplyr</div>
+      <button class="matrix-cell active" data-row="dplyr_readr" data-col="dplyr_readr">readr::read_tsv() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_vroom">readr::read_tsv() + dplyr × vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="dplyr_fread">readr::read_tsv() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_readr">readr::read_tsv() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_vroom">readr::read_tsv() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_readr" data-col="datatable_fread">readr::read_tsv() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_vroom">vroom::vroom() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="dplyr_fread">vroom::vroom() + dplyr × fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_readr">vroom::vroom() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_vroom">vroom::vroom() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_vroom" data-col="datatable_fread">vroom::vroom() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + dplyr</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="dplyr_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="dplyr_fread">fread() + dplyr</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_readr">fread() + dplyr × readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_vroom">fread() + dplyr × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="dplyr_fread" data-col="datatable_fread">fread() + dplyr × fread() + data.table</button>
+      <div class="matrix-tab-row">readr::read_tsv() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_readr" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_readr">readr::read_tsv() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_vroom">readr::read_tsv() + data.table × vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_readr" data-col="datatable_fread">readr::read_tsv() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">vroom::vroom() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_vroom" data-col="datatable_readr">×</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_vroom">vroom::vroom() + data.table</button>
+      <button class="matrix-cell" data-row="datatable_vroom" data-col="datatable_fread">vroom::vroom() + data.table × fread() + data.table</button>
+      <div class="matrix-tab-row">fread() + data.table</div>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_vroom">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="dplyr_fread">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_readr">×</button>
+      <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_vroom">×</button>
+      <button class="matrix-cell" data-row="datatable_fread" data-col="datatable_fread">fread() + data.table</button>
+    </div>
+  </div>
+  </div>
+
+  <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/max_ncells_metric.png" alt="max_ncells - readr::read_tsv() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_readr_max_ncells.png" alt="max_ncells - readr::read_tsv() + dplyr vs vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_dplyr_fread_max_ncells.png" alt="max_ncells - readr::read_tsv() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_readr_max_ncells.png" alt="max_ncells - readr::read_tsv() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_vroom_max_ncells.png" alt="max_ncells - readr::read_tsv() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_readr_vs_datatable_fread_max_ncells.png" alt="max_ncells - readr::read_tsv() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/max_ncells_metric.png" alt="max_ncells - vroom::vroom() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_dplyr_fread_max_ncells.png" alt="max_ncells - vroom::vroom() + dplyr vs fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_readr_max_ncells.png" alt="max_ncells - vroom::vroom() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_vroom_max_ncells.png" alt="max_ncells - vroom::vroom() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_vroom_vs_datatable_fread_max_ncells.png" alt="max_ncells - vroom::vroom() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/max_ncells_metric.png" alt="max_ncells - fread() + dplyr">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_readr_max_ncells.png" alt="max_ncells - fread() + dplyr vs readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_vroom_max_ncells.png" alt="max_ncells - fread() + dplyr vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/dplyr_fread_vs_datatable_fread_max_ncells.png" alt="max_ncells - fread() + dplyr vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/max_ncells_metric.png" alt="max_ncells - readr::read_tsv() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_readr_max_ncells.png" alt="max_ncells - readr::read_tsv() + data.table vs vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_readr_vs_datatable_fread_max_ncells.png" alt="max_ncells - readr::read_tsv() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/max_ncells_metric.png" alt="max_ncells - vroom::vroom() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/final_plots/mem/datatable_vroom_vs_datatable_fread_max_ncells.png" alt="max_ncells - vroom::vroom() + data.table vs fread() + data.table">
+  </div>
+
+  <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
+    <div class="matrix-loader" aria-hidden="true"></div>
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/max_ncells_metric.png" alt="max_ncells - fread() + data.table">
+  </div>
+
+</div>
 
 
 
