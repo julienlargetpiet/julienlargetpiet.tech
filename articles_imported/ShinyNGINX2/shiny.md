@@ -4464,7 +4464,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/current_vcells_metric.png" alt="current_vcells - readr::read_tsv() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/current_vcells_metric.png" alt="current_vcells - readr::read_tsv() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
@@ -4494,7 +4494,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/current_vcells_metric.png" alt="current_vcells - vroom::vroom() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/current_vcells_metric.png" alt="current_vcells - vroom::vroom() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
@@ -4519,7 +4519,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/current_vcells_metric.png" alt="current_vcells - fread() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/current_vcells_metric.png" alt="current_vcells - fread() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
@@ -4539,7 +4539,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/current_vcells_metric.png" alt="current_vcells - readr::read_tsv() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_readr_plots/current_vcells_metric.png" alt="current_vcells - readr::read_tsv() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
@@ -4554,7 +4554,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/current_vcells_metric.png" alt="current_vcells - vroom::vroom() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/current_vcells_metric.png" alt="current_vcells - vroom::vroom() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
@@ -4564,7 +4564,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/current_vcells_metric.png" alt="current_vcells - fread() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_fread_plots/current_vcells_metric.png" alt="current_vcells - fread() + data.table">
   </div>
 
 </div>
@@ -4632,7 +4632,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/current_ncells_metric.png" alt="current_ncells - readr::read_tsv() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/current_ncells_metric.png" alt="current_ncells - readr::read_tsv() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
@@ -4662,7 +4662,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/current_ncells_metric.png" alt="current_ncells - vroom::vroom() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/current_ncells_metric.png" alt="current_ncells - vroom::vroom() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
@@ -4687,7 +4687,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/current_ncells_metric.png" alt="current_ncells - fread() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/current_ncells_metric.png" alt="current_ncells - fread() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
@@ -4707,7 +4707,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/current_ncells_metric.png" alt="current_ncells - readr::read_tsv() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_readr_plots/current_ncells_metric.png" alt="current_ncells - readr::read_tsv() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
@@ -4722,7 +4722,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/current_ncells_metric.png" alt="current_ncells - vroom::vroom() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/current_ncells_metric.png" alt="current_ncells - vroom::vroom() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
@@ -4732,7 +4732,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/current_ncells_metric.png" alt="current_ncells - fread() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_fread_plots/current_ncells_metric.png" alt="current_ncells - fread() + data.table">
   </div>
 
 </div>
@@ -4800,7 +4800,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/max_vcells_metric.png" alt="max_vcells - readr::read_tsv() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/max_vcells_metric.png" alt="max_vcells - readr::read_tsv() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
@@ -4830,7 +4830,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/max_vcells_metric.png" alt="max_vcells - vroom::vroom() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/max_vcells_metric.png" alt="max_vcells - vroom::vroom() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
@@ -4855,7 +4855,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/max_vcells_metric.png" alt="max_vcells - fread() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/max_vcells_metric.png" alt="max_vcells - fread() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
@@ -4875,7 +4875,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/max_vcells_metric.png" alt="max_vcells - readr::read_tsv() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_readr_plots/max_vcells_metric.png" alt="max_vcells - readr::read_tsv() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
@@ -4890,7 +4890,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/max_vcells_metric.png" alt="max_vcells - vroom::vroom() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/max_vcells_metric.png" alt="max_vcells - vroom::vroom() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
@@ -4900,7 +4900,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/max_vcells_metric.png" alt="max_vcells - fread() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_fread_plots/max_vcells_metric.png" alt="max_vcells - fread() + data.table">
   </div>
 
 </div>
@@ -4968,7 +4968,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_readr_plots/max_ncells_metric.png" alt="max_ncells - readr::read_tsv() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_readr_plots/max_ncells_metric.png" alt="max_ncells - readr::read_tsv() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_readr" data-col="dplyr_vroom">
@@ -4998,7 +4998,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_vroom_plots/max_ncells_metric.png" alt="max_ncells - vroom::vroom() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_vroom_plots/max_ncells_metric.png" alt="max_ncells - vroom::vroom() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_vroom" data-col="dplyr_fread">
@@ -5023,7 +5023,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="dplyr_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_mem_fread_plots/max_ncells_metric.png" alt="max_ncells - fread() + dplyr">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/dplyr_fread_plots/max_ncells_metric.png" alt="max_ncells - fread() + dplyr">
   </div>
 
   <div class="matrix-tab-panel" data-row="dplyr_fread" data-col="datatable_readr">
@@ -5043,7 +5043,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_readr">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_readr_plots/max_ncells_metric.png" alt="max_ncells - readr::read_tsv() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_readr_plots/max_ncells_metric.png" alt="max_ncells - readr::read_tsv() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_readr" data-col="datatable_vroom">
@@ -5058,7 +5058,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_vroom">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_vroom_plots/max_ncells_metric.png" alt="max_ncells - vroom::vroom() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_vroom_plots/max_ncells_metric.png" alt="max_ncells - vroom::vroom() + data.table">
   </div>
 
   <div class="matrix-tab-panel" data-row="datatable_vroom" data-col="datatable_fread">
@@ -5068,15 +5068,10 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
   <div class="matrix-tab-panel" data-row="datatable_fread" data-col="datatable_fread">
     <div class="matrix-loader" aria-hidden="true"></div>
-    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_mem_fread_plots/max_ncells_metric.png" alt="max_ncells - fread() + data.table">
+    <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_fread_plots/max_ncells_metric.png" alt="max_ncells - fread() + data.table">
   </div>
 
 </div>
-
-
-
-
-
 
 
 
