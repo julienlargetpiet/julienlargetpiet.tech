@@ -5,13 +5,13 @@ Most readers responded positively, but some disagreed with the benchmarking meth
 
 To fully understand the pipeline architecture I developed, and why I ultimately chose it over the alternatives, I recommend reading the previous article first:
 
-[https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html](https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html)
+![https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html](https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html)
 
-In this new benchmark, I use a more rigorous methodology in order to produce more precise, more reliable, and more reproducible results.
+In this new benchmark, I use a more rigorous methodology to produce more precise, reliable, and reproducible results.
 
-The goal is not only to compare execution times, but also to make the entire process transparent. Every experiment is designed to be reproducible, and the article can be read as a practical tutorial for benchmarking this kind of data-manipulation pipeline.
+The goal is not only to compare execution times, but also to make the entire process transparent. Every experiment is designed to be reproducible, and the article can also be read as a practical tutorial for benchmarking this kind of data-manipulation pipeline.
 
-The entire raw work I did in the article is available here:
+The entire raw work behind this article is available here:
 
 ![https://github.com/julienlargetpiet/Article_RSHINY](https://github.com/julienlargetpiet/Article_RSHINY)
 
@@ -34,23 +34,23 @@ For those benchmarks, I'll use those package versions:
 
 ## The data
 
-I will run all configurations across 20 log files, from 1× to 20× the original file size.
+I run all configurations across 20 log files, ranging from 1× to 20× the original file size.
 
-For this benchmark, I use the real `NGINX` log file from my blog as the base dataset.
+For the base dataset, I use the real `NGINX` access log from my blog. This file becomes the first benchmark file.
 
-But then I'll have to double its size.
+However, simply appending the same file multiple times would not be very representative. If I only duplicated the original file, the number of rows would increase, but the cardinality of each dimension would remain unchanged.
 
-It won't be nice to just append the file n times to make the nth log file since the cardinality of each dimension will not change.
+In other words, values such as `unique(df$ip)` or `unique(df$date)` would remain the same across all generated files.
 
-That's just a fancy word to say that `unique(df$ip)` or `unique(df$date)`  will be the same for all log-file if I do that.
+To avoid this, I artificially increase the cardinality of some columns using a constrained fuzzing process.
 
-Then, I will artificially increase the cardinality (fuzzing with constraints in some sense) .
+The `target` column is already well represented in the original file, so I do not modify it. The same applies to `status` and `ua`.
 
-But technically, since `target` values is already quite well represented, we are not forced to increase he cardinality for this column.
+Therefore, the fuzzing process only needs to modify two columns:
 
-The same goes fo `status` and `ua`.
+- `ip`
 
-So we have just to apply this method over `ip` and of course `ts` -> `timestamp` -> `date`.
+- `ts`, which is later converted into timestamp / date
 
 Here is the script:
 
