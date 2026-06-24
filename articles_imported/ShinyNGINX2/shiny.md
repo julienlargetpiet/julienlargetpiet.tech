@@ -5,7 +5,7 @@ Most readers responded positively, but some disagreed with the benchmarking meth
 
 To fully understand the pipeline architecture I developed, and why I ultimately chose it over the alternatives, I recommend reading the previous article first:
 
-![https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html](https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html)
+[https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html](https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html)
 
 In this new benchmark, I use a more rigorous methodology to produce more precise, reliable, and reproducible results.
 
@@ -13,7 +13,7 @@ The goal is not only to compare execution times, but also to make the entire pro
 
 The entire raw work behind this article is available here:
 
-![https://github.com/julienlargetpiet/Article_RSHINY](https://github.com/julienlargetpiet/Article_RSHINY)
+[https://github.com/julienlargetpiet/Article_RSHINY](https://github.com/julienlargetpiet/Article_RSHINY)
 
 ## Packages version
 
