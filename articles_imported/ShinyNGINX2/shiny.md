@@ -1,15 +1,19 @@
 
 My previous article was somewhat polarizing.
 
-Most readers responded positively, but some disagreed with the methodology I used for the benchmarks.
+Most readers responded positively, but some disagreed with the benchmarking methodology I used. That criticism is precisely why this article exists.
 
-That criticism is precisely why this article exists.
-
-To fully understand the pipeline architecture I developed and why I ultimately chose it over the alternatives I recommend first reading my previous article:
+To fully understand the pipeline architecture I developed, and why I ultimately chose it over the alternatives, I recommend reading the previous article first:
 
 [https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html](https://julienlargetpiet.tech/articles/data-table-vs-dplyr-in-a-data-pipeline.html)
 
-In this new benchmark, I will use a more rigorous methodology to produce significantly more precise and reliable results.
+In this new benchmark, I use a more rigorous methodology in order to produce more precise, more reliable, and more reproducible results.
+
+The goal is not only to compare execution times, but also to make the entire process transparent. Every experiment is designed to be reproducible, and the article can be read as a practical tutorial for benchmarking this kind of data-manipulation pipeline.
+
+The entire raw work I did in the article is available here:
+
+![https://github.com/julienlargetpiet/Article_RSHINY](https://github.com/julienlargetpiet/Article_RSHINY)
 
 ## Packages version
 
@@ -84,7 +88,7 @@ for (i in 2:20) {
   for (i2 in seq_len(i - 1L)) {
     tmp <- copy(dt)
 
-    cur_delta <- max(df$ts) - min(df$ts) + 1
+    cur_delta <- max(dt$ts) - min(dt$ts) + 1
     tmp[, ts := ts + i2 * cur_delta]
     tmp[, ip := fuzz_ip(ip, i2)]
   
@@ -277,7 +281,7 @@ Because `cl` is a string, I use the `.data` pronoun inside ggplot2 to refer to a
 
 ```r
 
-.df[[cl]]
+.data[[cl]]
 
 ```
 
@@ -984,7 +988,7 @@ write_benchs <- function() {
 
 ```
 
-Because the whole pipeline will be ran on different log file whose rows will double each time.
+Because, the whole pipeline is run on 20 generated log files, from 1× to 20× the original size.
 
 For instance later in the benchmark I have:
 
@@ -4639,6 +4643,9 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
 </div>
 
+We see that looking at the big picture, the native `readr + dplyr` vs `fread + datatable` is pretty hard to distinguish a fundamental performance difference, apart from the cold-start raw ingestion results that are significantly in favor of the  `data.table` path.
+
+Also, I like to compare the `vroom + dplyr` path compared to `fread + data.table` where we clearly see that the initial ingestion cost is deported to the operation that forces materialization.
 
 #### `user_time`
 
@@ -5144,6 +5151,14 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
 </div>
 
+Here is a very interesting results.
+
+We already roughly know that `readr + dplyr` path uses a little less `VCells` than `data.table` paths.
+
+But look at that, native `vroom + dplyr` uses order of magnitude less `VCells` than those previous paths, especially in ingestion because columns are stored in `ALTREP` format, but **even in the materialization triggerring functions**.
+
+This is also normal, in the `vroom + dplyr` path, we just fully materialize the `ts` column, then we take a small subset of the dataframe, and from there we begin to materialize the whole row-reduced dataframe. This is why we see a big jump of memory coonsumption on the `Date mutation` function and then almost no jump at all (constant) even if we still materialize the remaiding columns, but that are now very small compared to their initial size.
+
 #### `current_ncells`
 
 <h3>mem / current_ncells</h3>
@@ -5648,6 +5663,26 @@ So, here are a per-operation and per-configuration metrics box-plots:
 
 </div>
 
+## Conclusion
 
+`fread + data.table` remains the most direct and predictable path. It parses the data eagerly, produces a fully materialized `data.table`, and then benefits from `data.table`'s strengths: by-reference updates, efficient `filtering`, fast and multithreaded `grouping`, and low overhead for operations that modify the table structure. This makes it a very strong choice when the pipeline is expected to touch most of the data anyway.
+
+`readr + dplyr` gives a more conventional tidyverse pipeline. Once the data is materialized, its performance is often close enough to the `data.table` path that the difference is not always fundamental at the whole-pipeline level. However, some operations still show the expected overhead from `dplyr`'s reconstruction model, especially compared to `data.table` operations that can work in place or mostly manipulate pointers.
+
+The most interesting case is `vroom + dplyr`.
+
+At ingestion time, `vroom` is clearly in a different category because it does not immediately parse every column into ordinary R vectors. It builds a lazy `ALTREP` representation instead. This makes raw ingestion extremely cheap in both time and memory. This does not remove the cost; it moves it. The cost is paid later, when an operation actually needs the values. 
+
+But we still clearly see the memory-consumption advantage of the `vroom + dplyr` path.
+
+The reason is that full materialization does not happen on the original dataframe. With the other paths, the initial dataframe is already fully materialized at ingestion time, so the full cost is paid on the complete dataset.
+
+With `vroom + dplyr`, the pipeline first materializes only the columns that are actually needed, especially `ts / date`, then applies filters that reduce the dataframe to a much smaller subset. The remaining columns are materialized later, but at that point they are materialized on a row-reduced tibble, not on the original full-size dataframe.
+
+So vroom does not make materialization free. It changes when materialization happens, and in this pipeline that timing matters a lot: by the time most columns need to become real R vectors, the dataframe is already much smaller.
+
+That explains the lower `VCells` usage and the execution time not being dramatic.
+
+However, this advantage does not come for free in execution time. The first operations that force materialization still pay a significant cost, even if they materialize a smaller dataframe. In other words, `vroom + dplyr` saves a lot of memory here, but part of the parsing/materialization cost is simply moved from ingestion to the later materialization-triggering operations.
 
 
