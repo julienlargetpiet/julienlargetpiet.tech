@@ -3902,6 +3902,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
 <div class="matrix-tabs" data-matrix-tabs>
 
   <div class="matrix-tabs-header">
+  <div class="matrix-tabs-scroll">
     <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
       <div class="matrix-tabs-corner"></div>
       <div class="matrix-tab-col">readr::read_tsv() + dplyr</div>
@@ -3953,6 +3954,7 @@ So, here are a per-operation and per-configuration metrics box-plots:
       <button class="matrix-cell matrix-cell-disabled" disabled data-row="datatable_fread" data-col="datatable_vroom">×</button>
       <button class="matrix-cell" data-row="datatable_fread" data-col="datatable_fread">fread() + data.table</button>
     </div>
+  </div>
   </div>
 
   <div class="matrix-tab-panel active" data-row="dplyr_readr" data-col="dplyr_readr">
