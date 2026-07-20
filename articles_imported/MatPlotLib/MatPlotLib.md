@@ -1705,7 +1705,7 @@ I would have this result:
 
 ![measure5b.png](../asset/common_files/Matplotlib/measure5b.png)
 
-We clearly see tha the `pd.Index` that have more distinct values have a lower executin time, but this is just a benchmark artifact due to the CPU being on "turbo" the more the programm runs and because the we have a number of distinct values that increases then the `pd.Index` that are ran at the end (more distinc values) are those that takes advantage of the CPU "turbo" mode.
+We clearly see that the `pd.Index` that have more distinct values have a lower executin time, but this is just a benchmark artifact due to the CPU being on "turbo" the more the programm runs and because the we have a number of distinct values that increases then the `pd.Index` that are ran at the end (more distinc values) are those that takes advantage of the CPU "turbo" mode.
 
 Then when I do the following:
 
@@ -1728,7 +1728,7 @@ idx = pd.Index(np.repeat(steps, counts))
 
 ```
 
-`.idx_loc()` can take advantage of this block representation and return a `slice()`, then I have to make it really shuffled, unordered is not sufficient.
+`.idx_loc()` can take advantage of this block representation and may return a `slice()`, then I have to make it really shuffled, unordered is not sufficient.
 
 So I update the key generation to:
 
@@ -1739,11 +1739,91 @@ idx = pd.Index(steps)
 
 ```
 
+To make the return type a boolean array.
+
 And now I have:
 
 ![measure5d.png](../asset/common_files/Matplotlib/measure5d.png)
 
 Which leads to the same conclusion, but we see that on average, the execution time is 2 times higher.
+
+But it was all a lie !
+
+Yess, `.get_loc` only return a slice when the keys values are contiguous AND monotonic:
+
+```python
+
+>>> x = pd.Index([2, 2, 1, 1, 1, 3, 3] + list(np.full(45, 7))) # contiguous non-monotonic
+
+>>> x.get_loc(7)
+array([False, False, False, False, False, False, False,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True])
+
+>>> x2 = pd.Index(np.repeat(list(range(5)), np.full(5, 12))) # contiguous AND monotonic
+
+>>> x2.get_loc(2)
+slice(24, 36, None)
+
+```
+
+So, yess the liearly increasing `elapsed_time` aspect of the last 2 benchmarks is explained by the simple fact that the more `n` grows, the more we need to allocate for the returned boolean vector.
+
+But then, why this 2X difference between the last 2 benchmarks ?
+
+The performance difference is mainly due to the fact that the contiguous same-value keys `pd.Index` has much better cache-locality than the fully shuffled key values `pd.Index`, again just low-level principles.
+
+And for a monotonic non-unique `pd.Index` it can use the `np.searchsorted()` path which led to performance improovements.
+
+But what is `searchsorted()` ?
+
+It's just the function that returns the first (`side = "left"`) or last (`side = "right"`) index of a value in an array:
+
+```python
+
+>>> np.searchsorted(np.repeat(np.array(list(range(4))), np.full(4, 5)), 3, side="left")
+np.int64(15)
+
+>>> np.searchsorted(np.repeat(np.array(list(range(4))), np.full(4, 5)), 3, side="right")
+np.int64(20)
+
+```
+
+Then, it just make a slice of it from the lower and upper bound.
+
+So, to make a monotonic non-unique `pd.Index`, I do:
+
+```python
+
+
+hmn1 = n // DISTINCT_INDEX
+counts = np.full(DISTINCT_INDEX,
+                 hmn1, 
+                 dtype = np.int32)
+counts[: n % DISTINCT_INDEX] += 1
+steps = np.arange(DISTINCT_INDEX)
+idx = pd.Index(np.repeat(steps, counts))
+
+```
+
+And I benchmark `.get_loc()`.
+
+Here are the results:
+
+![measure5e.png](../asset/common_files/Matplotlib/measure5e.png)
+
+As you see it's very efficient because it's not forced to allocate for a n size boolean vector.
+
+The contract to do that is:
+
+- contiguous key values
+
+- monotonicly increasing 
+
+This is true for all `Index` variants, so no surprise if I restate it a bit differently in the next parts.
 
 Leaving the wrapping logic and going back to default the implementation semantic.
 
@@ -1872,7 +1952,7 @@ Indeed, for a sufficiently high number of unique keys, the occurence of the keys
 
 And we also know that a boolean can be encoded onto only 1 byte.
 
-While the integers returned by `.get_indexer_for` are 8 bytes integers (64 bits):
+While the integers returned by `.get_indexer_for()` are 8 bytes integers (64 bits):
 
 ```python
 
@@ -1966,6 +2046,8 @@ fig.savefig("measure6b.png")
 
 
 ```
+
+Note that `.get_indexer_non_unique()` is the method `.get_indexer_for()` is dispatched to when the `Index` has not only unique values.
 
 Here are the results:
 
@@ -2076,6 +2158,20 @@ Here are the results:
 ![measure6d.png](../asset/common_files/Matplotlib/measure6d.png)
 
 Almost no difference from the previous benchmark, that's why `.get_loc()` + `np.flatnonzero()` is better and should replace `.get_indexer_for()` imo.
+
+In fact a convenient use of `.get_indexer_for()` is when you want to search for target values in a source according to the order of target:
+
+```python
+
+>>> x1 = pd.Index(list("abcde"))
+
+>>> x2 = pd.Index(list("ace"))
+
+>>> x1[x1.get_indexer_for(x2)]
+
+Index(['a', 'c', 'e'], dtype='str')
+
+```
 
 Also, this is a very inefficient method to construct a `numpy.ndarray` that is continuously increasing from `0` to the length of `Index` is:
 
@@ -3294,7 +3390,19 @@ Here are the results:
 
 ![measure_cat_index1.png](../assets/common_files/Matplotlib/measure_cat_index1.png)
 
-This is quite performant and roughly have the `0(log(n))` curve (we have to look from the `n = 1_000_000` binary search triggering point).
+For this monotonic, non-unique `pd.CategoricalIndex`, `.get_loc()` uses duplicate-boundary lookup and returns a slice across the entire tested range. 
+
+It does not change the timed steady-state lookup algorithm, so no large performance discontinuity appears.
+
+For a non-unique monotonic index, pandas’s engine goes to `._get_loc_duplicates()`, which performs two `np.searchsorted` calls and returns a slice:
+
+```python
+
+left  = searchsorted(key, side="left")
+right = searchsorted(key, side="right")
+return slice(left, right)
+
+```
 
 Now, another benchmark for the unsorted values:
 
@@ -3393,6 +3501,58 @@ array([False, False, False, False, False, False, False, False, False,
 ```
 
 The `elapsed` time is linearly increasing because the returned boolean vector increases over `n`, as simple as that.
+
+By the way, the contact that makes `.get_loc`  returns a slice is not just the contiguousness of the key values, but also the fact that they are monotonicly increasing:
+
+```python
+
+>>> x = pd.CategoricalIndex(pd.Categorical.from_codes([1, 1, 1, 0, 0, 0, 2, 2], categories = list("abc")))
+
+>>> x.get_loc("a")
+array([False, False, False,  True,  True,  True, False, False])
+
+>>> x2 = pd.CategoricalIndex(pd.Categorical.from_codes([2, 2, 1, 1, 1, 0, 0, 0], categories = list("abc")))
+
+>>> x2.get_loc("a")
+array([False, False, False, False, False,  True,  True,  True])
+
+>>> x3 = pd.CategoricalIndex(pd.Categorical.from_codes([0, 0, 0, 1, 1, 1, 2, 2], categories = list("abc")))
+
+>>> x3.get_loc("a")
+slice(0, 3, None)
+
+```
+
+Then, if I had cosntructed the `pd.CategoricalIndex` as:
+
+```python
+
+n_categories = len(cat_val)
+
+counts = np.full(
+    n_categories,
+    n // n_categories,
+    dtype=np.int64,
+)
+
+counts[: n % n_categories] += 1
+
+codes = np.repeat(
+            rng.permutation(np.arange(n_categories, dtype = np.int8)),
+            counts
+        )
+idx = pd.Categorical.from_codes(
+                    codes, 
+                    categories = cat_val, 
+                    ordered = True
+       )
+idx = pd.CategoricalIndex(idx)
+
+```
+
+I would have roughly the same results from the shuffled key values benchmark:
+
+![measure_cat_index1b.png](../assets/common_files/Matplotlib/measure_cat_index1b.png)
 
 Back to usage:
 
@@ -4364,6 +4524,36 @@ array([0, 2])
 
 ```
 
+Btw, here is an example where it is monotonicly sorted and contiguous so `.get_locs` returns a slice and `.get_locs()` returns an array of positions, like `.get_indexer_for` concerning the return type:
+
+```python
+
+>>> x3 = pd.MultiIndex(
+...     levels=[
+...         list("abc"),
+...         [1, 2, 3],
+...     ],
+...     codes=[
+...         np.repeat(
+...             [0, 0, 0, 1, 1, 1, 2, 2, 2],
+...             10,
+...         ),
+...         np.repeat(
+...             [0, 1, 2] * 3,
+...             10,
+...         ),
+...     ],
+... )
+
+
+>>> x3.get_loc(('a', 1))
+slice(np.int64(0), np.int64(10), None)
+
+>>> x3.get_locs(('a', 1))
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+```
+
 Now, let's try to infere the implementation of `.loc`.
 
 Taking this query for example:
@@ -4425,7 +4615,7 @@ array([1])
 
 But this approach is ineficient because it must perform `len(levels)` scans and apply the intersection.
 
-It would be faster tomaintain only one internal `index` array that for each position has an hash of the code levels.
+It would be faster to maintain only one internal `index` array that for each position has an hash of the code levels.
 
 Like:
 
@@ -4457,19 +4647,427 @@ position = mi._engine.get_loc(combined_key)
 
 ```
 
-But this does not explain the `.get_locs()` with `slice(None)` behavior, at one ormore levels, none is specified.
+But this does not explain the `.get_locs()` with `slice(None)` behavior, at one or more levels, none is specified.
 
 From what I think is the optimal solution, is just to perform `.get_loc` for as many unspecified keys there are and combine the results.
 
-Then we have the array of positions and we can use `.iloc`.
+Then we have the array of positions (slice or boolean vector) and we can use `.iloc`.
 
 Let's benchmark it, first with sorted keys:
 
 ```python
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import time, math
+import numpy as np
+from itertools import product
+
+xs = list(range(1_000, 2_000_000, 100_000))
+ys = []
+
+n_repeats = 10_000
+
+rng = np.random.default_rng(55)
+
+lvls = [ ['A', 'B', 'C'], [1, 2], ['T', 'E'] ]
+
+rep_val = math.prod([ len(x) for x in lvls ])
+
+original_sz = rep_val
+
+codes = []
+
+for pr in lvls:
+
+    sz = len(pr)
+
+    cur_arr = np.arange(0, sz)
+    
+    cur_arr = np.repeat(cur_arr, np.full(sz, rep_val // sz))
+
+    itr = original_sz // rep_val
+
+    if itr > 0: cur_arr = np.tile(cur_arr, itr)
+
+    codes.append(cur_arr)
+
+    rep_val //= sz
+
+lvls_choice = [x for x in product(*lvls)]
+
+base_val = math.prod([len(x) for x in lvls])
+# OR
+#base_val = np.array([len(x) for x in levels]).prod()
+
+for n in xs:
+
+    hmn = n // base_val
+    counts = np.full(base_val, hmn, dtype = np.int32)
+    counts[: n % base_val] += 1
+
+    cur_codes = []
+    for i in range(len(lvls)):
+        cur_codes.append(np.repeat(codes[i], counts))
+
+    idx = pd.MultiIndex(
+            levels = lvls,
+            codes = cur_codes,
+            names = ["g1", "g2", "g3"]
+          )
+    keys_indices = rng.integers(0, len(lvls_choice), size = n_repeats)
+    keys = [lvls_choice[i] for i in keys_indices]
+
+    #keys = rng.choice(lvls_choice, size = n_repeats)
+
+    print("ok", keys[0])
+
+    idx.get_loc(keys[0])
+
+    start = time.perf_counter()
+
+    for key in keys:
+        idx.get_loc(key)
+
+    elapsed = time.perf_counter() - start
+
+    ys.append(elapsed / n_repeats)
+
+fig, ax = plt.subplots()
+
+ax.plot(xs, ys, "r*-")
+ax.set_xlabel("Index size")
+ax.set_ylabel("Average get_loc time")
+
+fig.savefig("measure_multi_index.png")
+
+```
+
+The important part here is that I construct the `pd.MultiIndex` by providing the codes for the same reson I did the equivalent for the `pd.CategoricalIndex`, because it's faster -> no need to build the internal codes by scanning the keys values.
+
+But to construct the codes monotonicly increasing, what kind of algo to use ?
+
+Hmm, cartesian product !
+
+Look for examplehere I can generate all the combinations between 8 `[0, 1]` lists to generate all the possible states of a byte:
+
+```python
+
+>>> lst = [x for x in product([0, 1], repeat = 8)]
+
+>>> len(lst)
+256
+
+>>> lst[slice(0, len(lst), 30)]
+[(0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 1, 1, 1, 0), (0, 0, 1, 1, 1, 1, 0, 0), (0, 1, 0, 1, 1, 0, 1, 0), (0, 1, 1, 1, 1, 0, 0, 0), (1, 0, 0, 1, 0, 1, 1, 0), (1, 0, 1, 1, 0, 1, 0, 0), (1, 1, 0, 1, 0, 0, 1, 0), (1, 1, 1, 1, 0, 0, 0, 0)]
+
+```
+
+But as you see it returns a list of tuples, not what I want because the API is very clear, for 3 levels we have forexample:
+
+```python
+
+pd.MultiIndex(
+    levels = [ cat1, cat2, cat3 ]
+    codes = [ codes1, codes2, codes3 ],
+    names = ["group1", "group2", "group3"]
+)
+
+```
+
+where `catN` and `codesN` are lists.
+
+Another example for a 2 levels `pd.MultiIndex`:
+
+```python
+
+>>> x = pd.MultiIndex(levels = [ ["A", "B"], [1, 2]], codes = [ [0, 0, 1, 1] , [0, 1, 0, 1] ], names = ["g1", "g2"])
+>>> x
+MultiIndex([('A', 1),
+            ('A', 2),
+            ('B', 1),
+            ('B', 2)],
+           names=['g1', 'g2'])
+
+```
+
+Therefore, we need to provide the codes a list of list, each list representing the codes for the associated level.
+
+When you saw the that:
+
+```python
+
+[ [0, 0, 1, 1] , [0, 1, 0, 1] ]
+
+```
+
+You can recognize a pattern.
+
+The repetition of each unique code value is conditioned to its level position and the sum of unique values it has for this level.
+
+Like in this example:
+
+```python
+
+[ 
+  ["A", "B", "C"],
+  [1, 2],
+  ["T", "E"]
+
+]
+
+```
+
+We can consider the following:
+
+1. What is the current pattern for this level ?
+
+- At the first level, the pattern is built with `len(level1) * len(level2) * len(level3) => 3 * 2 * 2 = 12` values.
+
+- At the second level, the pattern is built with `len(level1) * len(level2) => 2 * 2 = 4` values.
+
+- At the third level, the pattern is built with `len(level1) => 2 = 2` values.
+
+2. How much should we repeat each unqiue key at this level ?
+
+- At the first level, it's `total_unique_combinations_at_this_level / unique_values_at_this_level => 12 / 3 = 4`
+
+- At the first level, it's `total_unique_combinations_at_this_level / unique_values_at_this_level => 4 / 2 = 4`
+
+- At the first level, it's `total_unique_combinations_at_this_level / unique_values_at_this_level => 2 / 2 = 4`
+
+3.
+
+- Should we repeat this patter to match the size of all the possible combinations ?
+
+- At the first level, no because ` total_unique_combinations / ( len(level1) * len(level2) * len(level3) )= 1`.
+
+- At the second -> yes -> `total_unique_combinations / ( len(level1) * len(level2) )= 3` times
+
+- At the third -> yes -> `total_unique_combinations / len(level1)= 6` times
+
+That is exactly this implementation:
+
+```python
+
+for pr in lvls:
+
+    sz = len(pr)
+
+    cur_arr = np.arange(0, sz)
+    
+    cur_arr = np.repeat(cur_arr, np.full(sz, rep_val // sz))
+
+    itr = original_sz // rep_val
+
+    if itr > 1: cur_arr = np.tile(cur_arr, itr)
+
+    codes.append(cur_arr)
+
+    rep_val //= sz
+
+```
+
+To avoid the remaining allocation due to `tile`, we can allocate once since we know in advance the size of the array and then set the values manually:
+
+```python
+
+for pr in lvls:
+
+    sz = len(pr)
+
+    cur_arr = np.empty(original_sz, 0)
+
+    cur_sz = rep_val // sz
+
+    for i in range(sz): 
+        cur_arr[i * cur_sz : (i + 1) * cur_sz] = i
+
+    itr = original_sz // rep_val
+
+    if itr > 1:
+        for i in range(1, itr):
+            cur_arr[i * rep_val : (i + 1) * rep_val] = cur_arr[0:rep_val]
+
+    codes.append(cur_arr)
+
+    rep_val //= sz
+
+```
+
+But lesswork happens inside `numpy` therefore it is not automatically faster.
+
+Btw, we can simplify the initial version to:
+
+```python
+
+for level in lvls:
+    sz = len(level)
+
+    block_size = rep_val // sz
+    itr = original_sz // rep_val
+
+    cur_arr = np.tile(
+        np.repeat(np.arange(sz), block_size),
+        itr,
+    )
+
+    codes.append(cur_arr)
+    rep_val //= sz
+
+```
+
+After this digression, here are the results:
+
+![measure_multi_index.png](../assets/common_files/Matplotlib/measure_multi_index.png)
+
+This is pretty fast and constant.
+
+We do not clearly see the `O(log(n))` curve from `n = 1_000_000` to the end neither the big jump from pre `n = 1_000_000` to post `n = 1_000_000` because from what I've understood, it uses `np.searchsorted()` at every tested level.
+
+Indeed, it's able to see in advance that the key values are monotonic, so it directly uses this method.
+
+But of course, you could build your own hashmap and use it to select rows if you absolutely want to use this method:
+
+```python
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import time, math
+import numpy as np
+from itertools import product
+from collections import defaultdict
+
+xs = list(range(1_000, 5_000_000, 100_000))
+ys = []
+
+n_repeats = 1_000
+
+rng = np.random.default_rng(55)
+
+lvls = [ ['A', 'B', 'C'], [1, 2], ['T', 'E'] ]
+
+rep_val = math.prod([ len(x) for x in lvls ])
+
+original_sz = rep_val
+
+codes = []
+
+for pr in lvls:
+
+    sz = len(pr)
+
+    cur_arr = np.arange(0, sz)
+    
+    cur_arr = np.repeat(cur_arr, np.full(sz, rep_val // sz))
+
+    itr = original_sz // rep_val
+
+    if itr > 1: cur_arr = np.tile(cur_arr, itr)
+
+    codes.append(cur_arr)
+
+    rep_val //= sz
+
+lvls_choice = [x for x in product(*lvls)]
+
+base_val = math.prod([len(x) for x in lvls])
+# OR
+#base_val = np.array([len(x) for x in levels]).prod()
+
+for n in xs:
+
+    hmn = n // base_val
+    counts = np.full(base_val, hmn, dtype = np.int32)
+    counts[: n % base_val] += 1
+
+    cur_codes = []
+    for i in range(len(lvls)):
+        cur_codes.append(np.repeat(codes[i], counts))
+
+    idx = pd.MultiIndex(
+            levels = lvls,
+            codes = cur_codes,
+            names = ["g1", "g2", "g3"]
+          )
+
+    keys_indices = rng.integers(0, len(lvls_choice), size = n_repeats)
+    keys = [lvls_choice[i] for i in keys_indices]
+
+    hsh = defaultdict(list)
+    for i, key in enumerate(idx.values):
+        hsh[key].append(i)
+
+    start = time.perf_counter()
+
+    for key in keys:
+        hsh[key]
+
+    elapsed = time.perf_counter() - start
+
+    ys.append(elapsed / n_repeats)
+
+fig, ax = plt.subplots()
+
+ax.plot(xs, ys, "r*-")
+ax.set_xlabel("Index size")
+ax.set_ylabel("Average get_loc time")
+
+fig.savefig("measure_multi_index3.png")
 
 
 ```
+
+Note that I could replace:
+
+```python
+
+for i, key in enumerate(idx.values):
+    hsh[key].append(i)
+
+```
+
+by:
+
+```python
+
+
+for i, key in enumerate(zip(*idx.codes)):
+    hsh[ tuple(idx.levels[i2][cur_idx] for i2, cur_idx in enumerate(key) ) ].append(i)
+
+```
+
+But since the key values of the `pd.MultiIndex` are already materialized, then I just use the first version.
+
+And here are the results:
+
+![measure_multi_index3.png](../assets/common_files/Matplotlib/measure_multi_index3.png)
+
+Very fast.
+
+Now, I will just reference the result to a variable like that:
+
+```python
+
+result = hsh[key]
+
+```
+
+Now, I have those results:
+
+![measure_multi_index3b.png](../assets/common_files/Matplotlib/measure_multi_index3b.png)
+
+Hoooo, wait why ?
+
+At first, I create a `defaultdict(list)` and repeatedly execute `result = hsh[key]`. During the lookup loop, the lists are owned by `hsh`, while the most recently accessed list is additionally referenced by `result`.
+
+At the beginning of the next outer iteration, `hsh` is replaced by a new dictionary. The old dictionary is then destroyed, which releases its references to all its lists. Every list is freed immediately except the last one, because `result` still references it.
+
+The timer then starts while result still points to that old list. On the first assignment in the new lookup loop, `result` is redirected to a list from the new dictionary. The old list consequently loses its final reference and is destroyed at that moment.
+
+Because this old list contains roughly `n / 12` positions, releasing all its elements costs roughly `O(n / 12)`. Since that deallocation occurs inside the timed region, it produces the apparently linear lookup time.
+
+The fix is therefore simple, just put `result = None` at the beginning of the outer loop.
 
 With `MultiIndex`, you also have `.xs()` method that does the same job but with explicit level selection:
 
@@ -7213,7 +7811,7 @@ For standard  `pd.Index`, you have a wide amount of `dtypes` to have more contro
 
 ```
 
-### Custom `TimedeltaIndex`
+### Custom `TimedeltaRangeSr`
 
 Yess, same as `pd.DatetimeRangeSr`, here is a POC of what could be a `pd.TimedeltaRangeSr`.
 
