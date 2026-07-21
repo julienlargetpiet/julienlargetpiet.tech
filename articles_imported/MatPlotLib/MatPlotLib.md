@@ -5279,6 +5279,229 @@ Freq: D, dtype: int64
 
 ```
 
+Now we will try to retro-engineer the `.get_loc` implementation.
+
+First, because we are working with timestamps and that the row-selection must still be pleasant so that we should accept this selection type:
+
+```python
+
+>>> ser["2024-01-01"]
+2024-01-01 00:00:00    0
+2024-01-01 12:00:00    1
+Freq: 12h, dtype: int64
+
+```
+
+On a `pd.Series` that has been constructed as:
+
+```python
+
+>>> x = pd.date_range("2024-01-01", periods = 12, freq = "12h")
+>>> ser = pd.Series(list(range(12)), index = x)
+
+>>> ser
+2024-01-01 00:00:00     0
+2024-01-01 12:00:00     1
+2024-01-02 00:00:00     2
+2024-01-02 12:00:00     3
+2024-01-03 00:00:00     4
+2024-01-03 12:00:00     5
+2024-01-04 00:00:00     6
+2024-01-04 12:00:00     7
+2024-01-05 00:00:00     8
+2024-01-05 12:00:00     9
+2024-01-06 00:00:00    10
+2024-01-06 12:00:00    11
+Freq: 12h, dtype: int64
+
+```
+
+It suggest that this is literally always a selection between a lower and an upper bound, because as you see the datetime resolution used for the selection `"2024-01-01"` is larger than the lowest time resolution used in the key values.
+
+Then this:
+
+```python
+
+>>> ser["2024-01-01"]
+
+```
+
+Is fundamentally equal to:
+
+```python
+
+>>> ser["2024-01-01 00:00:00":"2024-01-01 23:59:59"]
+2024-01-01 00:00:00    0
+2024-01-01 12:00:00    1
+Freq: 12h, dtype: int64
+
+```
+
+This means:
+
+- For ythe lower bound -> the datetime until the lowest time resolution that is being precised in the selection value, and the rest of the lower time resolutions are set to their minimum values
+
+- For ythe upper bound -> the datetime until the lowest time resolution that is being precised in the selection value, and the rest of the lower time resolutions are set to their maximum values
+
+But wait, we have 2 problems to solve.
+
+First determining the lowest time resolution precised in the querying value.
+
+Second, constructing the lower and upper bound from the known querying value and the rest of the lower time resolution.
+
+Those are simple problems if we just accept ISO time, but the `[]` operator of `pd.DatetimeIndex` **directly** accepts other date format, hence this is more complicated architecture.
+
+But first, I will show you how it can be done in simple ISO: 
+
+First it can just do this:
+
+```python
+
+days_mnth = [
+    31,  # January
+    28,  # February
+    31,  # March
+    30,  # April
+    31,  # May
+    30,  # June
+    31,  # July
+    31,  # August
+    30,  # September
+    31,  # October
+    30,  # November
+    31,  # December
+]
+
+days_mnth_leap = [
+    31,  # January
+    29,  # February
+    31,  # March
+    30,  # April
+    31,  # May
+    30,  # June
+    31,  # July
+    31,  # August
+    30,  # September
+    31,  # October
+    30,  # November
+    31,  # December
+]
+
+def is_leap(year: int) -> bool:
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+def detect_resolution(s: str):
+    if len(s) == 4:
+        
+        lwr_bnd = s + "-01-01" + " " + "00:00:00"
+        upr_bnd = s + "-" + "01" + "-" + days_mnth_leap[-1] if is_leap(int(s)) else days_mnth[-1] + " " + "23:59:59.999999999"
+
+    if len(s) == 7:
+
+        yr, mnth = s.split("-")
+        mnth = int(mnth)
+
+        lwr_bnd = yr + "-" + str(mnth) + "-01"  + " " +  "00:00:00"
+        upr_bnd = yr + "-" + str(mnth) + "-" + days_mnth_leap[mnth] if is_leap(yr) else days_mnth[mnth] + " " + "23:59:59.999999999"
+
+
+    if len(s) == 10:
+        
+        yr, mnth, dy = s.split("-")
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " +  "00:00:00"
+        upr_bnd = yr + "-" + mnth + "-" + dy + " " + "23:59:59.999999999"
+
+    if len(s) == 13:
+
+        yr, mnth, dy = s.split("-")
+        dy, h = dy.split(" ")
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":00:00"
+        upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":59:59.999999999"
+
+    if len(s) == 16:
+                
+        yr, mnth, dy = s.split("-")
+        dy, h = dy.split(" ")      
+        h, min = h.split(":")
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + ":00"
+        upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + ":59.999999999"
+
+    if len(s) == 19:
+
+        yr, mnth, dy = s.split("-")
+        dy, h = dy.split(" ")      
+        h, min, s = h.split(":")
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s
+        upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s + ".999999999"  
+
+    if len(s) > 19 and s[19] == ".":
+        digits = len(s) - 20
+
+        if digits <= 3:
+
+            yr, mnth, dy = s.split("-")
+            dy, h = dy.split(" ")      
+            h, min, s = h.split(":")
+            
+            lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s
+            upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s + "999999"
+
+
+        elif digits <= 6:
+
+            yr, mnth, dy = s.split("-")
+            dy, h = dy.split(" ")      
+            h, min, s = h.split(":")
+
+            lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s
+            upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s + "999"
+
+        else:
+        
+            lwr_bnd = s
+            upr_bnd = s
+
+    else:
+        raise ValueError("Unsupported datetime format")
+
+    return lwr_bnd, upr_bnd
+
+```
+
+
+
+```python
+
+def detect_resolution(s: str):
+    if len(s) == 4:
+        return "Y"
+    if len(s) == 7:
+        return "M"
+    if len(s) == 10:
+        return "D"
+    if len(s) == 13:
+        return "h"
+    if len(s) == 16:
+        return "min"
+    if len(s) == 19:
+        return "s"
+    if len(s) > 19 and s[19] == ".":
+        digits = len(s) - 20
+        if digits <= 3:
+            return "ms"
+        if digits <= 6:
+            return "us"
+        return "nanosecond"
+
+    raise ValueError("Unsupported datetime format")
+
+
+```
+
 To describe time difference, we have `pd.Timedelta()` and `pd.DateOffset()`.
 
 In fact `pd.DateOffset` is very specific:
@@ -5304,6 +5527,45 @@ Then use `pd.Timedelta(time_unit)` when yo want to ADD a fixed duration.
 And use `pd.DateOffset(time_unit)` when you want "the same date of **origin** + an offset of the unit time but **aware of calendar - interpreted by the calendar accoding to the local TimeZone**"
 
 `pd.DateOffset` is therefore inherently dependant of the origin (the context) where it is applied for the current computation.
+
+Note that there's aclear distinction between `pd.DateOffset` being used with time units plurial and with singular synthax.
+
+Indeed, from this point we are familiarized with the plurial use of time unite (`hours, minutes, days...`) that "add" a certain time to the original timestamp.
+
+But `hour, minute, day...` also exists andhave completely different behaviour:
+
+```python
+
+>>> pd.Timestamp(pd.Timestamp("2024-02-05 10:00:00") + pd.DateOffset(hours = 11))
+Timestamp('2024-02-05 21:00:00')
+
+# While
+
+>>> pd.Timestamp(pd.Timestamp("2024-02-05 10:00:00") + pd.DateOffset(hour = 11))
+Timestamp('2024-02-05 11:00:00')
+
+```
+
+Or even:
+
+```python
+
+>>> pd.Timestamp(pd.Timestamp("2024-02-25 10:00:00") + pd.DateOffset(day = 22))
+Timestamp('2024-02-22 10:00:00')
+
+```
+
+And:
+
+
+```python
+
+>>> pd.Timestamp(pd.Timestamp("2024-02-25 10:00:00") + pd.DateOffset(day = 22, hour=11))
+Timestamp('2024-02-22 11:00:00')
+
+```
+
+In this use, we just replace the time unit with the one(s) we provide.
 
 So after saying this you know that those are equivalent.
 
@@ -5846,7 +6108,7 @@ idx + pd.Timedelta(days=1)
 
 ```
 
-Here, `.date_range()` is a vectorized operation.
+Here, the operations are vectorized.
 
 `Timezone` handling
 
@@ -6208,25 +6470,29 @@ It will shift all the datetime by `n * freq` (if `freq` is available).
 
 ```python
 
+>>> x = pd.date_range("2024-01-01", periods = 15, freq="W")
+
+>>> x
+
+DatetimeIndex(['2024-01-07', '2024-01-14', '2024-01-21', '2024-01-28',
+               '2024-02-04', '2024-02-11', '2024-02-18', '2024-02-25',
+               '2024-03-03', '2024-03-10', '2024-03-17', '2024-03-24',
+               '2024-03-31', '2024-04-07', '2024-04-14'],
+              dtype='datetime64[us]', freq='W-SUN')
+
 >>> x.shift(1)
 
-DatetimeIndex(['2024-01-23 00:10:00+01:00', '2024-01-30 00:10:00+01:00',
-               '2024-02-06 00:10:00+01:00', '2024-02-13 00:10:00+01:00',
-               '2024-02-20 00:10:00+01:00', '2024-02-27 00:10:00+01:00',
-               '2024-03-05 00:10:00+01:00', '2024-03-12 00:10:00+01:00',
-               '2024-03-19 00:10:00+01:00', '2024-03-26 00:10:00+01:00',
-               '2024-04-02 00:10:00+02:00', '2024-04-09 00:10:00+02:00',
-               '2024-04-16 00:10:00+02:00', '2024-04-23 00:10:00+02:00',
-               '2024-04-30 00:10:00+02:00'],
-              dtype='datetime64[us, Europe/Paris]', freq='W-TUE')
+DatetimeIndex(['2024-01-14', '2024-01-21', '2024-01-28', '2024-02-04',
+               '2024-02-11', '2024-02-18', '2024-02-25', '2024-03-03',
+               '2024-03-10', '2024-03-17', '2024-03-24', '2024-03-31',
+               '2024-04-07', '2024-04-14', '2024-04-21'],
+              dtype='datetime64[us]', freq='W-SUN')
 
 ```
 
 Here it shifted dates by one week.
 
-Nothing special happens at year start or end (January 1st is not always a Monday, it increases by one every normal year and by 2 for a leap year).
-
-Now, the infamous `.strftime()`.
+Now, the famous `.strftime()`.
 
 Wow, big mental model change here, now `"M"` is minute lol, `"min"` does not exists.
 
@@ -6312,7 +6578,7 @@ PeriodIndex(['2024-01', '2024-02', '2024-03'], dtype='period[M]')
 
 >>> idx.to_period("Q")
 
-PeriodIndex(['2024Q1', '2024Q1', '2024Q1'], dtype='period[Q-DEC]')
+PeriodIndex(['2024Q1', '2024Q1', '2024Q1'], dtype='period[Q-DEC]') # Q-DEC means the first quarter begins in DECEMBER
 
 ...
 
@@ -6322,7 +6588,7 @@ So, now this is good for grouping by, for example.
 
 Indeed, semantically `pd.PeriodIndex` represent time spans / calendar buckets.
 
-The, a `pd.PeriodIndex` is not timezone-aware.
+A `pd.PeriodIndex` is not timezone-aware.
 
 Note that, if you do not give argument as `time unit`, it tries to infere it.
 
