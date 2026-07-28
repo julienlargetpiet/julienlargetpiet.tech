@@ -13,7 +13,7 @@ rng = np.random.default_rng(55)
 
 #DISTINCT_INDICES = rng.permutation(np.arange(3, 25))
 
-DISTINCT_INDICES = np.arange(3, 25)[::-1]
+DISTINCT_INDICES = rng.permutation(np.arange(3, 25)[::-1])
 
 for CNT in range(0, 25 - 3, 1):
 
@@ -23,8 +23,8 @@ for CNT in range(0, 25 - 3, 1):
 
     for n in xs:
     
-        steps = rng.integers(0, DISTINCT_INDEX, size = n)
-        idx = pd.Index(steps)
+        #steps = rng.integers(0, DISTINCT_INDEX, size = n)
+        #idx = pd.Index(steps)
    
         #hmn1 = n // DISTINCT_INDEX
         #counts = np.full(DISTINCT_INDEX,
@@ -33,6 +33,14 @@ for CNT in range(0, 25 - 3, 1):
         #counts[: n % DISTINCT_INDEX] += 1
         #steps = rng.permutation(np.arange(DISTINCT_INDEX))
         #idx = pd.Index(np.repeat(steps, counts))
+
+        hmn1 = n // DISTINCT_INDEX
+        counts = np.full(DISTINCT_INDEX,
+                         hmn1, 
+                         dtype = np.int32)
+        counts[: n % DISTINCT_INDEX] += 1
+        steps = np.arange(DISTINCT_INDEX)
+        idx = pd.Index(np.repeat(steps, counts))
 
         print(f"n = {n}")
 
@@ -74,7 +82,7 @@ ax.set_xlabel("Index size")
 ax.set_ylabel("Average get_loc time")
 ax.legend()
 
-fig.savefig("measure5d.png")
+fig.savefig("measure5e.png")
 #fig.savefig("measure5.png")
 
 

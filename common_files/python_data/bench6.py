@@ -33,6 +33,7 @@ for CNT in range(0, 25 - 3, 1):
         start = time.perf_counter()
     
         for key in keys:
+            #idx.get_indexer_non_unique([ key ])
             idx.get_indexer_non_unique([ key ])
     
         elapsed = time.perf_counter() - start

@@ -6,7 +6,7 @@ import numpy as np
 xs = list(range(1_000, 5_000_000, 100_000))
 ys = []
 
-n_repeats = 10_000
+n_repeats = 10
 rng = np.random.default_rng(55)
 
 cat_val = np.array([
@@ -17,6 +17,9 @@ cat_val = np.array([
 ])
 
 for n in xs:
+
+    print('ok')
+
     n_categories = len(cat_val)
 
     counts = np.full(
@@ -35,7 +38,7 @@ for n in xs:
     #)
 
     codes = np.repeat(
-                np.arange(n_categories, dtype = np.int8),
+                rng.permutation(np.arange(n_categories, dtype = np.int8)),
                 counts
             )
     idx = pd.Categorical.from_codes(
@@ -64,7 +67,7 @@ ax.set_xlabel("Index size")
 ax.set_ylabel("Average get_loc time")
 
 fig.tight_layout()
-fig.savefig("measure_cat_index1.png")
+fig.savefig("measure_cat_index1b.png")
 
 
 

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import time, math
 import numpy as np
 from itertools import product
+from collections import defaultdict
 
 xs = list(range(1_000, 5_000_000, 100_000))
 ys = []
@@ -35,27 +36,6 @@ for pr in lvls:
 
     rep_val //= sz
 
-#for pr in lvls:
-#
-#    sz = len(pr)
-#
-#    cur_arr = np.full(original_sz, 0)
-#
-#    cur_sz = rep_val // sz
-#
-#    for i in range(sz): 
-#        cur_arr[i * cur_sz : (i + 1) * cur_sz] = i
-#
-#    itr = original_sz // rep_val
-#
-#    if itr > 1:
-#        for i in range(1, itr):
-#            cur_arr[i * rep_val : (i + 1) * rep_val] = cur_arr[0:rep_val]
-#
-#    codes.append(cur_arr)
-#
-#    rep_val //= sz
-
 lvls_choice = [x for x in product(*lvls)]
 
 base_val = math.prod([len(x) for x in lvls])
@@ -63,6 +43,8 @@ base_val = math.prod([len(x) for x in lvls])
 #base_val = np.array([len(x) for x in levels]).prod()
 
 for n in xs:
+
+    result = None
 
     hmn = n // base_val
     counts = np.full(base_val, hmn, dtype = np.int32)
@@ -77,19 +59,21 @@ for n in xs:
             codes = cur_codes,
             names = ["g1", "g2", "g3"]
           )
+
     keys_indices = rng.integers(0, len(lvls_choice), size = n_repeats)
     keys = [lvls_choice[i] for i in keys_indices]
 
-    #keys = rng.choice(lvls_choice, size = n_repeats)
+    hsh = defaultdict(list)
+    for i, key in enumerate(idx.values):
+        hsh[key].append(i)
 
-    print("ok", keys[0])
-
-    idx.get_loc(keys[0])
+    print("ok")
 
     start = time.perf_counter()
 
     for key in keys:
-        idx.get_loc(key)
+        result = hsh[key]
+        #hsh[key]
 
     elapsed = time.perf_counter() - start
 
@@ -101,7 +85,7 @@ ax.plot(xs, ys, "r*-")
 ax.set_xlabel("Index size")
 ax.set_ylabel("Average get_loc time")
 
-fig.savefig("measure_multi_index.png")
+fig.savefig("measure_multi_index3b2.png")
 
 
 
