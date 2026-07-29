@@ -1011,7 +1011,7 @@ dtype: str
 
 ```
 
-Also a quick note about the behavior of `.iloc[]`.
+Also a quick note about the behavior of `.iloc[]` and `.loc[]`.
 
 - `[ID1:ID2]` -> returns a view, but when you modifie it, it silently copies it before writing (Copy On Write) so it never modifies the origin
 
@@ -1040,8 +1040,65 @@ And here the `[[...]]` synthax effect.
 >>> np.shares_memory(x.to_numpy(), yb.to_numpy())
 False
 
+# and with .iloc
+
+>>> x3 = x.iloc[[0, 2, 1]]
+>>> np.shares_memory(x, x3)
+False
+
 ```
 
+But be carefull, it's not just because you are selecting through the the default random access selector that you are referencing the sub-range of the initial dataframe.
+
+Ideed, if the keys you are selectioning are not sorted in the initial dataframe, then `pandas` is forced to make a direct copy of it.
+
+Because in fact referenced dataframes are not just raw dataframes whose elements are references, it wouldn't be cheap, like `nrows * 64bits` on 64 bits machines.
+
+Therefore, when the referenced sub-range of the initial dataframe has contiguous key values according to the key selection, it can just create a cheap view-like object.
+
+That's why:
+
+```python
+
+>>> x = pd.Series(list(range(4)), index = [2, 3, 4, 1])
+
+>>> x2 = x.loc[2:4]
+
+>>> np.shares_memory(x, x2)
+True
+
+>>> x3 = x.loc[1:4] # not contiguous in the original dataframe
+
+>>> np.shares_memory(x3, x2)
+False
+
+```
+
+Also, when you use the appropriate `Index` to select, it will always directly copy the dataframe even if the underlying values are contiguous:
+
+```python
+
+>>> x = pd.Series(list(range(6)), index = pd.Index(list(range(6))))
+
+>>> idx2 = pd.Index(list(range(1, 5)))
+
+>>> x2 = x[idx2]
+
+>>> np.shares_memory(x, x2)
+False
+
+```
+
+Hence, if you don't want a direct copy and that the values are sorted, you have to use `.get_loc()`:
+
+```python
+
+>>> x4 = x[x.index.get_loc(idx2[0]):x.index.get_loc(idx2[-1]) + 1]
+
+>>> np.shares_memory(x, x4)
+True
+
+```
 
 Now you guess what will happen with `.loc[3:5]` for example --> multiple `.loc[]` (maybe `.loc[3] ++ .loc[4]`)
 
@@ -5351,7 +5408,7 @@ Second, constructing the lower and upper bound from the known querying value and
 
 Those are simple problems if we just accept ISO time, but the `[]` operator of `pd.DatetimeIndex` **directly** accepts other date format, hence this is more complicated architecture.
 
-But first, I will show you how it can be done in simple ISO: 
+But first, I'll show you a simple **semantic** (not algorithmically internal) equivalent in simple ISO: 
 
 First it can just do this:
 
@@ -5391,86 +5448,5826 @@ def is_leap(year: int) -> bool:
     return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 def detect_resolution(s: str):
+    
     if len(s) == 4:
         
-        lwr_bnd = s + "-01-01" + " " + "00:00:00"
-        upr_bnd = s + "-" + "01" + "-" + days_mnth_leap[-1] if is_leap(int(s)) else days_mnth[-1] + " " + "23:59:59.999999999"
+        lwr_bnd = s + "-01-01" + " " + "00:00:00.000000000"
+        upr_bnd = s + "-12-31" + " " + "23:59:59.999999999"
 
-    if len(s) == 7:
+    elif len(s) == 7:
 
         yr, mnth = s.split("-")
-        mnth = int(mnth)
+        
+        yr_int = int(yr)
+        mnth_int = int(mnth)
 
-        lwr_bnd = yr + "-" + str(mnth) + "-01"  + " " +  "00:00:00"
-        upr_bnd = yr + "-" + str(mnth) + "-" + days_mnth_leap[mnth] if is_leap(yr) else days_mnth[mnth] + " " + "23:59:59.999999999"
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
 
+        lwr_bnd = yr + "-" + mnth + "-01"  + " " +  "00:00:00.000000000"
+        upr_bnd = yr + "-" + mnth + "-" + str( days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1] ) + " " + "23:59:59.999999999"
 
-    if len(s) == 10:
+    elif len(s) == 10:
         
         yr, mnth, dy = s.split("-")
+        
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
 
-        lwr_bnd = yr + "-" + mnth + "-" + dy + " " +  "00:00:00"
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")      
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + "00:00:00.000000000"
         upr_bnd = yr + "-" + mnth + "-" + dy + " " + "23:59:59.999999999"
 
-    if len(s) == 13:
+    elif len(s) == 13:
 
         yr, mnth, dy = s.split("-")
         dy, h = dy.split(" ")
 
-        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":00:00"
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":00:00.000000000"
         upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":59:59.999999999"
 
-    if len(s) == 16:
+    elif len(s) == 16:
                 
         yr, mnth, dy = s.split("-")
         dy, h = dy.split(" ")      
-        h, min = h.split(":")
+        h, mn = h.split(":")
 
-        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + ":00"
-        upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + ":59.999999999"
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+        mn_int = int(mn)
 
-    if len(s) == 19:
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":" + mn + ":00.000000000"
+        upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":" + mn + ":59.999999999"
+
+    elif len(s) == 19:
 
         yr, mnth, dy = s.split("-")
         dy, h = dy.split(" ")      
-        h, min, s = h.split(":")
+        h, mn, sec = h.split(":")
 
-        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s
-        upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s + ".999999999"  
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+        mn_int = int(mn)
+        sec_int = int(sec)
 
-    if len(s) > 19 and s[19] == ".":
-        digits = len(s) - 20
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
 
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+
+        lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":" + mn + ":" + sec + ".000000000"
+        upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + ":" + mn + ":" + sec + ".999999999"  
+
+    elif len(s) > 20 and s[19] == ".":
+        yr, mnth, dy = s.split("-")
+        dy, time_part = dy.split(" ")
+        h, mn, sec_fraction = time_part.split(":")
+        sec, fraction = sec_fraction.split(".", 1)
+    
+        if not fraction.isdigit():
+            raise ValueError("Fractional seconds must contain only digits")
+    
+        digits = len(fraction)
+    
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+        mn_int = int(mn)
+        sec_int = int(sec)
+    
+        if not 1 <= mnth_int <= 12:
+            raise ValueError("Month must be between 1 and 12")
+    
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+    
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+    
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+    
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+    
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+    
+        prefix = f"{yr}-{mnth}-{dy} {h}:{mn}:{sec}."
+    
+        if digits <= 3:
+            fraction = fraction.ljust(3, "0")
+            lwr_bnd = prefix + fraction + "000000"
+            upr_bnd = prefix + fraction + "999999"
+    
+        elif digits <= 6:
+            fraction = fraction.ljust(6, "0")
+            lwr_bnd = prefix + fraction + "000"
+            upr_bnd = prefix + fraction + "999"
+    
+        elif digits <= 9:
+            fraction = fraction.ljust(9, "0")
+            lwr_bnd = prefix + fraction
+            upr_bnd = lwr_bnd
+    
+        else:
+            raise ValueError("At most 9 fractional digits are supported")
+    
+    else:
+        raise ValueError("Unsupported datetime format")
+
+    return lwr_bnd, upr_bnd
+
+
+```
+
+From an ISO date string, it returns the adequat lower and upper bounds.
+
+Look at those examples:
+
+```python
+
+a, b = detect_resolution("2024")
+
+print(a)
+
+print(b)
+
+print("####")
+
+a, b = detect_resolution("2024-02")
+
+print(a)
+
+print(b)
+
+print("###")
+
+a, b = detect_resolution("2024-02-11")
+
+print(a)
+
+print(b)
+
+print("###")
+
+a, b = detect_resolution("2024-02-11 22")
+
+print(a)
+
+print(b)
+
+print("###")
+
+a, b = detect_resolution("2024-02-11 22:34")
+
+print(a)
+
+print(b)
+
+print("###")
+
+a, b = detect_resolution("2024-02-11 22:34:55")
+
+print(a)
+
+print(b)
+
+print("###")
+
+a, b = detect_resolution("2024-02-11 22:34:55.127")
+
+print(a)
+
+print(b)
+
+print("###")
+
+a, b = detect_resolution("2024-02-11 22:34:55.127128")
+
+print(a)
+
+print(b)
+
+print("###")
+
+a, b = detect_resolution("2024-02-11 22:34:55.127128129")
+
+print(a)
+
+print(b)
+
+```
+
+Output:
+
+```
+
+2024-01-01 00:00:00.000000000
+2024-12-31 23:59:59.999999999
+####
+2024-02-01 00:00:00.000000000
+2024-02-29 23:59:59.999999999
+###
+2024-02-11 00:00:00.000000000
+2024-02-11 23:59:59.999999999
+###
+2024-02-11 22:00:00.000000000
+2024-02-11 22:59:59.999999999
+###
+2024-02-11 22:34:00.000000000
+2024-02-11 22:34:59.999999999
+###
+2024-02-11 22:34:55.000000000
+2024-02-11 22:34:55.999999999
+###
+2024-02-11 22:34:55.127000000
+2024-02-11 22:34:55.127999999
+###
+2024-02-11 22:34:55.127128000
+2024-02-11 22:34:55.127128999
+###
+2024-02-11 22:34:55.127128129
+2024-02-11 22:34:55.127128129
+
+```
+
+And then use them as, respectively, the lower and upper bound:
+
+```python
+
+idx = pd.date_range("2024-01-01 12:00:00", 
+                    periods = 30, 
+                    freq = "6h")
+
+
+a, b = detect_resolution("2024-01-05")
+
+ser = pd.Series(list(range(30)), index = idx)
+
+serb = ser.loc[a:b]
+
+print(serb)
+
+```
+
+Output:
+
+```
+
+2024-01-05 00:00:00    14
+2024-01-05 06:00:00    15
+2024-01-05 12:00:00    16
+2024-01-05 18:00:00    17
+
+```
+
+This is semantically identical, but it does not tell us anything about the internal algorithm used, for example I didn't even mentioned `.get_loc` or anything, so how is that computed (spoiler we won't use `.get_loc`) ?
+
+Note that here because data are contiguous according to the selected range, `serb` is a view-like object of `ser`, we can confirm it by:
+
+```python
+
+print(np.shares_memory(ser, serb))
+
+```
+
+Output:
+
+```
+
+True
+
+```
+
+Hmm, because at the end of the day dates are integers, so we must find a way to efficiently derive the integer from an ISO timestamp given its time unit resolutions that we already parsed with the latter function `detect_resolution()`:
+
+```python
+
+days_mnth = [
+    31,  # January
+    28,  # February
+    31,  # March
+    30,  # April
+    31,  # May
+    30,  # June
+    31,  # July
+    31,  # August
+    30,  # September
+    31,  # October
+    30,  # November
+    31,  # December
+]
+
+days_mnth_leap = [
+    31,  # January
+    29,  # February
+    31,  # March
+    30,  # April
+    31,  # May
+    30,  # June
+    31,  # July
+    31,  # August
+    30,  # September
+    31,  # October
+    30,  # November
+    31,  # December
+]
+
+days_mnth2 = [
+    0,    # Before January
+    31,   # Before February
+    59,   # Before March
+    90,   # Before April
+    120,  # Before May
+    151,  # Before June
+    181,  # Before July
+    212,  # Before August
+    243,  # Before September
+    273,  # Before October
+    304,  # Before November
+    334,  # Before December
+]
+
+days_mnth_leap2 = [
+    0,    # Before January
+    31,   # Before February
+    60,   # Before March
+    91,   # Before April
+    121,  # Before May
+    152,  # Before June
+    182,  # Before July
+    213,  # Before August
+    244,  # Before September
+    274,  # Before October
+    305,  # Before November
+    335,  # Before December
+]
+
+def is_leap(year: int) -> bool:
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+def leap_years_before(year: int) -> int:
+
+    year -= 1
+
+    return year // 4 - year // 100 + year // 400
+
+#EPOCH_YEAR_DAYS = (
+#    366 * leap_years_before(1970)
+#    + 365 * (1969 - leap_years_before(1970))
+#)
+
+# that simplifies to:
+
+#EPOCH_YEAR_DAYS = (
+#    365 * 1969 + leap_years_before(1970)
+#)
+
+# that is equivalent to:
+
+EPOCH_YEAR_DAYS = 719_162
+
+def get_epoch(
+    yr: int = 1970,
+    mnth: int = 1,
+    dy: int = 1,
+    hour: int = 0,
+    mn: int = 0,
+    sec: int = 0,
+    millisecond: int = 0,
+    microsecond: int = 0,
+    nanosecond: int = 0,
+    unit: str = "ns",
+) -> int:
+
+    if unit not in {"s", "ms", "us", "ns"}:
+        raise ValueError("Unit must be 's', 'ms', 'us', or 'ns'")
+
+    if yr < 1:
+        raise ValueError("Year must be at least 1")
+
+    if not 1 <= mnth <= 12:
+        raise ValueError("Month must be between 1 and 12")
+
+    is_leap_val = is_leap(yr)
+
+    month_days = days_mnth_leap if is_leap_val else days_mnth
+    max_day = month_days[mnth - 1]
+
+    if not 1 <= dy <= max_day:
+        raise ValueError(f"Day must be between 1 and {max_day}")
+
+    if not 0 <= hour <= 23:
+        raise ValueError("Hour must be between 0 and 23")
+
+    if not 0 <= mn <= 59:
+        raise ValueError("Minute must be between 0 and 59")
+
+    if not 0 <= sec <= 59:
+        raise ValueError("Second must be between 0 and 59")
+
+    if not 0 <= millisecond <= 999:
+        raise ValueError("Millisecond must be between 0 and 999")
+
+    if not 0 <= microsecond <= 999:
+        raise ValueError("Microsecond must be between 0 and 999")
+
+    if not 0 <= nanosecond <= 999:
+        raise ValueError("Nanosecond must be between 0 and 999")
+
+    total_days = 0
+
+    #this is the simple ineficient loop
+    #if yr >= 1970:
+    #    for year in range(1970, yr):
+    #        total_days += 366 if is_leap(year) else 365
+    #else:
+    #    for year in range(yr, 1970):
+    #        total_days -= 366 if is_leap(year) else 365
+
+    tot_leap_years = leap_years_before(yr)
+    #total_days += 366 * tot_leap_years + 365 * (yr - 1 - tot_leap_years) - EPOCH_YEARS_DAYS
+    # that simplifies to:
+    total_days += 365 * (yr - 1) + tot_leap_years - EPOCH_YEAR_DAYS
+
+    mnths_offset = ( days_mnth_leap2 if is_leap_val else days_mnth2 )
+    total_days += mnths_offset[mnth - 1]
+    
+    total_days += dy - 1
+
+    total_seconds = (
+        total_days * 24 * 3600
+        + hour * 3600
+        + mn * 60
+        + sec
+    )
+
+    # we may define a dict of operators and then return operators[unit](total_seconds)
+    #operators = {
+    #    "s":  lambda x: x,
+    #    "ms": lambda x: x * 1_000 + millisecond,
+    #    "us": lambda x: (x * 1_000 + millisecond) * 1_000 + microsecond,
+    #    "ns": lambda x: ((x * 1_000 + millisecond) * 1_000 + microsecond) * 1_000 + nanosecond,
+    #}
+
+    #return operators[unit](total_seconds)
+
+    # or just simple if statements
+
+    if unit == "s":
+        return total_seconds
+
+    if unit == "ms":
+        return (
+            total_seconds * 1_000
+            + millisecond
+        )
+    
+    if unit == "us":
+        return (
+            total_seconds * 1_000_000
+            + millisecond * 1_000
+            + microsecond
+        )
+    
+    return (
+        total_seconds * 1_000_000_000
+        + millisecond * 1_000_000
+        + microsecond * 1_000
+        + nanosecond
+    )
+
+```
+
+Now we implement a variant of `detect_resoltion()` that instead of returning upper and lower bounds as ISO date string, will return them as values using `get_epoch()`:
+
+```python
+
+def detect_resolution2(s: str,
+                       unit = "ns"):
+    
+    if len(s) == 4:
+        
+        lwr_bnd = get_epoch(int(s), unit = unit)
+        upr_bnd = get_epoch(int(s), 
+                            12, 
+                            31, 
+                            23, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 7:
+
+        yr, mnth = s.split("-")
+        
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+
+        dy_int = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+        
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            23, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+
+    elif len(s) == 10:
+        
+        yr, mnth, dy = s.split("-")
+        
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")      
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            23, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 13:
+
+        yr, mnth, dy = s.split("-")
+        dy, h = dy.split(" ")
+
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            h_int, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 16:
+                
+        yr, mnth, dy = s.split("-")
+        dy, h = dy.split(" ")      
+        h, mn = h.split(":")
+
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+        mn_int = int(mn)
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            mn_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            h_int, 
+                            mn_int, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 19:
+
+        yr, mnth, dy = s.split("-")
+        dy, h = dy.split(" ")      
+        h, mn, sec = h.split(":")
+
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+        mn_int = int(mn)
+        sec_int = int(sec)
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            mn_int,
+                            sec_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            h_int, 
+                            mn_int, 
+                            sec_int, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) > 20 and s[19] == ".":
+        yr, mnth, dy = s.split("-")
+        dy, time_part = dy.split(" ")
+        h, mn, sec_fraction = time_part.split(":")
+        sec, fraction = sec_fraction.split(".", 1)
+    
+        if not fraction.isdigit():
+            raise ValueError("Fractional seconds must contain only digits")
+    
+        digits = len(fraction)
+    
+        yr_int = int(yr)
+        mnth_int = int(mnth)
+        dy_int = int(dy)
+        h_int = int(h)
+        mn_int = int(mn)
+        sec_int = int(sec)
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError("Month must be between 1 and 12")
+    
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+    
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+    
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+    
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+    
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+    
         if digits <= 3:
 
-            yr, mnth, dy = s.split("-")
-            dy, h = dy.split(" ")      
-            h, min, s = h.split(":")
-            
-            lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s
-            upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s + "999999"
+            fraction = fraction.ljust(3, "0")
+            ms_int = int(fraction)
 
+            lwr_bnd = get_epoch(yr_int,
+                                mnth_int,
+                                dy_int,
+                                h_int,
+                                mn_int,
+                                sec_int,
+                                ms_int,
+                                unit = unit)
+
+            upr_bnd = get_epoch(yr_int, 
+                                mnth_int, 
+                                dy_int, 
+                                h_int, 
+                                mn_int, 
+                                sec_int, 
+                                ms_int, 
+                                999,
+                                999,
+                                unit)
 
         elif digits <= 6:
+            fraction = fraction.ljust(6, "0")
 
-            yr, mnth, dy = s.split("-")
-            dy, h = dy.split(" ")      
-            h, min, s = h.split(":")
+            ms_int = int(fraction[0:3])
+            us_int = int(fraction[3:])
 
-            lwr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s
-            upr_bnd = yr + "-" + mnth + "-" + dy + " " + h + min + s + "999"
+            lwr_bnd = get_epoch(yr_int,
+                                mnth_int,
+                                dy_int,
+                                h_int,
+                                mn_int,
+                                sec_int,
+                                ms_int,
+                                us_int,
+                                unit = unit)
+
+            upr_bnd = get_epoch(yr_int, 
+                                mnth_int, 
+                                dy_int, 
+                                h_int, 
+                                mn_int, 
+                                sec_int, 
+                                ms_int, 
+                                us_int,
+                                999,
+                                unit)
+    
+        elif digits <= 9:
+            fraction = fraction.ljust(9, "0")
+   
+            ms_int = int(fraction[0:3])
+            us_int = int(fraction[3:6])
+            ns_int = int(fraction[6:])
+
+            lwr_bnd = get_epoch(yr_int,
+                                mnth_int,
+                                dy_int,
+                                h_int,
+                                mn_int,
+                                sec_int,
+                                ms_int,
+                                us_int,
+                                ns_int,
+                                unit)
+
+            upr_bnd = lwr_bnd
 
         else:
-        
-            lwr_bnd = s
-            upr_bnd = s
-
+            raise ValueError("At most 9 fractional digits are supported")
+    
     else:
         raise ValueError("Unsupported datetime format")
 
     return lwr_bnd, upr_bnd
 
 ```
+
+Hmm, but here the goal is to accepts complete and partial ISO date string even with different separators, so a flexible ISO if I may say.
+
+Then, to gain more performance we can even bypass the `.split()` function and directly access the time unit in the original string with slices:
+
+```python
+
+def detect_resolution2(s: str,
+                       unit = "ns"):
+    
+    if len(s) == 4:
+        
+        lwr_bnd = get_epoch(int(s), unit = unit)
+        upr_bnd = get_epoch(int(s), 
+                            12, 
+                            31, 
+                            23, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 7:
+
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+
+        dy_int = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+        
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            23, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+
+    elif len(s) == 10:
+        
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")      
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            23, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 13:
+
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            h_int, 
+                            59, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 16:
+                
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:13])
+        mn_int = int(s[14:])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            mn_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            h_int, 
+                            mn_int, 
+                            59, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) == 19:
+
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:13])
+        mn_int = int(s[14:16])
+        sec_int = int(s[17:])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            mn_int,
+                            sec_int,
+                            unit = unit)
+
+        upr_bnd = get_epoch(yr_int, 
+                            mnth_int, 
+                            dy_int, 
+                            h_int, 
+                            mn_int, 
+                            sec_int, 
+                            999, 
+                            999,
+                            999,
+                            unit)
+
+    elif len(s) > 20:
+               
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:13])
+        mn_int = int(s[14:16])
+        sec_int = int(s[17:19])
+        fraction = s[20:]
+
+        if not fraction.isdigit():
+            raise ValueError("Fractional seconds must contain only digits")
+
+        digits = len(fraction)
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError("Month must be between 1 and 12")
+    
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+    
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+    
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+    
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+    
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+    
+        if digits <= 3:
+
+            fraction = fraction.ljust(3, "0")
+            ms_int = int(fraction)
+
+            lwr_bnd = get_epoch(yr_int,
+                                mnth_int,
+                                dy_int,
+                                h_int,
+                                mn_int,
+                                sec_int,
+                                ms_int,
+                                unit = unit)
+
+            upr_bnd = get_epoch(yr_int, 
+                                mnth_int, 
+                                dy_int, 
+                                h_int, 
+                                mn_int, 
+                                sec_int, 
+                                ms_int, 
+                                999,
+                                999,
+                                unit)
+
+        elif digits <= 6:
+            
+            fraction = fraction.ljust(6, "0")
+
+            ms_int = int(fraction[0:3])
+            us_int = int(fraction[3:])
+
+            lwr_bnd = get_epoch(yr_int,
+                                mnth_int,
+                                dy_int,
+                                h_int,
+                                mn_int,
+                                sec_int,
+                                ms_int,
+                                us_int,
+                                unit = unit)
+
+            upr_bnd = get_epoch(yr_int, 
+                                mnth_int, 
+                                dy_int, 
+                                h_int, 
+                                mn_int, 
+                                sec_int, 
+                                ms_int, 
+                                us_int,
+                                999,
+                                unit)
+    
+        elif digits <= 9:
+            
+            fraction = fraction.ljust(9, "0")
+   
+            ms_int = int(fraction[0:3])
+            us_int = int(fraction[3:6])
+            ns_int = int(fraction[6:])
+
+            lwr_bnd = get_epoch(yr_int,
+                                mnth_int,
+                                dy_int,
+                                h_int,
+                                mn_int,
+                                sec_int,
+                                ms_int,
+                                us_int,
+                                ns_int,
+                                unit)
+
+            upr_bnd = lwr_bnd
+
+        else:
+            raise ValueError("At most 9 fractional digits are supported")
+    
+    else:
+        raise ValueError("Unsupported datetime format")
+
+    return lwr_bnd, upr_bnd
+
+```
+
+Now, we can verify it produces intended results.
+
+As said before because I know the values are contiguous, I can do:
+
+```python
+
+a, b = detect_resolution2("2024-01-05")
+
+positions = [ i for i, vl in enumerate(idx) if vl.value >= a and vl.value <= b ] 
+
+#serc = ser.iloc[min(positions):max(positions) + 1]
+
+# or a lot better
+
+serc = ser.iloc[positions[0]:positions[-1] + 1]
+
+print(serc)
+
+```
+
+Output:
+
+```
+
+2024-01-05 00:00:00    14
+2024-01-05 06:00:00    15
+2024-01-05 12:00:00    16
+2024-01-05 18:00:00    17
+Freq: 6h, dtype: int64
+
+```
+
+Same result, I'm a happy man right now !
+
+Or I can directly get the integer representation of the timestamps on the `idx` with the `.asi8` attribute, then I do:
+
+```python
+
+a, b = detect_resolution2("2024-01-05", unit = idx.unit)
+
+positions = [ i for i, vl in enumerate(idx.asi8) if vl >= a and vl <= b ] 
+
+serc = ser.iloc[positions[0]:positions[-1] + 1]
+
+print(serc)
+
+```
+
+Which outputs the same result.
+
+Note, that I precised the `idx` unit to be sure about being on the same unit:
+
+```python
+
+a, b = detect_resolution2("2024-01-05", unit = idx.unit)
+
+```
+
+But, again, I can take advantage of `np.searchsorted()` that avoids the unnecessecary scan of all the `idx` values because it uses the binary search algorithm.
+
+And because the values are sorted I can use it here:
+
+```python
+
+mn_bnd = np.searchsorted(idx.asi8, a, side = "left")
+
+mx_bnd = np.searchsorted(idx.asi8, b, side = "right")
+
+serc = ser.iloc[mn_bnd:mx_bnd]
+
+print(serc)
+
+```
+
+Same result:
+
+```
+
+2024-01-05 00:00:00    14
+2024-01-05 06:00:00    15
+2024-01-05 12:00:00    16
+2024-01-05 18:00:00    17
+
+```
+
+
+And of course:
+
+```python
+
+print(np.shares_memory(ser, serb))
+
+```
+
+is `True`
+
+Until now we accept a wide range of ISO date string format, meaning different separators and different time unit resolution.
+
+But technically speaking, not even a full ISO 8601 date string because here no timezone can be directly attacched to the string.
+
+Then, I have first to build a timezone extractor function:
+
+```python
+
+def timezone_extractor(s: str) -> str | None:
+    if s.endswith("Z"):
+        return s[-1]
+
+    if (
+        len(s) >= 6
+        and s[-6] in "+-"
+        and s[-5:-3].isdigit()
+        and s[-3] == ":"
+        and s[-2:].isdigit()
+    ):
+
+        hour = int(s[-5:-3])
+        minute = int(s[-2:])
+
+        if hour <= 23 and minute <= 59:
+            return s[-6:]
+
+        raise ValueError("Invalid UTC offset")
+
+    return None
+
+```
+
+Hmm, but it fact it would be simpler to handle the timezone if it would return an empty string instead of `None`, yess sometimes non-explicit error-handling is simply better:
+
+```python
+
+def timezone_extractor(s: str) -> str:
+    if s.endswith("Z"):
+        return s[-1]
+
+    if (
+        len(s) >= 6
+        and s[-6] in "+-"
+        and s[-5:-3].isdigit()
+        and s[-3] == ":"
+        and s[-2:].isdigit()
+    ):
+
+        hour = int(s[-5:-3])
+        minute = int(s[-2:])
+
+        if hour <= 23 and minute <= 59:
+            return s[-6:]
+
+        raise ValueError("Invalid UTC offset")
+
+    return ""
+
+```
+
+I also want a function allowing to compute the offset of the given timezone, we will implement 2 versions.
+
+First the ISO version that is shaped to accept ISO timezone offset, meaning `hour:minutes`, no second or lower time resolution such as second fraction:
+
+```python
+
+MLT_TIME = {
+             "s": 1,
+             "ms": 1_000,
+             "us": 1_000_000,
+             "ns": 1_000_000_000
+           }
+
+def get_time_tmz(s: str, 
+                      unit: str):
+    return (int(s[0:2]) * 3600 + int(s[3:5]) * 60) * MLT_TIME[unit]
+
+```
+
+Note that the timezone string that will be passed will have a sign `"+"` or `"-"`, then it should be erased from it and stored in a special variable with which we'll multiply the result of the function to have the correct offset, a little of fore-shadowing of the `detect_resolution2()` funtion:
+
+```python
+
+tmz = timezone_extractor(s)
+
+tmz_offset = len(tmz)
+
+if len(tmz) > 1:
+    sign = -1 if tmz[0] == "-" else 1
+    #tmz_offset_time = sign * get_time_tmz(tmz[1:], unit)
+    tmz_offset_time = sign * get_time_tmz2(tmz[1:], unit)
+else:
+    tmz_offset_time = 0
+
+```
+
+And another variant that can compute the timezone offset up to the nanosecond precision:
+
+```python
+
+POW10 = (
+    1,
+    10,
+    100,
+    1_000,
+    10_000,
+    100_000,
+    1_000_000,
+    10_000_000,
+    100_000_000,
+    1_000_000_000,
+)
+
+UNIT_DIGITS = {
+    "s": 0,
+    "ms": 3,
+    "us": 6,
+    "ns": 9,
+}
+
+def get_time_tmz2(s: str, unit: str) -> int:
+    
+    try:
+        multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    if len(s) == 5:
+        # HH:MM
+        hour = int(s[0:2])
+        minute = int(s[3:5])
+        second = 0
+        fraction = ""
+
+    elif len(s) == 8:
+        # HH:MM:SS
+        hour = int(s[0:2])
+        minute = int(s[3:5])
+        second = int(s[6:8])
+        fraction = ""
+
+    elif len(s) > 9:
+        # HH:MM:SS.fraction
+        hour = int(s[0:2])
+        minute = int(s[3:5])
+        second = int(s[6:8])
+        fraction = s[9:]
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        if len(fraction) > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+    else:
+        raise ValueError(
+            "Expected HH:MM, HH:MM:SS, or HH:MM:SS.fraction"
+        )
+
+    if not 0 <= hour <= 23:
+        raise ValueError("Hour must be between 0 and 23")
+
+    if not 0 <= minute <= 59:
+        raise ValueError("Minute must be between 0 and 59")
+
+    if not 0 <= second <= 59:
+        raise ValueError("Second must be between 0 and 59")
+
+    total_seconds = hour * 3600 + minute * 60 + second
+    result = total_seconds * multiplier
+
+    if len(fraction) > 9:
+        unit_digits = UNIT_DIGITS[unit]
+
+        if len(fraction) > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{len(fraction)} fractional digits"
+            )
+
+        #fraction_in_unit = int(
+        #    fraction.ljust(unit_digits, "0")
+        #)
+
+        #result += fraction_in_unit
+        # Or more performant
+
+        #result += int(fraction) * 10 ** (unit_digit - len(fraction))
+
+        # or even
+        result += int(fraction) * POW10[unit_digits - len(fraction)]
+
+    return result
+
+```
+
+The interesting part is here:
+
+```pyhton
+
+fraction_in_unit = int(
+    fraction.ljust(unit_digits, "0")
+)
+
+
+```
+
+It's the exact same method I used in the `detect_resolution2()` function to pad the unit of the fractional part, but it creates a temporary string which can be avoided by a simple multiplication of a power of ten. And the poweris simply the string length difference of the indended resolution and wha we have:
+
+```python
+
+int(fraction) * 10 ** (unit_digit - len(fraction))
+
+```
+
+But, this still can be improoved by not having to even call the power function. Because there is a small set of powerof ten we can multiply the fraction with, we can simply create a constant set containing all of them in order and directly get the `10 ** (unit_digit - len(fraction))` part:
+
+```python
+
+POW10 = (
+    1,
+    10,
+    100,
+    1_000,
+    10_000,
+    100_000,
+    1_000_000,
+    10_000_000,
+    100_000_000,
+    1_000_000_000,
+)
+
+int(fraction) * POW10[unit_digits - len(fraction)]
+
+```
+
+Hmm, but there's another thing we can improve too.
+
+When it comes to the `upr_bnd` computation, we can apply the same trick that we've done in the fraction branch.
+
+This means computing the `scale` that will be used as follow, here the year branch for example:
+
+```python
+
+
+TIME_RESOLUTION_MULT_VAL = (
+   86_400, #24 * 60 * 60
+   3_600,
+   60
+)
+
+MLT_TIME = {
+             "s": 1,
+             "ms": 1_000,
+             "us": 1_000_000,
+             "ns": 1_000_000_000
+           }
+
+...
+
+scale = 366 if is_leap(year) else 365
+scale *= TIME_RESOLUTION_MULT_VAL[0]
+scale *= MLT_TIME[unit]
+
+lwr_bnd = get_epoch(year, unit = unit)
+upr_bnd = lwr_bnd + scale - 1
+
+```
+
+Which is much cheaper than calling the `get_epoch()` function.
+
+
+I'll now plug that timezone extractor followed by the timezone offset computation, the improved fraction padding method and `upr_bnd` computation in `detect_resolution2()`, I promise that's the last time you see this function:
+
+```python
+
+def detect_resolution2(s: str,
+                       unit = "ns"):
+
+    if s[0] == " ":
+        s = s.lstrip()
+
+    if s[-1] == " ":
+        s = s.rstrip()
+
+    tmz = timezone_extractor(s)
+  
+    tmz_offset = len(tmz)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+        #tmz_offset_time = sign * get_time_tmz(tmz[1:], unit)
+        tmz_offset_time = sign * get_time_tmz2(tmz[1:], unit)
+    else:
+        tmz_offset_time = 0
+
+    real_len = len(s) - tmz_offset
+
+    if real_len == 4:
+
+        year = int(s)
+
+        scale = 366 if is_leap(year) else 365
+        scale *= TIME_RESOLUTION_MULT_VAL[0]
+        scale *= MLT_TIME[unit]
+
+        lwr_bnd = get_epoch(year, unit = unit)
+        upr_bnd = lwr_bnd + scale - 1
+
+    elif real_len == 7:
+
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:real_len])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+
+        scale = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+        scale *= TIME_RESOLUTION_MULT_VAL[0]
+        scale *= MLT_TIME[unit]
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            unit = unit)
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    elif real_len == 10:
+        
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:real_len])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")      
+
+        scale = TIME_RESOLUTION_MULT_VAL[0]
+        scale *= MLT_TIME[unit]
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            unit = unit)
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    elif real_len == 13:
+
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:real_len])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        scale = TIME_RESOLUTION_MULT_VAL[1]
+        scale *= MLT_TIME[unit] 
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            unit = unit)
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    elif real_len == 16:
+                
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:13])
+        mn_int = int(s[14:real_len])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        scale = TIME_RESOLUTION_MULT_VAL[2]
+        scale *= MLT_TIME[unit] 
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            mn_int,
+                            unit = unit)
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    elif real_len == 19:
+
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:13])
+        mn_int = int(s[14:16])
+        sec_int = int(s[17:real_len])
+
+        if mnth_int < 1 or mnth_int > 12:
+            raise ValueError("Month must be between 1 and 12")
+ 
+        dy_max = days_mnth_leap[mnth_int - 1] if is_leap(yr_int) else days_mnth[mnth_int - 1]
+
+        if dy_int < 1 or dy_int > dy_max:
+            raise ValueError(f"Day must be between 1 and {dy_max}")
+
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+
+        scale = MLT_TIME[unit] 
+
+        lwr_bnd = get_epoch(yr_int,
+                            mnth_int,
+                            dy_int,
+                            h_int,
+                            mn_int,
+                            sec_int,
+                            unit = unit)
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    elif real_len > 20:
+        yr_int = int(s[:4])
+        mnth_int = int(s[5:7])
+        dy_int = int(s[8:10])
+        h_int = int(s[11:13])
+        mn_int = int(s[14:16])
+        sec_int = int(s[17:19])
+        fraction = s[20:real_len]
+    
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+    
+        digits = len(fraction)
+    
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+    
+        if not 1 <= mnth_int <= 12:
+            raise ValueError("Month must be between 1 and 12")
+    
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+    
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+    
+        if not 0 <= h_int <= 23:
+            raise ValueError("Hour must be between 0 and 23")
+    
+        if not 0 <= mn_int <= 59:
+            raise ValueError("Minute must be between 0 and 59")
+    
+        if not 0 <= sec_int <= 59:
+            raise ValueError("Second must be between 0 and 59")
+    
+        unit_digits = UNIT_DIGITS[unit]
+    
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+    
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+    
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        ) + add_fraction 
+    
+        upr_bnd = lwr_bnd + scale - 1    
+
+    else:
+        raise ValueError("Unsupported datetime format")
+
+    return lwr_bnd - tmz_offset_time, upr_bnd - tmz_offset_time
+
+```
+
+Note that I substract the offset, because the intent is to allow the user to express the timestamp in local time with a timezone offset, so the resulting lower and uper bounds are converted to `UTC + 0` -> standard point for timestamp comparisons.
+
+And when the offset is positive, it means that the associated timestamp is in advance compared to the UTC reference.
+
+Therefore, if it's negative, it means that the associated local time is late, so the corresponding `UTC + 0` timestamp is higher.
+
+Those assertions succeeds:
+
+```python
+
+assert detect_resolution2(
+    "2024-01-01 00:00:00.123+01:00",
+    unit = "ns"
+) == (
+    base - one_hour,
+    base - one_hour + 999_999,
+)
+
+assert detect_resolution2(
+    "2024-01-01 00:00:00.123-01:00",
+    unit="ns",
+) == (
+    base + one_hour,
+    base + one_hour + 999_999,
+)
+
+```
+
+Because that's a static parser (to be fast), the days format must be `"0"` padded, so `"2024-11-2"` becomes `"2024-11-02"`.
+
+But, what about the other date format ?
+
+First, I will set the following architecture for maximum convenience / flaxibility and performance.
+
+A high performance date parser should be static, therefore it decreases the flexibility of `pd.DatetimeIndex`. 
+
+Indeed, the latter accepts a wide variety of date formats.
+
+So a good architecture is:
+
+- implement a dispatcher for detecting on the fly the input format to make it be correctly parsed to return a proper lower and uper bound as integer (at UTC + 0).
+
+- implement static parsers for commonly used date-format such as ISO 8601 format or other convenient ones
+
+- if the format does not match one of the implemented ones, then raise an Error and tell to provide a user-format instead, so we have to implement a function that will read a user-provided format and the input date using this format to correctly parse it
+
+- we can even try to infere the user format just by the date input but it has to be documented as prone to errors (but maybe more convenient)
+
+Going back to the implementation of static parser for commonly used date format.
+
+We have the english abreviated month variant like:
+
+```
+
+Jan 31 2024 17:12:33
+
+```
+
+And its comma + `"at"` variant:
+
+```
+
+Jan 31, 2024 at 17:12:33
+
+
+```
+
+And when the day is before the month:
+
+```
+
+31 Jan 2024 17:12:33
+
+```
+
+
+And of course with the comma + `"at"` variant:
+
+```
+
+31 Jan, 2024 at 17:12:33
+
+```
+
+Here, are respectively the formats:
+
+```python
+
+def detect_resolution2_month_day(
+    s: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+    s = s.strip()
+
+    if not s:
+        raise ValueError("Empty datetime string")
+
+    try:
+        unit_multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    tmz = timezone_extractor(s)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+
+        tmz_offset_time = (
+            sign * get_time_tmz2(tmz[1:], unit)
+        )
+    else:
+        tmz_offset_time = 0
+
+    if tmz:
+        core = s[:-len(tmz)].rstrip()
+    else:
+        core = s
+
+    real_len = len(core)
+
+    # ---------------------------------------------------------
+    # Jan 2024
+    # Month resolution
+    # ---------------------------------------------------------
+    if real_len == 8:
+        month_abbrev = core[0:3]
+        yr_int = int(core[4:8])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        days_in_month = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        scale = (
+            days_in_month
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15 2024
+    # Day resolution
+    # ---------------------------------------------------------
+    elif real_len == 11:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[7:11])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15 2024 17
+    # Hour resolution
+    # ---------------------------------------------------------
+    elif real_len == 14:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[1]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15 2024 17:12
+    # Minute resolution
+    # ---------------------------------------------------------
+    elif real_len == 17:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+        mn_int = int(core[15:17])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[2]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15 2024 17:12:33
+    # Second resolution
+    # ---------------------------------------------------------
+    elif real_len == 20:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+        mn_int = int(core[15:17])
+        sec_int = int(core[18:20])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        scale = unit_multiplier
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15 2024 17:12:33.123...
+    # Fractional-second resolution
+    # ---------------------------------------------------------
+    elif real_len > 21:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+        mn_int = int(core[15:17])
+        sec_int = int(core[18:20])
+
+        # Position 20 is the fractional separator.
+        fraction = core[21:real_len]
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        digits = len(fraction)
+
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        unit_digits = UNIT_DIGITS[unit]
+
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+
+        lwr_bnd = (
+            get_epoch(
+                yr_int,
+                mnth_int,
+                dy_int,
+                h_int,
+                mn_int,
+                sec_int,
+                unit=unit,
+            )
+            + add_fraction
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        raise ValueError(
+            "Unsupported abbreviated-month datetime format"
+        )
+
+    return (
+        lwr_bnd - tmz_offset_time,
+        upr_bnd - tmz_offset_time,
+    )
+
+```
+
+
+
+```python
+
+def detect_resolution2_month_day_comma_at(
+    s: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+    s = s.strip()
+
+    if not s:
+        raise ValueError("Empty datetime string")
+
+    try:
+        unit_multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    tmz = timezone_extractor(s)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+
+        tmz_offset_time = (
+            sign * get_time_tmz2(tmz[1:], unit)
+        )
+    else:
+        # No timezone or Z.
+        tmz_offset_time = 0
+
+    if tmz:
+        core = s[:-len(tmz)].rstrip()
+    else:
+        core = s
+
+    real_len = len(core)
+
+    # ---------------------------------------------------------
+    # Jan 2024
+    # Month resolution
+    # ---------------------------------------------------------
+    if real_len == 8:
+        month_abbrev = core[0:3]
+        yr_int = int(core[4:8])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        days_in_month = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        scale = (
+            days_in_month
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15, 2024
+    # Day resolution
+    # ---------------------------------------------------------
+    elif real_len == 12:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[8:12])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15, 2024 at 17
+    # Hour resolution
+    # ---------------------------------------------------------
+    elif real_len == 18:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[8:12])
+        h_int = int(core[16:18])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[1]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15, 2024 at 17:12
+    # Minute resolution
+    # ---------------------------------------------------------
+    elif real_len == 21:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[8:12])
+        h_int = int(core[16:18])
+        mn_int = int(core[19:21])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[2]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15, 2024 at 17:12:33
+    # Second resolution
+    # ---------------------------------------------------------
+    elif real_len == 24:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[8:12])
+        h_int = int(core[16:18])
+        mn_int = int(core[19:21])
+        sec_int = int(core[22:24])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        scale = unit_multiplier
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # Jan 15, 2024 at 17:12:33.123...
+    # Fractional-second resolution
+    # ---------------------------------------------------------
+    elif real_len > 25:
+        month_abbrev = core[0:3]
+        dy_int = int(core[4:6])
+        yr_int = int(core[8:12])
+        h_int = int(core[16:18])
+        mn_int = int(core[19:21])
+        sec_int = int(core[22:24])
+
+        # Position 24 is the fractional separator.
+        fraction = core[25:real_len]
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        digits = len(fraction)
+
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        unit_digits = UNIT_DIGITS[unit]
+
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+
+        lwr_bnd = (
+            get_epoch(
+                yr_int,
+                mnth_int,
+                dy_int,
+                h_int,
+                mn_int,
+                sec_int,
+                unit=unit,
+            )
+            + add_fraction
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        raise ValueError(
+            "Unsupported abbreviated-month comma-at "
+            "datetime format"
+        )
+
+    return (
+        lwr_bnd - tmz_offset_time,
+        upr_bnd - tmz_offset_time,
+    )
+
+```
+
+```python
+
+def detect_resolution2_day_month(
+    s: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+    s = s.strip()
+
+    if not s:
+        raise ValueError("Empty datetime string")
+
+    try:
+        unit_multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    tmz = timezone_extractor(s)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+
+        tmz_offset_time = (
+            sign * get_time_tmz2(tmz[1:], unit)
+        )
+    else:
+        tmz_offset_time = 0
+
+    if tmz:
+        core = s[:-len(tmz)].rstrip()
+    else:
+        core = s
+
+    real_len = len(core)
+
+    # ---------------------------------------------------------
+    # Jan 2024
+    # Month resolution
+    # ---------------------------------------------------------
+    if real_len == 8:
+        month_abbrev = core[0:3]
+        yr_int = int(core[4:8])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        days_in_month = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        scale = (
+            days_in_month
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # 15 Jan 2024
+    # Day resolution
+    # ---------------------------------------------------------
+    elif real_len == 11:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[7:11])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # 15 Jan 2024 17
+    # Hour resolution
+    # ---------------------------------------------------------
+    elif real_len == 14:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[1]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # 15 Jan 2024 17:12
+    # Minute resolution
+    # ---------------------------------------------------------
+    elif real_len == 17:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+        mn_int = int(core[15:17])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[2]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # 15 Jan 2024 17:12:33
+    # Second resolution
+    # ---------------------------------------------------------
+    elif real_len == 20:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+        mn_int = int(core[15:17])
+        sec_int = int(core[18:20])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        scale = unit_multiplier
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # ---------------------------------------------------------
+    # 15 Jan 2024 17:12:33.123...
+    # Fractional-second resolution
+    # ---------------------------------------------------------
+    elif real_len > 21:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[7:11])
+        h_int = int(core[12:14])
+        mn_int = int(core[15:17])
+        sec_int = int(core[18:20])
+
+        # Position 20 is the fractional separator.
+        fraction = core[21:real_len]
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        digits = len(fraction)
+
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        unit_digits = UNIT_DIGITS[unit]
+
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+
+        lwr_bnd = (
+            get_epoch(
+                yr_int,
+                mnth_int,
+                dy_int,
+                h_int,
+                mn_int,
+                sec_int,
+                unit=unit,
+            )
+            + add_fraction
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        raise ValueError(
+            "Unsupported day-abbreviated-month "
+            "datetime format"
+        )
+
+    return (
+        lwr_bnd - tmz_offset_time,
+        upr_bnd - tmz_offset_time,
+    )
+
+```
+
+
+
+```python
+
+def detect_resolution2_day_month_comma(
+    s: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+    s = s.strip()
+
+    if not s:
+        raise ValueError("Empty datetime string")
+
+    try:
+        unit_multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    tmz = timezone_extractor(s)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+
+        tmz_offset_time = (
+            sign * get_time_tmz2(tmz[1:], unit)
+        )
+    else:
+        tmz_offset_time = 0
+
+    if tmz:
+        core = s[:-len(tmz)].rstrip()
+    else:
+        core = s
+
+    real_len = len(core)
+
+    # Jan 2024
+    if real_len == 8:
+        month_abbrev = core[0:3]
+        yr_int = int(core[4:8])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        days_in_month = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        scale = (
+            days_in_month
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 15 Jan, 2024
+    elif real_len == 12:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[8:12])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 15 Jan, 2024 17
+    elif real_len == 15:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[8:12])
+        h_int = int(core[13:15])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[1]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 15 Jan, 2024 17:12
+    elif real_len == 18:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[8:12])
+        h_int = int(core[13:15])
+        mn_int = int(core[16:18])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[2]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 15 Jan, 2024 17:12:33
+    elif real_len == 21:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[8:12])
+        h_int = int(core[13:15])
+        mn_int = int(core[16:18])
+        sec_int = int(core[19:21])
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        scale = unit_multiplier
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 15 Jan, 2024 17:12:33.123...
+    elif real_len > 22:
+        dy_int = int(core[0:2])
+        month_abbrev = core[3:6]
+        yr_int = int(core[8:12])
+        h_int = int(core[13:15])
+        mn_int = int(core[16:18])
+        sec_int = int(core[19:21])
+
+        # Position 21 is the fractional separator.
+        fraction = core[22:real_len]
+
+        try:
+            mnth_int = ABREV_MONTH_ENG[month_abbrev]
+        except KeyError:
+            raise ValueError(
+                "Unsupported English month abbreviation: "
+                f"{month_abbrev!r}"
+            ) from None
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        digits = len(fraction)
+
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        unit_digits = UNIT_DIGITS[unit]
+
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+
+        lwr_bnd = (
+            get_epoch(
+                yr_int,
+                mnth_int,
+                dy_int,
+                h_int,
+                mn_int,
+                sec_int,
+                unit=unit,
+            )
+            + add_fraction
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        raise ValueError(
+            "Unsupported day-abbreviated-month comma "
+            "datetime format"
+        )
+
+    return (
+        lwr_bnd - tmz_offset_time,
+        upr_bnd - tmz_offset_time,
+    )
+
+```
+
+We also have the `Apache/NGINX` date format that looks like this:
+
+```
+
+31/Jan/2024:27:12:33 + 01:00
+
+```
+
+But that's already handled by `detect_resolution2_day_month()` because it is permissive in terms of separators (that must be one char btw).
+
+The RFC 2822 is also another date format that can be easily implemented at this stage, indeed it looks like:
+
+```
+
+Wed, 31 Jan 2024 17:12:33 +0100
+
+```
+
+Also very similar to what `detect_resolution2_day_month()` parses, then its implementation is just:
+
+```python
+
+def detect_resolution2_rfc2822(
+    s: str,
+    unit: str = "ns",
+):
+    s = s.strip()
+
+    if len(s) >= 5 and s[3] == ",":
+        s = s[5:]
+
+    return detect_resolution2_day_month(s, unit)
+
+```
+
+And we also have the compact numeric format that is like:
+
+```
+
+20240131171233 -> 31/Jan/2024:27:12:33
+
+```
+
+Here's its implementation:
+
+```python
+
+def detect_resolution2_compact_numeric(
+    s: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+    s = s.strip()
+
+    if not s:
+        raise ValueError("Empty datetime string")
+
+    try:
+        unit_multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    tmz = timezone_extractor(s)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+        tmz_offset_time = (
+            sign * get_time_tmz2(tmz[1:], unit)
+        )
+    else:
+        tmz_offset_time = 0
+
+    if tmz:
+        core = s[:-len(tmz)].rstrip()
+    else:
+        core = s
+
+    real_len = len(core)
+
+    # 2024
+    if real_len == 4:
+        yr_int = int(core[0:4])
+
+        days_in_year = 366 if is_leap(yr_int) else 365
+
+        scale = (
+            days_in_year
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 202401
+    elif real_len == 6:
+        yr_int = int(core[0:4])
+        mnth_int = int(core[4:6])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        days_in_month = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        scale = (
+            days_in_month
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 20240131
+    elif real_len == 8:
+        yr_int = int(core[0:4])
+        mnth_int = int(core[4:6])
+        dy_int = int(core[6:8])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 2024013117
+    elif real_len == 10:
+        yr_int = int(core[0:4])
+        mnth_int = int(core[4:6])
+        dy_int = int(core[6:8])
+        h_int = int(core[8:10])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[1]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 202401311712
+    elif real_len == 12:
+        yr_int = int(core[0:4])
+        mnth_int = int(core[4:6])
+        dy_int = int(core[6:8])
+        h_int = int(core[8:10])
+        mn_int = int(core[10:12])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[2]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 20240131171233
+    elif real_len == 14:
+        yr_int = int(core[0:4])
+        mnth_int = int(core[4:6])
+        dy_int = int(core[6:8])
+        h_int = int(core[8:10])
+        mn_int = int(core[10:12])
+        sec_int = int(core[12:14])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        scale = unit_multiplier
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 20240131171233.123...
+    elif real_len > 15:
+        yr_int = int(core[0:4])
+        mnth_int = int(core[4:6])
+        dy_int = int(core[6:8])
+        h_int = int(core[8:10])
+        mn_int = int(core[10:12])
+        sec_int = int(core[12:14])
+
+        # Position 14 is the fractional separator.
+        fraction = core[15:real_len]
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        digits = len(fraction)
+
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        unit_digits = UNIT_DIGITS[unit]
+
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+
+        lwr_bnd = (
+            get_epoch(
+                yr_int,
+                mnth_int,
+                dy_int,
+                h_int,
+                mn_int,
+                sec_int,
+                unit=unit,
+            )
+            + add_fraction
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        raise ValueError(
+            "Unsupported compact numeric datetime format"
+        )
+
+    return (
+        lwr_bnd - tmz_offset_time,
+        upr_bnd - tmz_offset_time,
+    )
+
+```
+
+There's also the numeric DMY format:
+
+```
+
+31-01-2024
+
+```
+
+Here's its implementation:
+
+```python
+
+def detect_resolution2_numeric_dmy(
+    s: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+    s = s.strip()
+
+    if not s:
+        raise ValueError("Empty datetime string")
+
+    try:
+        unit_multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    tmz = timezone_extractor(s)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+
+        tmz_offset_time = (
+            sign * get_time_tmz2(tmz[1:], unit)
+        )
+    else:
+        tmz_offset_time = 0
+
+    if tmz:
+        core = s[:-len(tmz)].rstrip()
+    else:
+        core = s
+
+    real_len = len(core)
+
+    # 01/2024
+    # %m/%Y
+    if real_len == 7:
+        mnth_int = int(core[0:2])
+        yr_int = int(core[3:7])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        days_in_month = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        scale = (
+            days_in_month
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 31/01/2024
+    # %d/%m/%Y
+    elif real_len == 10:
+        dy_int = int(core[0:2])
+        mnth_int = int(core[3:5])
+        yr_int = int(core[6:10])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 31/01/2024 17
+    # %d/%m/%Y %H
+    elif real_len == 13:
+        dy_int = int(core[0:2])
+        mnth_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[1]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 31/01/2024 17:12
+    # %d/%m/%Y %H:%M
+    elif real_len == 16:
+        dy_int = int(core[0:2])
+        mnth_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+        mn_int = int(core[14:16])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[2]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 31/01/2024 17:12:33
+    # %d/%m/%Y %H:%M:%S
+    elif real_len == 19:
+        dy_int = int(core[0:2])
+        mnth_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+        mn_int = int(core[14:16])
+        sec_int = int(core[17:19])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        scale = unit_multiplier
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 31/01/2024 17:12:33.123...
+    # %d/%m/%Y %H:%M:%S.%f
+    elif real_len > 20:
+        dy_int = int(core[0:2])
+        mnth_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+        mn_int = int(core[14:16])
+        sec_int = int(core[17:19])
+
+        # Position 19 is the fractional separator.
+        fraction = core[20:real_len]
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        digits = len(fraction)
+
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        unit_digits = UNIT_DIGITS[unit]
+
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+
+        lwr_bnd = (
+            get_epoch(
+                yr_int,
+                mnth_int,
+                dy_int,
+                h_int,
+                mn_int,
+                sec_int,
+                unit=unit,
+            )
+            + add_fraction
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        raise ValueError(
+            "Unsupported numeric DMY datetime format"
+        )
+
+    return (
+        lwr_bnd - tmz_offset_time,
+        upr_bnd - tmz_offset_time,
+    )
+
+```
+
+And finally the numeric MDY format:
+
+```python
+
+def detect_resolution2_numeric_mdy(
+    s: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+    s = s.strip()
+
+    if not s:
+        raise ValueError("Empty datetime string")
+
+    try:
+        unit_multiplier = MLT_TIME[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    tmz = timezone_extractor(s)
+
+    if len(tmz) > 1:
+        sign = -1 if tmz[0] == "-" else 1
+
+        tmz_offset_time = (
+            sign * get_time_tmz2(tmz[1:], unit)
+        )
+    else:
+        tmz_offset_time = 0
+
+    if tmz:
+        core = s[:-len(tmz)].rstrip()
+    else:
+        core = s
+
+    real_len = len(core)
+
+    # 01/2024
+    # %m/%Y
+    if real_len == 7:
+        mnth_int = int(core[0:2])
+        yr_int = int(core[3:7])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        days_in_month = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        scale = (
+            days_in_month
+            * TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 01/31/2024
+    # %m/%d/%Y
+    elif real_len == 10:
+        mnth_int = int(core[0:2])
+        dy_int = int(core[3:5])
+        yr_int = int(core[6:10])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[0]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 01/31/2024 17
+    # %m/%d/%Y %H
+    elif real_len == 13:
+        mnth_int = int(core[0:2])
+        dy_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[1]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 01/31/2024 17:12
+    # %m/%d/%Y %H:%M
+    elif real_len == 16:
+        mnth_int = int(core[0:2])
+        dy_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+        mn_int = int(core[14:16])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        scale = (
+            TIME_RESOLUTION_MULT_VAL[2]
+            * unit_multiplier
+        )
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 01/31/2024 17:12:33
+    # %m/%d/%Y %H:%M:%S
+    elif real_len == 19:
+        mnth_int = int(core[0:2])
+        dy_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+        mn_int = int(core[14:16])
+        sec_int = int(core[17:19])
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        scale = unit_multiplier
+
+        lwr_bnd = get_epoch(
+            yr_int,
+            mnth_int,
+            dy_int,
+            h_int,
+            mn_int,
+            sec_int,
+            unit=unit,
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    # 01/31/2024 17:12:33.123...
+    # %m/%d/%Y %H:%M:%S.%f
+    elif real_len > 20:
+        mnth_int = int(core[0:2])
+        dy_int = int(core[3:5])
+        yr_int = int(core[6:10])
+        h_int = int(core[11:13])
+        mn_int = int(core[14:16])
+        sec_int = int(core[17:19])
+
+        # Position 19 is the fractional separator.
+        fraction = core[20:real_len]
+
+        if not fraction.isdigit():
+            raise ValueError(
+                "Fractional seconds must contain only digits"
+            )
+
+        digits = len(fraction)
+
+        if digits > 9:
+            raise ValueError(
+                "At most 9 fractional digits are supported"
+            )
+
+        if not 1 <= mnth_int <= 12:
+            raise ValueError(
+                "Month must be between 1 and 12"
+            )
+
+        dy_max = (
+            days_mnth_leap[mnth_int - 1]
+            if is_leap(yr_int)
+            else days_mnth[mnth_int - 1]
+        )
+
+        if not 1 <= dy_int <= dy_max:
+            raise ValueError(
+                f"Day must be between 1 and {dy_max}"
+            )
+
+        if not 0 <= h_int <= 23:
+            raise ValueError(
+                "Hour must be between 0 and 23"
+            )
+
+        if not 0 <= mn_int <= 59:
+            raise ValueError(
+                "Minute must be between 0 and 59"
+            )
+
+        if not 0 <= sec_int <= 59:
+            raise ValueError(
+                "Second must be between 0 and 59"
+            )
+
+        unit_digits = UNIT_DIGITS[unit]
+
+        if digits > unit_digits:
+            raise ValueError(
+                f"Unit {unit!r} cannot represent "
+                f"{digits} fractional digits"
+            )
+
+        scale = POW10[unit_digits - digits]
+        add_fraction = int(fraction) * scale
+
+        lwr_bnd = (
+            get_epoch(
+                yr_int,
+                mnth_int,
+                dy_int,
+                h_int,
+                mn_int,
+                sec_int,
+                unit=unit,
+            )
+            + add_fraction
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        raise ValueError(
+            "Unsupported numeric MDY datetime format"
+        )
+
+    return (
+        lwr_bnd - tmz_offset_time,
+        upr_bnd - tmz_offset_time,
+    )
+
+```
+
+At this point there are 3 things to implement.
+
+First, a dispatcher that will check if the input date format belongs to known formats whose static parser has been implemented, and if it fails to match one of them, then passit to the date format guesser (third thing we will implement). If in the dispatcher, the format is already given, it can directly passit to the general date format parser (second thing we'll implement) or one of the already implemented static date format parser if it matches one.
+
+Second, a general date format parser (returning lower and uper bounds like the `detect_resolution...()` variants) so the user can chose its custom format.
+
+Third, when the second is implemented, a function that will try to infere the format of the input date **and** then generate a date format based on what the function infered so it can pass it to the general date format parser. If it fails, raises an error.
+
+
+Hmm, we will now focus one the `general_date_parser()` function.
+
+Here all the keywords we will need to be able to parse:
+
+| Code | Meaning | Example |
+|---|---|---|
+| `%a` | Abbreviated weekday name | `Mon` |
+| `%A` | Full weekday name | `Monday` |
+| `%w` | Weekday number, Sunday = `0`, Saturday = `6` | `1` |
+| `%u` | ISO weekday number, Monday = `1`, Sunday = `7` | `1` |
+| `%d` | Day of month | `01`–`31` |
+| `%j` | Day of year | `001`–`366` |
+| `%m` | Numeric month | `01`–`12` |
+| `%b` | Abbreviated month name | `Jan` |
+| `%B` | Full month name | `January` |
+| `%y` | Two-digit year | `24` |
+| `%Y` | Four-digit calendar year | `2024` |
+| `%G` | ISO week-based year | `2024` |
+| `%U` | Week number, Sunday as first weekday | `00`–`53` |
+| `%W` | Week number, Monday as first weekday | `00`–`53` |
+| `%V` | ISO week number | `01`–`53` |
+| `%H` | Hour using the 24-hour clock | `00`–`23` |
+| `%I` | Hour using the 12-hour clock | `01`–`12` |
+| `%M` | Minute | `00`–`59` |
+| `%S` | Second | `00`–`59` |
+| `%f` | Fractional second | `123456789` |
+| `%p` | AM/PM marker | `AM`, `PM` |
+| `%z` | Numeric UTC offset | `+0100`, `+01:00`, `Z` |
+| `%Z` | Timezone name or abbreviation | `UTC`, `GMT` |
+| `%c` | Locale-specific date and time | Locale-dependent |
+| `%x` | Locale-specific date | Locale-dependent |
+| `%X` | Locale-specific time | Locale-dependent |
+| `%%` | Literal percent character | `%` |
+
+
+Those are used in the `pd.to_datetime()` function in the `format` argument, here some examples:
+
+```python
+
+>>> pd.to_datetime("January 31, 2024 at 02:30 PM Europe/Paris", format = "%B %d, %Y at %I:%M %p %Z")
+Timestamp('2024-01-31 14:30:00+0100', tz='UTC+01:00')
+
+>>> pd.to_datetime("2024-01-01 19:30:22.55 +01:00", format = "%Y-%m-%d %H:%M:%S.%f %z")
+Timestamp('2024-01-01 19:30:22.550000+0100', tz='UTC+01:00')
+
+>>> pd.to_datetime("31 Jan, 2024 at 02:30 PM Europe/Paris", format = "%d %b, %Y at %I:%M %p %Z")
+Timestamp('2024-01-31 14:30:00+0100', tz='UTC+01:00')
+
+>>> pd.to_datetime("2024-01-01 19:30:22.55 Europe/Paris", format = "%Y-%m-%d %H:%M:%S.%f %Z")
+Timestamp('2024-01-01 19:30:22.550000+0100', tz='UTC+01:00')
+
+>>> pd.to_datetime("2024-01-01 19:30:22 Europe/Paris 55", format = "%Y-%m-%d %H:%M:%S %Z %f")
+Timestamp('2024-01-01 19:30:22.550000+0100', tz='UTC+01:00')
+
+```
+
+
+Okok, that will be some decent work to make a functional parser.
+
+First, we'll define a class that will be a common accepted type for all the functions above and carry the relevant informations for the epoch computation (here the date and time values are already normalized at the minimum) :
+
+```python
+
+class ParsedDateTime:
+    def __init__(self):
+        self.year: int = 0
+        self.month: int = 1
+        self.day: int = 1
+
+        self.hour: int = 0
+        self.minute: int = 0
+        self.second: int = 0
+
+        self.fraction: int = 0
+        self.fraction_digits: int = 0
+
+        self.utc_offset: int = 0
+
+        self.uses_12_hour_clock: bool = False
+        self.am_pm: str = ""
+
+        # year, month, day, hour, minute, second
+        self.resolution = [0, 0, 0, 0, 0, 0]
+
+```
+
+Second, we can think of making a functions for all directives, the grab time format variants, and the conversion to int timeformat variants:
+
+```python
+
+def grab_fixed_digits(
+    s: str,
+    pos: int,
+    width: int,
+    field_name: str,
+) -> tuple[str, int]:
+    end = pos + width
+
+    if end > len(s):
+        raise ValueError(
+            f"Not enough characters to parse {field_name}"
+        )
+
+    token = s[pos:end]
+
+    if not token.isdigit():
+        raise ValueError(
+            f"{field_name} must contain exactly "
+            f"{width} digits, got {token!r}"
+        )
+
+    return token, end
+
+def grab_unit_year_2(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        2,
+        "two-digit year",
+    )
+
+
+def conversion_year_2(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    year = int(token)
+
+    if year <= 68:
+        year += 2000
+    else:
+        year += 1900
+
+    parsed.year = year
+    parsed.resolution[0] = 1
+
+    return parsed
+
+def grab_unit_year_4(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        4,
+        "year",
+    )
+
+
+def conversion_year_4(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    year = int(token)
+
+    if year == 0:
+        raise ValueError("Year 0 is not supported")
+
+    parsed.year = year
+    parsed.resolution[0] = 1
+
+    return parsed
+
+def grab_unit_month(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        2,
+        "month",
+    )
+
+
+def conversion_month(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    month = int(token)
+
+    if not 1 <= month <= 12:
+        raise ValueError(
+            "Month must be between 1 and 12"
+        )
+
+    parsed.month = month
+    parsed.resolution[1] = 1
+
+    return parsed
+
+def grab_unit_day(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        2,
+        "day",
+    )
+
+
+def conversion_day(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    day = int(token)
+
+    if not 1 <= day <= 31:
+        raise ValueError(
+            "Day must be between 1 and 31"
+        )
+
+    parsed.day = day
+    parsed.resolution[2] = 1
+
+    return parsed
+
+def grab_unit_hour_24(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        2,
+        "hour",
+    )
+
+
+def conversion_hour_24(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    hour = int(token)
+
+    if not 0 <= hour <= 23:
+        raise ValueError(
+            "Hour must be between 0 and 23"
+        )
+
+    parsed.hour = hour
+    parsed.resolution[3] = 1
+
+    return parsed
+
+def grab_unit_hour_12(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        2,
+        "12-hour clock hour",
+    )
+
+
+def conversion_hour_12(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    hour = int(token)
+
+    if not 1 <= hour <= 12:
+        raise ValueError(
+            "12-hour clock hour must be between 1 and 12"
+        )
+
+    parsed.hour = hour
+    parsed.uses_12_hour_clock = True
+    parsed.resolution[3] = 1
+
+    return parsed
+
+def grab_unit_am_pm(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    end = pos + 2
+
+    if end > len(s):
+        raise ValueError(
+            "Not enough characters to parse AM/PM"
+        )
+
+    token = s[pos:end]
+
+    if token.upper() not in ("AM", "PM"):
+        raise ValueError(
+            f"Expected AM or PM, got {token!r}"
+        )
+
+    return token, end
+
+
+def conversion_am_pm(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    parsed.am_pm = token.upper()
+    return parsed
+
+def apply_am_pm(
+    parsed: ParsedDateTime,
+) -> None:
+    if not parsed.uses_12_hour_clock:
+        if parsed.am_pm:
+            raise ValueError(
+                "%p requires the %I directive"
+            )
+
+        return
+
+    if not parsed.am_pm:
+        raise ValueError(
+            "%I requires the %p directive"
+        )
+
+    if parsed.am_pm == "AM":
+        if parsed.hour == 12:
+            parsed.hour = 0
+    else:
+        if parsed.hour != 12:
+            parsed.hour += 12
+
+def grab_unit_minute(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        2,
+        "minute",
+    )
+
+
+def conversion_minute(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    minute = int(token)
+
+    if not 0 <= minute <= 59:
+        raise ValueError(
+            "Minute must be between 0 and 59"
+        )
+
+    parsed.minute = minute
+    parsed.resolution[4] = 1
+
+    return parsed
+
+def grab_unit_second(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        2,
+        "second",
+    )
+
+def conversion_second(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    second = int(token)
+
+    if not 0 <= second <= 59:
+        raise ValueError(
+            "Second must be between 0 and 59"
+        )
+
+    parsed.second = second
+    parsed.resolution[5] = 1
+
+    return parsed
+
+def grab_unit_fraction(
+    s: str,
+    pos: int,
+    next_literal: str,
+) -> tuple[str, int]:
+    if next_literal:
+        end = s.find(next_literal, pos)
+
+        if end == -1:
+            raise ValueError(
+                f"Expected {next_literal!r} "
+                "after fractional seconds"
+            )
+    else:
+        end = len(s)
+
+    token = s[pos:end]
+
+    if not token:
+        raise ValueError(
+            "Fractional seconds cannot be empty"
+        )
+
+    if not token.isdigit():
+        raise ValueError(
+            "Fractional seconds must contain only digits"
+        )
+
+    if len(token) > 9:
+        raise ValueError(
+            "At most 9 fractional digits are supported"
+        )
+
+    return token, end
+
+def conversion_fraction(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    parsed.fraction = int(token)
+    parsed.fraction_digits = len(token)
+
+    return parsed
+
+def grab_unit_month_abbreviated(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    end = pos + 3
+
+    if end > len(s):
+        raise ValueError(
+            "Not enough characters to parse "
+            "an abbreviated month"
+        )
+
+    return s[pos:end], end
+
+def conversion_month_abbreviated(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    normalized = token.capitalize()
+
+    try:
+        month = ABREV_MONTH_ENG[normalized]
+    except KeyError as exc:
+        raise ValueError(
+            f"Invalid abbreviated month: {token!r}"
+        ) from exc
+
+    parsed.month = month
+    parsed.resolution[1] = 1
+
+    return parsed
+
+def grab_unit_month_full(
+    s: str,
+    pos: int,
+    next_literal: str,
+) -> tuple[str, int]:
+    if next_literal:
+        end = s.find(next_literal, pos)
+
+        if end == -1:
+            raise ValueError(
+                f"Expected {next_literal!r} "
+                "after the month name"
+            )
+    else:
+        end = len(s)
+
+    token = s[pos:end]
+
+    if not token:
+        raise ValueError(
+            "Full month name cannot be empty"
+        )
+
+    return token, end
+
+def conversion_month_full(
+    parsed: ParsedDateTime,
+    token: str,
+) -> ParsedDateTime:
+    normalized = token.capitalize()
+
+    try:
+        month = FULL_MONTH_ENG[normalized]
+    except KeyError as exc:
+        raise ValueError(
+            f"Invalid full month name: {token!r}"
+        ) from exc
+
+    parsed.month = month
+    parsed.resolution[1] = 1
+
+    return parsed
+
+def grab_unit_timezone(
+    s: str,
+    pos: int,
+    next_literal: str,
+) -> tuple[str, int]:
+    if pos >= len(s):
+        raise ValueError("Missing timezone offset")
+
+    if s[pos] == "Z":
+        return "Z", pos + 1
+
+    if s[pos] not in ("+", "-"):
+        raise ValueError(
+            "Timezone must start with '+', '-', or 'Z'"
+        )
+
+    if next_literal:
+        end = s.find(next_literal, pos)
+
+        if end == -1:
+            raise ValueError(
+                f"Expected {next_literal!r} after timezone"
+            )
+    else:
+        end = len(s)
+
+    token = s[pos:end]
+
+    return token, end
+
+def conversion_timezone(
+    parsed: ParsedDateTime,
+    token: str,
+    unit: str,
+) -> ParsedDateTime:
+    if token == "Z":
+        parsed.utc_offset = 0
+        return parsed
+
+    sign = -1 if token[0] == "-" else 1
+
+    parsed.utc_offset = (
+        sign * get_time_tmz2(token[1:], unit)
+    )
+
+    return parsed
+
+```
+
+The `grab_unit_XXX` function familly is the function that will return the time unit in the input date string for this specific directive.
+
+The signature of this function familly is:
+
+```python
+
+def grab_unit_XXX(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+
+```
+
+As you see, it obviously accepts the date which is `s`, and the `pos` that is the beginning position from which the related time unit is defined.
+
+Then, it's up to the function (directive related) to grab with a fixed width for fixed time unit format (`grab_fixed_digits()`) or with another method that we'll see when the time unit has a variable width.
+
+For fixed width, such as `%Y` -> year on 4 digits, it uses the `grab_fixed_digits()` function:
+
+```python
+
+def grab_unit_year_4(
+    s: str,
+    pos: int,
+) -> tuple[str, int]:
+    return grab_fixed_digits(
+        s,
+        pos,
+        4,
+        "year",
+    )
+
+```
+
+with:
+
+```python
+
+def grab_fixed_digits(
+    s: str,
+    pos: int,
+    width: int,
+    field_name: str,
+) -> tuple[str, int]:
+    end = pos + width
+
+    if end > len(s):
+        raise ValueError(
+            f"Not enough characters to parse {field_name}"
+        )
+
+    token = s[pos:end]
+
+    if not token.isdigit():
+        raise ValueError(
+            f"{field_name} must contain exactly "
+            f"{width} digits, got {token!r}"
+        )
+
+    return token, end
+
+```
+
+Now for the variable with time unit format, we need to have the `pos` found as the start of the next pattern that is between the current directive and the next one. Or if they are contiguous, then `pos` is just the start of the next directive in the `format` input. 
+
+We have this relationship between the string date input and the format because that's literally the goal of the format to describe where time unit are in which format and where the separation are.
+
+It would be simpler if I show you directly the parser:
+
+```python
+
+def detect_resolution2_general_date_parser(
+    s: str,
+    fmt: str,
+    unit: str = "ns",
+) -> tuple[int, int]:
+
+    try:
+        unit_digits = UNIT_DIGITS[unit]
+    except KeyError as exc:
+        raise ValueError(
+            "unit must be 's', 'ms', 'us', or 'ns'"
+        ) from exc
+
+    parsed = ParsedDateTime()
+
+    fmt_pos = 0
+    s_pos = 0
+
+    while fmt_pos < len(fmt):
+        directive_pos = fmt.find("%", fmt_pos)
+
+        # No more directives: match the remaining literal.
+        if directive_pos == -1:
+            literal = fmt[fmt_pos:]
+
+            if not s.startswith(literal, s_pos):
+                raise ValueError(
+                    f"Expected literal {literal!r} "
+                    f"at input position {s_pos}"
+                )
+
+            s_pos += len(literal)
+            fmt_pos = len(fmt)
+            break
+
+        # Match text located before the next directive.
+        literal = fmt[fmt_pos:directive_pos]
+
+        if not s.startswith(literal, s_pos):
+            raise ValueError(
+                f"Expected literal {literal!r} "
+                f"at input position {s_pos}"
+            )
+
+        s_pos += len(literal)
+
+        if directive_pos + 1 >= len(fmt):
+            raise ValueError(
+                "Dangling '%' at the end of format"
+            )
+
+        directive = fmt[
+            directive_pos:directive_pos + 2
+        ]
+
+        match directive:
+            case "%Y":
+                conversion_fn = conversion_year_4
+                grab_fn = grab_unit_year_4
+                needs_next_literal = False
+
+            case "%y":
+                conversion_fn = conversion_year_2
+                grab_fn = grab_unit_year_2
+                needs_next_literal = False
+
+            case "%m":
+                conversion_fn = conversion_month
+                grab_fn = grab_unit_month
+                needs_next_literal = False
+
+            case "%b":
+                conversion_fn = conversion_month_abbreviated
+                grab_fn = grab_unit_month_abbreviated
+                needs_next_literal = False
+
+            case "%B":
+                conversion_fn = conversion_month_full
+                grab_fn = grab_unit_month_full
+                needs_next_literal = True
+
+            case "%d":
+                conversion_fn = conversion_day
+                grab_fn = grab_unit_day
+                needs_next_literal = False
+
+            case "%H":
+                conversion_fn = conversion_hour_24
+                grab_fn = grab_unit_hour_24
+                needs_next_literal = False
+
+            case "%I":
+                conversion_fn = conversion_hour_12
+                grab_fn = grab_unit_hour_12
+                needs_next_literal = False
+
+            case "%M":
+                conversion_fn = conversion_minute
+                grab_fn = grab_unit_minute
+                needs_next_literal = False
+
+            case "%S":
+                conversion_fn = conversion_second
+                grab_fn = grab_unit_second
+                needs_next_literal = False
+
+            case "%f":
+                conversion_fn = conversion_fraction
+                grab_fn = grab_unit_fraction
+                needs_next_literal = True
+
+            case "%p":
+                conversion_fn = conversion_am_pm
+                grab_fn = grab_unit_am_pm
+                needs_next_literal = False
+
+            case "%z":
+                conversion_fn = conversion_timezone
+                grab_fn = grab_unit_timezone
+                needs_next_literal = True
+
+            case _:
+                raise ValueError(
+                    f"Unsupported datetime directive: "
+                    f"{directive!r}"
+                )
+
+        if needs_next_literal:
+            next_fmt_pos = directive_pos + 2
+            next_directive_pos = fmt.find(
+                "%",
+                next_fmt_pos,
+            )
+
+            if next_directive_pos == -1:
+                next_literal = fmt[next_fmt_pos:]
+            else:
+                next_literal = fmt[
+                    next_fmt_pos:next_directive_pos
+                ]
+
+            token, s_pos = grab_fn(
+                s,
+                s_pos,
+                next_literal,
+            )
+        else:
+            token, s_pos = grab_fn(
+                s,
+                s_pos,
+            )
+
+        if directive == "%z":
+            parsed = conversion_fn(
+                parsed,
+                token,
+                unit,
+            )
+        else:
+            parsed = conversion_fn(
+                parsed,
+                token,
+            )
+
+        fmt_pos = directive_pos + 2
+
+    if s_pos != len(s):
+        raise ValueError(
+            f"Unparsed input remains at position {s_pos}: "
+            f"{s[s_pos:]!r}"
+        )
+
+    apply_am_pm(parsed)
+    day_max = validate_parsed_date(parsed)
+
+    if parsed.fraction_digits > 0:
+        scale = POW10[
+            unit_digits - parsed.fraction_digits
+        ]
+        add_fraction = parsed.fraction * scale
+
+        lwr_bnd = (
+            get_epoch(
+                parsed.year,
+                parsed.month,
+                parsed.day,
+                parsed.hour,
+                parsed.minute,
+                parsed.second,
+                unit=unit,
+            )
+            + add_fraction
+            - parsed.utc_offset
+        )
+
+        upr_bnd = lwr_bnd + scale - 1
+
+    else:
+        idx = (
+            5
+            - parsed.resolution[::-1].index(1) # can be improved representation
+        )
+
+        lst_time_values = [
+            parsed.year,
+            parsed.month,
+            parsed.day,
+            parsed.hour,
+            parsed.minute,
+            parsed.second,
+        ]
+
+        (
+            max_month,
+            max_day,
+            max_hour,
+            max_minute,
+            max_second,
+        ) = NORMALIZE_MAX_DATE[idx](
+            lst_time_values,
+            is_leap(parsed.year),
+        )
+
+        lwr_bnd = (
+            get_epoch(
+                parsed.year,
+                parsed.month,
+                parsed.day,
+                parsed.hour,
+                parsed.minute,
+                parsed.second,
+                unit=unit,
+            )
+            - parsed.utc_offset
+        )
+
+        upr_bnd = (
+            get_epoch(
+                parsed.year,
+                max_month,
+                max_day,
+                max_hour,
+                max_minute,
+                max_second,
+                999,
+                999,
+                999,
+                unit=unit,
+            )
+            - parsed.utc_offset
+        )
+
+    return (lwr_bnd, upr_bnd)
+
+
+```
+
+Here, the related part is here:
+
+```python
+
+if needs_next_literal:
+
+    next_fmt_pos = directive_pos + 2
+    next_directive_pos = fmt.find("%", next_fmt_pos)
+
+    if next_directive_pos == -1:
+        next_literal = fmt[next_fmt_pos:]
+    else:
+        next_literal = fmt[
+            next_fmt_pos:next_directive_pos
+        ]
+
+    token, s_pos = grab_fn(
+        s,
+        s_pos,
+        next_literal,
+    )
+else:
+    token, s_pos = grab_fn(
+        s,
+        s_pos,
+    )
+
+
+```
+
+If the time format has a variable width then it needs the `next_literal`, therefore it finds the index of the beginning of the next directive:
+
+```python
+
+next_fmt_pos = directive_pos + 2
+next_directive_pos = fmt.find("%", next_fmt_pos)
+
+```
+
+And constructs it before passing it to the related `grab_unit_XXX()` function:
+
+```python
+
+if next_directive_pos == -1:
+    next_literal = fmt[next_fmt_pos:]
+else:
+    next_literal = fmt[
+        next_fmt_pos:next_directive_pos
+    ]
+
+token, s_pos = grab_fn(
+    s,
+    s_pos,
+    next_literal,
+)
+
+```
+
+This is the case for the full month name `%B` for example:
+
+```python
+
+def grab_unit_month_full(
+    s: str,
+    pos: int,
+    next_literal: str,
+) -> tuple[str, int]:
+    if next_literal:
+        end = s.find(next_literal, pos)
+
+        if end == -1:
+            raise ValueError(
+                f"Expected {next_literal!r} "
+                "after the month name"
+            )
+    else:
+        end = len(s)
+
+    token = s[pos:end]
+
+    if not token:
+        raise ValueError(
+            "Full month name cannot be empty"
+        )
+
+    return token, end
+
+```
+
+Where it does the same thing but on the date string variable.
+
+Note that I can't predict the width of the time format just with the `len(next_literal)` because the equation in terms of positions in the date string is:
+
+```
+
+StartIndex + A + B = C
+
+```
+
+Where `A` is the width of the unknown date format, `B` is the only variable known (`len(next_literal)`) and `C` is the unknown **end index**.
+
+`C` is unknown just because we haven't already discovered `A`.
+
+There is a dependance `A -> C` and not `A <-> C`.
+
+Btw, here's there one architectural thing that triggers me a bit.
+
+I know this is just a POC of a date format parser not intended to be high-perf but his `if`... Ho my gosh:
+
+```python
+
+if directive == "%z":
+    parsed = conversion_fn(
+        parsed,
+        token,
+        unit,
+    )
+else:
+    parsed = conversion_fn(
+        parsed,
+        token,
+    )
+
+```
+
+This would be easily fixed in C++ with `templates` to make the function signature equal for all date format and still just the timezone conversion function to actually take by ref the unit string, so no `if`.
+
+There's still one thing that I did not cover, and it comes to the date maximum normaliation.
+
+Indeed, the data and time of the `parsed` object are already minimum normalized but there are still cases where I need to maximum normalized.
+
+That's why I implemented the `.resolution` attribute that allow to keep track of the resolution that has been provided.
+
+And I want to be as permissive as possible, meaning that I can allow this:
+
+```
+
+[1, 0, 0, 1, 1, 0]
+
+```
+
+Here, the year is provided, but not the month and even the day.
+
+Therefore they are by default equal to their respective minimum.
+
+So I can allow this format: `%Y %H:%M`.
+
+That's great for the lower bound, but it's another story when it comes to the upper bound.
+
+I mean, semantically we don't have to set all the undefined time unit to their respective maximum value, but just the last undefined.
+
+If we take the example above, it would be to maximum normalize the `.second` unit (to `59`).
+
+That's why I have the first separation between if the second fraction is provided and if not.
+
+Indeed, in the first case I can directly skip this step of maximum normalization because I know that the time unit with maximum resolution has been provided, then no time unit related normalization, because `"ms"`, `"us"` and `"ns"` works in the same base 10, therefore the normalization is just with the famous `scale - 1`:
+
+```python
+
+scale = POW10[
+    unit_digits - parsed.fraction_digits
+]
+add_fraction = parsed.fraction * scale
+
+lwr_bnd = (
+    get_epoch(
+        parsed.year,
+        parsed.month,
+        parsed.day,
+        parsed.hour,
+        parsed.minute,
+        parsed.second,
+        unit=unit,
+    )
+    + add_fraction
+    - parsed.utc_offset
+)
+
+upr_bnd = lwr_bnd + scale - 1
+
+```
+
+But, when units work with different base systems, that's another story and we need to find the maximum resolution unit and then begin to normalize from the next one.
+
+Here, I find the unit:
+
+```python
+
+idx = (
+    5
+    - parsed.resolution[::-1].index(1)
+)
+
+```
+
+Btw, this can be improved in term of performance because `[::-1]` literally creates a list, just elements with inverted order from `parsed.resolution`.
+
+And then I apply the related normalization function:
+
+```python
+
+lst_time_values = [
+    parsed.year,
+    parsed.month,
+    parsed.day,
+    parsed.hour,
+    parsed.minute,
+    parsed.second,
+]
+
+(
+    max_month,
+    max_day,
+    max_hour,
+    max_minute,
+    max_second,
+) = NORMALIZE_MAX_DATE[idx](
+    lst_time_values,
+    is_leap(parsed.year),
+)
+
+```
+
+With:
+
+```python
+
+NORMALIZE_MAX_DATE = (
+    # Year resolution
+    lambda x, isleap: (
+        12,
+        31,
+        23,
+        59,
+        59,
+    ),
+
+    # Month resolution
+    lambda x, isleap: (
+        x[1],
+        (
+            days_mnth_leap[x[1] - 1]
+            if isleap
+            else days_mnth[x[1] - 1]
+        ),
+        23,
+        59,
+        59,
+    ),
+
+    # Day resolution
+    lambda x, isleap: (
+        x[1],
+        x[2],
+        23,
+        59,
+        59,
+    ),
+
+    # Hour resolution
+    lambda x, isleap: (
+        x[1],
+        x[2],
+        x[3],
+        59,
+        59,
+    ),
+
+    # Minute resolution
+    lambda x, isleap: (
+        x[1],
+        x[2],
+        x[3],
+        x[4],
+        59,
+    ),
+
+    # Second resolution
+    lambda x, isleap: (
+        x[1],
+        x[2],
+        x[3],
+        x[4],
+        x[5],
+    ),
+)
+
+```
+
+Hmm, I can even optimize this by not making a normalization at all and just by using the old friend `upr_bnd = lwr_bnd + scale - 1`.
+
+Indeed, I can just precompute the delta between `upr_bnd` and `lwr_bnd` with:
+
+```python
+
+scale = NORMALIZE_MAX_DATE_LEAP[idx] if is_leap(parsed.year) else NORMALIZE_MAX_DATE[idx]
+
+```
+
+But again there's a problem here, look how should I define the second value of `NORMALIZE_MAX_DATE` and `NORMALIZE_MAX_DATE_LEAP`, wherethe given resolution is the month time unit ?
+
+```python
+
+NORMALIZE_MAX_DATE = (
+    365 * 24 * 60 * 60,
+    #X <- What should I put ???
+    24 * 60 * 60,
+    60 * 60,
+    60,
+    1
+)
+
+# same for leap variant
+
+```
+
+Hmm, in fact I defined those as:
+
+```python
+
+NORMALIZE_MAX_DATE = (
+    365 * 24 * 60 * 60,
+    -1,
+    24 * 60 * 60,
+    60 * 60,
+    60,
+    1,
+    31 * 24 * 60 * 60,  # January
+    28 * 24 * 60 * 60,  # February
+    31 * 24 * 60 * 60,  # March
+    30 * 24 * 60 * 60,  # April
+    31 * 24 * 60 * 60,  # May
+    30 * 24 * 60 * 60,  # June
+    31 * 24 * 60 * 60,  # July
+    31 * 24 * 60 * 60,  # August
+    30 * 24 * 60 * 60,  # September
+    31 * 24 * 60 * 60,  # October
+    30 * 24 * 60 * 60,  # November
+    31 * 24 * 60 * 60  # December
+)
+
+NORMALIZE_MAX_DATE_LEAP = (
+    366 * 24 * 60 * 60,
+    -1,
+    24 * 60 * 60,
+    60 * 60,
+    60,
+    1,
+    31 * 24 * 60 * 60,  # January
+    29 * 24 * 60 * 60,  # February
+    31 * 24 * 60 * 60,  # March
+    30 * 24 * 60 * 60,  # April
+    31 * 24 * 60 * 60,  # May
+    30 * 24 * 60 * 60,  # June
+    31 * 24 * 60 * 60,  # July
+    31 * 24 * 60 * 60,  # August
+    30 * 24 * 60 * 60,  # September
+    31 * 24 * 60 * 60,  # October
+    30 * 24 * 60 * 60,  # November
+    31 * 24 * 60 * 60,  # December
+)
+
+```
+
+And then, I compute the index and use the delta (`scale`) like this:
+
+```python
+
+cur_val = idx == 1
+#idx = idx - cur_val * idx + parsed.month * cur_val + 5 * cur_val
+# simplifies to:
+#idx = idx + cur_val * (-idx + parsed.month + 5)
+# or simple id else 
+idx = idx if not cur_val else 5 + parsed.month
+
+scale = NORMALIZE_MAX_DATE_LEAP[idx] if is_leap(parsed.year) else NORMALIZE_MAX_DATE[idx]
+scale *= MLT_TIME[unit]
+
+lwr_bnd = (
+    get_epoch(
+        parsed.year,
+        parsed.month,
+        parsed.day,
+        parsed.hour,
+        parsed.minute,
+        parsed.second,
+        unit=unit,
+    )
+    - parsed.utc_offset
+)
+
+upr_bnd = lwr_bnd + scale - 1
+
+```
+
+
+
+The `conversion_XXX` function familly
 
 
 
