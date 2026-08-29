@@ -302,7 +302,7 @@ $$
 
 $$
 \begin{aligned}
-10^{\frac{P_{dBm}}{10}} = \frac{P}{1 \mathrm{mW}}
+10^{\frac{P_{dBm}}{10}} = \frac{P}{1,\mathrm{mW}}
 \end{aligned}
 $$
 
