@@ -280,7 +280,7 @@ Its formula is:
 
 $$
 \begin{aligned}
-P\_{dBm} = 10 \cdot \log_{10}\left(\frac{P}{1\,\mathrm{mW}}\right)
+P\_{dBm} = 10 \cdot \log_{10}\left(\frac{P}{1 \mathrm{mW}}\right)
 \end{aligned}
 $$
 
