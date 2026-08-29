@@ -128,9 +128,7 @@ Now, you also note that I didn't use the well-known formula for the variance whi
 
 $$
 \begin{aligned}
-
 \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n}
-
 \end{aligned}
 $$
 
