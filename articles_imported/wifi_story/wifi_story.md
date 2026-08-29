@@ -290,7 +290,7 @@ So in other terms:
 
 $$
 \begin{aligned}
-\frac{P\_{dBm}}{10} = \log_{10}\left(\frac{P}{1\,\mathrm{mW}}\right)
+\frac{P\_{dBm}}{10} = \log_{10}\left(\frac{P}{1\ \mathrm{mW}}\right)
 \end{aligned}
 $$
 
@@ -302,7 +302,7 @@ $$
 
 $$
 \begin{aligned}
-10^{\frac{P_{dBm}}{10}} = \frac{P}{1mW}
+10^{\frac{P_{dBm}}{10}} = \frac{P}{1 \mathrm{mW}}
 \end{aligned}
 $$
 
@@ -314,7 +314,7 @@ $$
 
 $$
 \begin{aligned}
-P = 1mW * 10^{\frac{P_{dBm}}{10}}
+P = 1 \mathrm{mW} * 10^{\frac{P_{dBm}}{10}}
 \end{aligned}
 $$
 
