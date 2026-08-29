@@ -126,11 +126,13 @@ And the `%12-s` means the same thing, but the content is left-aligned.
 
 Now, you also note that I didn't use the well-known formula for the variance which is:
 
-\[
+$$
+\begin{aligned}
 
 \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n}
 
-\]
+\end{aligned}
+$$
 
 Which would require AWK to keep an array of the `x_i` because at first I need to compute the average and then use it in the formula.
 
