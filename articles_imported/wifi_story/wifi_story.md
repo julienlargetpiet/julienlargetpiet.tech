@@ -290,7 +290,7 @@ So in other terms:
 
 $$
 \begin{aligned}
-\frac{P\_{dBm}}{10} = log_{10}_{\frac{P}{1mW}}
+\frac{P\_{dBm}}{10} = \log_{10}\left(\frac{P}{1\,\mathrm{mW}}\right)
 \end{aligned}
 $$
 
