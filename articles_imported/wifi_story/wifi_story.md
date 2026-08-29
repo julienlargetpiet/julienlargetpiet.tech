@@ -173,28 +173,89 @@ Indeed:
 $$
 \begin{aligned}
 \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n}
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \equiv
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \frac{1}{n} \sum_{i=1}^{n} (x_i - \bar{x})^2
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \equiv
-\frac{1}{n} \sum_{i=1}^{n}
-\left(
-x_i^2 - 2x_i\bar{x} + \bar{x}^2
-\right)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\frac{1}{n} \sum_{i=1}^{n} \left( x_i^2 - 2x_i\bar{x} + \bar{x}^2 \right)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \equiv
-\frac{1}{n}
-\left(
-\sum_{i=1}^{n} x_i^2 -2\bar{x}\sum_{i=1}^{n} x_i + \sum_{i=1}^{n} \bar{x}^2
-\right)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\frac{1}{n} \left( \sum_{i=1}^{n} x_i^2 -2\bar{x}\sum_{i=1}^{n} x_i + \sum_{i=1}^{n} \bar{x}^2 \right)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \equiv
-\frac{1}{n}
-\left(
-\sum_{i=1}^{n} x_i^2 - 2\bar{x}\sum_{i=1}^{n} x_i + n\bar{x}^2
-\right)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\frac{1}{n} \left( \sum_{i=1}^{n} x_i^2 - 2\bar{x}\sum_{i=1}^{n} x_i + n\bar{x}^2 \right)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \equiv
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \frac{1}{n}\sum_{i=1}^{n} x_i^2 - 2\bar{x}\frac{1}{n}\sum_{i=1}^{n} x_i + \bar{x}^2
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \equiv
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \frac{1}{n}\sum_{i=1}^{n} x_i^2 - 2\bar{x}^2 + \bar{x}^2
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \equiv
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
 \frac{1}{n}\sum_{i=1}^{n} x_i^2 - \bar{x}^2
 \end{aligned}
 $$
