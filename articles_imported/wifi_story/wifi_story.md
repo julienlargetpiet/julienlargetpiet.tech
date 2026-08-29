@@ -495,7 +495,7 @@ printf "\n"
 
 ```
 
-## Download and upload througput
+## Download througput
 
 For the download throughput, that's simple.
 
