@@ -136,29 +136,27 @@ Which would require AWK to keep an array of the `x_i` because at first I need to
 
 therefore, I used the equivalent:
 
-\[
-
+$$
+\begin{aligned}
 \frac{\sum_{i=1}^{n} x_i^2}{n} - \bar{x}^2
-
-\]
+\end{aligned}
+$$
 
 Like that I can compute in one pass the:
 
-\[
-
+$$
+\begin{aligned}
 \sum_{i=1}^{n} x_i^2
-
-\]
-
+\end{aligned}
+$$
 
 And the:
 
-\[
-
-
+$$
+\begin{aligned}
 \bar{x}
-
-\]
+\end{aligned}
+$$
 
 So I just have to do:
 
@@ -172,67 +170,34 @@ At the end to compute the variance.
 
 Indeed:
 
-\[
-
+$$
+\begin{aligned}
 \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n}
-
 \equiv
-
 \frac{1}{n} \sum_{i=1}^{n} (x_i - \bar{x})^2
-
 \equiv
-
 \frac{1}{n} \sum_{i=1}^{n}
 \left(
 x_i^2 - 2x_i\bar{x} + \bar{x}^2
 \right)
-
 \equiv
-
 \frac{1}{n}
 \left(
-\sum_{i=1}^{n} x_i^2
--
-2\bar{x}\sum_{i=1}^{n} x_i
-+
-\sum_{i=1}^{n} \bar{x}^2
+\sum_{i=1}^{n} x_i^2 -2\bar{x}\sum_{i=1}^{n} x_i + \sum_{i=1}^{n} \bar{x}^2
 \right)
-
 \equiv
-
 \frac{1}{n}
 \left(
-\sum_{i=1}^{n} x_i^2
--
-2\bar{x}\sum_{i=1}^{n} x_i
-+
-n\bar{x}^2
+\sum_{i=1}^{n} x_i^2 - 2\bar{x}\sum_{i=1}^{n} x_i + n\bar{x}^2
 \right)
-
 \equiv
-
-\frac{1}{n}\sum_{i=1}^{n} x_i^2
--
-2\bar{x}\frac{1}{n}\sum_{i=1}^{n} x_i
-+
-\bar{x}^2
-
+\frac{1}{n}\sum_{i=1}^{n} x_i^2 - 2\bar{x}\frac{1}{n}\sum_{i=1}^{n} x_i + \bar{x}^2
 \equiv
-
-\frac{1}{n}\sum_{i=1}^{n} x_i^2
--
-2\bar{x}^2
-+
-\bar{x}^2
-
+\frac{1}{n}\sum_{i=1}^{n} x_i^2 - 2\bar{x}^2 + \bar{x}^2
 \equiv
-
-\frac{1}{n}\sum_{i=1}^{n} x_i^2
--
-\bar{x}^2
-
-\]
-
+\frac{1}{n}\sum_{i=1}^{n} x_i^2 - \bar{x}^2
+\end{aligned}
+$$
 
 After that, I'll use:
 
@@ -252,29 +217,25 @@ This is the strenght of the signal at the latest measurement.
 
 Its formula is:
 
-\[
-
+$$
+\begin{aligned}
 P_{dBm} = 10 \cdot log_{10}_{\frac{P}{1mW}}
-
-\]
+\end{aligned}
+$$
 
 Where `P` is the power received by the physical interface.
 
 So in other terms:
 
-\[
-
+$$
+\begin{aligned}
 \frac{P_{dBm}}{10} = log_{10}_{\frac{P}{1mW}}
-
 \equiv
-
 10^{\frac{P_{dBm}}{10}} = \frac{P}{1mW}
-
 \equiv
-
 P = 1mW * 10^{\frac{P_{dBm}}{10}}
-
-\]
+\end{aligned}
+$$
 
 Therefore, of course, the more `P` increases, the more `PdBm` increases.
 
