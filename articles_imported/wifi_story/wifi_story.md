@@ -172,7 +172,7 @@ Indeed:
 
 $$
 \begin{aligned}
-\frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n}
+\frac{\sum\_{i=1}^{n} (x_i - \bar{x})^2}{n}
 \end{aligned}
 $$
 
