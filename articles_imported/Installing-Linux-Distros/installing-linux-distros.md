@@ -112,11 +112,11 @@ We will create all 3 partitions `/dev/sdb1`, `/dev/sdb2` and `/dev/sdb3` in one 
 ```bash
 
 parted /dev/sdb --script \
-  mkpart gpt \ 
-  mklabel ESP fat32 1MiB 513MiB \ 
+  mklabel gpt \ 
+  mkpart ESP fat32 1MiB 513MiB \ 
   set 1 esp on \ 
-  mklabel VOID ext4 513MiB 50% \
-  mklabel ARCH ext4 50% 100%
+  mkpart VOID ext4 513MiB 50% \
+  mkpart ARCH ext4 50% 100%
 
 ```
 
@@ -162,7 +162,7 @@ Now, we'll format the other partitions:
 ```bash
 
 mkfs.ext4 -L VOID /dev/sdb2
-mkfs.ext4 -L ARCH /dev/sdb2
+mkfs.ext4 -L ARCH /dev/sdb3
 
 ```
 
@@ -278,7 +278,7 @@ xbps-install \
 
 For that we'll use `xgenfstab` which is part of Void native tools, it comes from `xtools` package (normally preinstalled in the live).
 
-As you may know the `/etc/fstab` file is necessary to the kernel so it can clearly see where to mount partitions and what are their related filesystem.
+As you may know the `/etc/fstab` is a userspace configuration file used by the init/service system and mount utilities to know what additional filesystems should be mounted.
 
 We'll see that the GRUB already contains information about which partition to mount as the root filesystem.
 
@@ -286,7 +286,7 @@ In the grub configuration file, we will able to see this for example:
 
 ```
 
-search --fs-uuid --set=root ARCH_UUID
+linux /boot/vmlinuz-linux root=UUID=ARCH_UUID rw
 
 ```
 
@@ -661,7 +661,7 @@ Output:
 
 ```
 
-/etc/localtime -> /usr/share/zoneinfo/Europe/Paris
+/usr/share/zoneinfo/Europe/Paris
 
 ```
 
@@ -743,7 +743,78 @@ In this case it's not the case, but we prefere to always normalize the output as
 
 Okok, back to configurations now:
 
-The keyboard layout is also something you can modify in `/etc/rc.conf`, for example:
+We also synchronize the hardware clock with the current Linux system clock:
+
+```bash
+
+hwclock --systohc
+
+```
+
+A computer actually has two relevant clocks:
+
+- `system clock` -> maintained by the Linux kernel while the system is running
+
+- `hardware clock` / RTC -> battery-backed clock that continues running while the computer is powered off
+
+The `--systohc` option means system-to-hardware-clock:
+
+```
+
+system clock
+     |
+     V
+hardware clock
+
+```
+
+When Linux boots, the usual sequence is roughly:
+
+```
+
+Hardware clock (RTC)
+        |
+        | Linux reads it during boot
+        V
+Kernel system clock
+        |
+        | optionally corrected later by NTP
+        V
+More accurate system clock
+
+```
+
+So if the RTC already contains a reasonably correct time, Linux can initialize its system clock from it without any Internet connection.
+
+Internet access becomes useful for NTP (Network Time Protocol). NTP lets Linux ask external time servers what the actual current time is and correct any drift.
+
+The reverse operation also exists:
+
+```bash
+
+hwclock --hctosys
+
+```
+
+which initializes the system clock from the hardware clock.
+
+Linux systems normally keep the hardware clock in UTC. The timezone configured through `/etc/localtime` is then used to convert UTC into the local civil time displayed to the user.
+
+For example, during summer in Paris:
+
+```
+
+hardware/system UTC time: 12:00
+                           |
+                           | Europe/Paris = UTC+2
+                           V
+displayed local time:     14:00
+
+```
+
+`hwclock` is a userspace utility around the Linux RTC interface. The hardware clock is exposed by the kernel through devices such as `/dev/rtc0`, so we could theoretically write a program that communicates with the RTC device directly, but `hwclock` provides the standard convenient interface for doing so.
+
+Now, the keyboard layout is also something you can modify in `/etc/rc.conf`, for example:
 
 ```
 
@@ -994,7 +1065,7 @@ So, you can check the enabled services with:
 
 ```bash
 
-ls -la /var
+ls -la /var/service
 
 ```
 
@@ -1141,7 +1212,9 @@ dracut --force
 
 That rebuilds the initramfs for the currently running kernel.
 
-If you want to target a specific kernel version, you can do:
+Without explicitly specifying a kernel version, using `dracut` during an installation can be confusing because the running kernel belongs to the live environment, not necessarily to the newly installed Void system.
+
+So, if you want to target a specific kernel version (the one installed for the system), you can do:
 
 ```bash
 
@@ -1377,7 +1450,7 @@ mount /dev/sdb1 /mnt/boot/efi
 
 ```
 
-Even though we do not need to install Arch’s own GRUB, mounting the ESP lets Arch record it in `/etc/fstab` with `genfstab -U /mnt /mnt/etc/fstab`, you can do it now btw.
+Even though we do not need to install Arch’s own GRUB, mounting the ESP lets Arch record it in `/etc/fstab` with `genfstab -U /mnt > /mnt/etc/fstab`, you can do it now btw.
 
 Now, we install the base Arch packages into its environment, that's the equivalent Arch command for the Void `XBPS_ARCH` step:
 
@@ -1407,6 +1480,236 @@ arch-chroot /mnt
 
 ```
 
+### Configuring timezone
+
+As we did for Void, we configure the timezone by making `/etc/localtime` point to the appropriate file from the system timezone database.
+
+For Paris:
+
+```bash
+
+ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+
+```
+
+We can verify the final target with:
+
+```
+
+readlink -f /etc/localtime
+
+```
+
+which should return:
+
+```
+
+/usr/share/zoneinfo/Europe/Paris
+
+```
+
+We also synchronize the hardware clock with the current Linux system clock like before in the Void installation:
+
+```bash
+
+hwclock --systohc
+
+```
+
+### Configuring the locale
+
+Arch, like our Void glibc installation, uses `glibc` impl, so locale data has to be generated.
+
+First open:
+
+```
+
+/etc/locale.gen
+
+```
+
+and uncomment the locales you want.
+
+For example:
+
+```
+
+fr_FR.UTF-8 UTF-8
+en_US.UTF-8 UTF-8
+
+```
+
+Then generate them:
+
+```bash
+
+locale-gen
+
+```
+
+Now choose the default locale used by the system.
+
+For example:
+
+```bash
+
+printf '%s\n' 'LANG=fr_FR.UTF-8' > /etc/locale.conf
+
+```
+
+### Keyboard layout
+
+Arch uses `/etc/vconsole.conf` for the virtual-console keyboard layout.
+
+For a French keyboard:
+
+```bash
+
+printf '%s\n' 'KEYMAP=fr' > /etc/vconsole.conf
+
+```
+
+This concerns the Linux virtual console.
+
+A graphical environment such as X11 or Wayland can have its own keyboard configuration later.
+
+### Hostname
+
+We now give the machine a hostname.
+
+For example:
+
+```bash
+
+printf '%s\n' 'arch-me' > /etc/hostname
+
+```
+
+Then we can configure `/etc/hosts`:
+
+```
+
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   arch-me.localdomain arch-me
+
+```
+
+Again, modifying `/etc/hostname` while inside the chroot configures the installed Arch system, it does not change the hostname currently used by the Arch live environment.
+
+### Setting the root password
+
+Set the password of the root account:
+
+```bash
+
+passwd
+
+```
+
+Same thing as before:
+
+```
+
+New password:
+Retype new password:
+
+```
+
+### Creating a normal user
+
+
+Now we create a normal user account.
+
+For example:
+
+```bash
+
+useradd -m -G wheel -s /bin/bash juju
+
+```
+
+A reminder of the parameters:
+
+
+- `-m` creates /home/juju
+
+- `-G` wheel adds the user to the supplementary wheel group
+
+- `-s` /bin/bash sets Bash as the login shell
+
+`juju` is the account name
+
+Then set its password:
+
+```bash
+
+passwd juju
+
+```
+
+We can verify the user's identity and groups with:
+
+```bash
+
+id juju
+
+```
+
+### Configuring sudo
+
+We already installed `sudo` with `pacstrap`.
+
+As with Void, Arch commonly uses the `wheel` group for users that should be allowed to run commands through `sudo`.
+
+We should edit `/etc/sudoers` through:
+
+```bash
+
+visudo
+
+```
+
+and enable:
+
+```
+
+%wheel ALL=(ALL:ALL) ALL
+
+```
+
+Using `visudo` rather than directly editing `/etc/sudoers` is preferable because it validates the syntax before saving an invalid configuration.
+
+We can verify the resulting file afterward with:
+
+```bash
+
+visudo -c
+
+```
+
+### Configuring networking
+
+During `pacstrap`, we installed:
+
+```
+
+networkmanager
+
+```
+
+The package installs the program, but installing a service does not mean that it will automatically start during boot.
+
+Arch uses `systemd`, not `runit` like Void uses, so we enable `NetworkManager` with:
+
+```bash
+
+systemctl enable NetworkManager
+
+```
+
+This creates the appropriate links so systemd starts `NetworkManager` during future boots.
+
 ### Microcode, again
 
 For Intel:
@@ -1433,7 +1736,7 @@ mkinitcpio -p linux
 
 ```
 
-The preset file is only a configuration file telling mkinitcpio which kernel and initramfs images to build; the initramfs itself is the generated image stored under /boot.
+The preset file is only a configuration file telling `mkinitcpio` which kernel and initramfs images to build; the initramfs itself is the generated image stored under /boot.
 
 ### Exiting Arch environment
 
