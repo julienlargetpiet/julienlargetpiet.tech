@@ -1392,7 +1392,7 @@ pacstrap -K /mnt \
 
 ```
 
-## `chroot` into Arch
+### `chroot` into Arch
 
 
 Now, we can `chroot` into Arch.
@@ -1407,7 +1407,7 @@ arch-chroot /mnt
 
 ```
 
-## Microcode, again
+### Microcode, again
 
 For Intel:
 
@@ -1435,7 +1435,7 @@ mkinitcpio -p linux
 
 The preset file is only a configuration file telling mkinitcpio which kernel and initramfs images to build; the initramfs itself is the generated image stored under /boot.
 
-## Exiting Arch environment
+### Exiting Arch environment
 
 We do the same thing we did for the Void step:
 
