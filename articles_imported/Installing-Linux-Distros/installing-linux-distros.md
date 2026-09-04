@@ -516,7 +516,7 @@ mount --rbind /run  /mnt/run
 
 ```
 
-Now, we also need to make sure modifications into the mount points **does not** affect the content of the source, so we need to recursively make the mount points "slave" of the mount sources with the `--make-rslave` command:
+We then mark these recursively bind-mounted trees as **slave**:
 
 ```bash
 
@@ -526,6 +526,68 @@ mount --make-rslave /mnt/sys
 mount --make-rslave /mnt/run
 
 ```
+
+This has nothing to do with ordinary file modifications, but with **mount events**.
+
+A **mount event** simply means that a filesystem is mounted or unmounted somewhere inside one of these directory trees.
+
+For example, after:
+
+```bash
+
+mount --rbind /dev /mnt/dev
+mount --make-rslave /mnt/dev
+
+```
+
+we can still enter the chroot and mount another filesystem somewhere below `/dev`:
+
+```bash
+
+mount something /dev/usb
+
+```
+
+That mount is perfectly valid inside the chroot.
+
+The important point is that, because `/mnt/dev` is marked as **slave**, this new mount does not propagate back into the live system's original `/dev` mount tree.
+
+Conceptually:
+
+```
+
+live system
+/dev
+ |
+ | --rbind
+ V
+/mnt/dev
+chroot
+
+```
+
+After `--make-rslave`:
+
+```
+
+mount created in live system
+        |
+        V
+may propagate into chroot
+
+mount created in chroot
+        |
+        X
+does not propagate back
+to the live system
+
+```
+
+So `--make-rslave` does not prevent mounting filesystems inside the chroot.
+
+It only controls the direction in which future mount and unmount events are propagated between the two mount trees.
+
+The purpose is therefore to isolate the mount structure, not the files themselves.
 
 And after that, we can finally `chroot` into the system (and use bash in it):
 
