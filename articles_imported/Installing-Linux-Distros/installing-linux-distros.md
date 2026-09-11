@@ -30,20 +30,20 @@ Output:
 
 NAME          SIZE TYPE MOUNTPOINTS PARTUUID                             PARTLABEL             LABEL    MODEL                      VENDOR   SERIAL          TRAN
 sda         447.1G disk                                                                                  Samsung SSD 870 EVO 500GB ATA      S6PXXXXXXXXX     sata
-├─sda1        100M part             174a0abe-1272-fa44-b63f-411ad529cc20
-└─sda2        447G part             60e9a40e-a90f-974e-af3c-7235b7e5d05f                       root
+|-sda1        100M part             174a0abe-1272-fa44-b63f-411ad529cc20
+|-sda2        447G part             60e9a40e-a90f-974e-af3c-7235b7e5d05f                       root
 
 sdb         465.8G disk                                                                                  TOSHIBA MQ04UBF500         TOSHIBA  12XXXXXXXXXX     usb
-├─sdb1        512M part             a1b2c3d4-1111-2222-3333-444444444444 EFI System Partition ESP
-└─sdb2      465.3G part             b2c3d4e5-1111-2222-3333-444444444444 MINT                  MINT
+|-sdb1        512M part             a1b2c3d4-1111-2222-3333-444444444444 EFI System Partition ESP
+|-sdb2      465.3G part             b2c3d4e5-1111-2222-3333-444444444444 MINT                  MINT
 
 nvme0n1     931.5G disk                                                                                  Samsung SSD 980 PRO 1TB             S5GXXXXXXXXX     nvme
-├─nvme0n1p1 513.1M part /boot/efi 819733c4-e61a-422c-aa86-f66d0f53aa60 EFI System Partition
-└─nvme0n1p2   931G part /         b9560819-c4cd-4cb0-ad55-edf17b702939
+|-nvme0n1p1 513.1M part /boot/efi 819733c4-e61a-422c-aa86-f66d0f53aa60 EFI System Partition
+|-nvme0n1p2   931G part /         b9560819-c4cd-4cb0-ad55-edf17b702939
 
 nvme1n1     465.8G disk                                                                                  CT500P3SSD8                            234XXXXXXXXX     nvme
-├─nvme1n1p1   465G part             7ffb20c7-af9a-4692-88f1-446c4cccb736 Basic data partition
-└─nvme1n1p2   779M part             3b3e11c5-fe80-4e31-b148-e8240b908445
+|-nvme1n1p1   465G part             7ffb20c7-af9a-4692-88f1-446c4cccb736 Basic data partition
+|-nvme1n1p2   779M part             3b3e11c5-fe80-4e31-b148-e8240b908445
 
 ```
 
