@@ -9,7 +9,7 @@ Indeed, we'll focus on Gentoo specific architecture here.
 
 We'll download the ISO here: [https://distfiles.gentoo.org/releases/amd64/autobuilds/current-install-amd64-minimal/](https://distfiles.gentoo.org/releases/amd64/autobuilds/current-install-amd64-minimal/).
 
-Choose the adequat architecture, forme it's `amd64`.
+Choose the adequat architecture, for me it's `amd64`.
 
 Now, just copy the ISO onto an USB stick, or use Ventoy if you want.
 
