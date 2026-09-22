@@ -4672,6 +4672,125 @@ Checksums-Sha512:
 
 Indeed, it made the relations by looking in the `Binary` field where we see that `ssh` appears.
 
+Now, we also have the equivalent to:
+
+```bash
+
+pactree -g pkg 
+
+```
+
+with
+
+```bash
+
+apt-cache dotty pkg
+
+```
+
+That will output a DOT structured output for the `dot` utility to convert it to an SVG, PNG, JPEG, JPG, PDF etcetera...
+
+So, we can do the following:
+
+```bash
+
+apt-cache dotty brave-browser > brave.dot
+
+```
+
+And then:
+
+```bash
+
+dot -Tpdf brave.dot -o brave-graph.pdf
+
+```
+
+But often, when the depedencies graph is huge, this will fail (core dumped).
+
+Indeed, for example look at the number of depedencies of `brave-browser`:
+
+```bash
+
+apt-cache dotty brave-browser | wc -l
+
+```
+
+Returns:
+
+```
+
+8677
+
+```
+
+In order to reduce this graph-size problem, we can temporarily override one of APT's configuration options.
+
+APT exposes many configuration keys that its commands read at runtime to determine their behavior. They generally follow a hierarchical naming scheme such as:
+
+```
+
+APT::Cache::Field
+
+```
+
+and can be overridden for a single command with:
+
+```
+
+-o Key=Value
+
+```
+
+For `apt-cache dotty`, one useful option is:
+
+```
+
+APT::Cache::GivenOnly=true|false
+
+```
+
+By default, `dotty` recursively follows dependency relationships starting from the packages given on the command line.
+
+When:
+
+```
+
+APT::Cache::GivenOnly=true
+
+```
+
+APT restricts the graph to the packages explicitly supplied as arguments instead of recursively expanding the dependency tree.
+
+We can therefore use:
+
+```bash
+
+apt-cache -o APT::Cache::GivenOnly=true dotty brave-browser | wc -l
+
+```
+
+which may return a much smaller result, for example:
+
+```
+
+77
+
+```
+
+We can then generate a much smaller DOT file:
+
+```bash
+
+apt-cache -o APT::Cache::GivenOnly=true dotty brave-browser > brave.dot
+
+```
+
+This temporary override applies only to that invocation of `apt-cache`; it does not permanently modify APT's configuration files.
+
+
+
+
 
 
 
