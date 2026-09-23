@@ -3386,6 +3386,34 @@ paramiko-doc - Effectuer des connexions SSH v2 avec Python (Documentation)
 
 ```
 
+We can also tell APT to only search for packages names (and not descriptions) with the `--names-only` flag (this is a convenience flag that temporary modifies the APT conf for the related command, see later with the `-o` option).
+
+For example:
+
+```bash
+
+apt-cache --names-only search ssh
+
+```
+
+Outputs:
+
+```
+
+erlang-ssh - mise en œuvre en Erlang/OTP du protocole SSH
+libssh-4 - tiny C SSH library (OpenSSL flavor)
+libssh-dev - tiny C SSH library - Development files (OpenSSL flavor)
+libssh-doc - tiny C SSH library - Documentation files
+libssh-gcrypt-4 - tiny C SSH library (gcrypt flavor)
+libssh-gcrypt-dev - tiny C SSH library - Development files (gcrypt flavor)
+libssh2-1-dev - SSH2 client-side library (development headers)
+libssh2-1t64 - Bibliothèque client SSH2
+...
+
+```
+
+All the returned packages name matche the input RegEx.
+
 Then, we can query the famous information block for a package and its downloaded versions using:
 
 ```bash
@@ -3862,7 +3890,7 @@ So:
 ```
 
 foo-plugin
-    |-- Enhances → foo
+    |-- Enhances -> foo
 
 ```
 
@@ -3934,6 +3962,8 @@ may return:
 ```
 
 This shows that some of the reverse relationships included in the default output came from `Recommends` relationships rather than strict `Depends` relationships.
+
+One thing I did not mention yet is that both `depends` and `rdepends` accept the `--recurse` flag that will traverse all mentioned depedencies and apply the same command, that is show their direct depedencies and so on until the "leafs" of the graphs.
 
 `apt-cache policy pkg` shows the installed version, the candidate version selected by APT, all known available versions, their pin priorities, and the repository indexes from which those versions are available.
 
@@ -4788,15 +4818,968 @@ apt-cache -o APT::Cache::GivenOnly=true dotty brave-browser > brave.dot
 
 This temporary override applies only to that invocation of `apt-cache`; it does not permanently modify APT's configuration files.
 
+Anyway, here's a PDF `dotty` coupled with `dot` can produce:
+
+[less-graph.pdf](/assets/common_files/Packages-Managers/less-graph.pdf)
+
+### The `apt-file` command familly
+
+After `apt-cache`, which queries package metadata, `apt-file` lets us query the file contents advertised by repository packages. Instead of asking “what does this package depend on?”, we can now ask “which package contains this file?” or “which files would this package install/own ?” thanks to the `Contents` indexes files.
+
+In order answer to the first question, we do:
+
+```bash
+
+apt-file search /path/to/some/file
+
+```
+
+Or:
+
+```bash
+
+apt-file find /path/to/some/file
+
+```
+
+Indeed, a synonim of `search` is `find`.
+
+For example, if we search who owns `/usr/bin/bash`, we do:
+
+```bash
+
+sudo apt-file search -x ^/usr/bin/bash$
+
+```
+
+or:
+
+```bash
+
+sudo apt-file search --regexp ^/usr/bin/bash$
+
+```
+
+Note that we used a regular expression to explicitly just match the given file `/usr/bin/bash` which returns:
+
+```
+
+bash: /usr/bin/bash
+
+```
+
+Instead of this:
+
+```bash
+
+sudo apt-file search /usr/bin/bash
+
+```
+
+Which would return something like:
+
+```
+
+bash: /usr/bin/bash
+bash: /usr/bin/bashbug
+bash-static: /usr/bin/bash-static
+bashtop: /usr/bin/bashtop
+python3-bashate: /usr/bin/bashate
+
+```
+
+You also can filter to only keep the package names with the `-l` flag, so:
+
+```bash
+
+sudo apt-file search -l /usr/bin/bash
+
+```
+
+Would return something like:
+
+```
+
+bash
+bash-static
+bashtop
+python3-bashate
+
+```
+
+We can also answer the second question with:
+
+```bash
+
+apt-file show pkg
+
+```
+
+or:
+
+```bash
+
+apt-file list pkg
+
+```
+
+Indeed, here `show` and `list` are synonims.
+
+And at the opposite of the `search/find` sub-commands, the default behavior of `show/list` is to take the input package name as a "strict matching string".
+
+That's why:
+
+```bash
+
+sudo apt-file show bash
+
+```
+
+Only returns the files owned by the package, and not all the files owned by packages which the name contains the "bash" substring.
+
+Here its output:
+
+```
+
+bash: /etc/bash.bashrc
+bash: /etc/skel/.bash_logout
+bash: /etc/skel/.bashrc
+bash: /etc/skel/.profile
+bash: /usr/bin/bash
+bash: /usr/bin/bashbug
+bash: /usr/bin/clear_console
+bash: /usr/bin/rbash
+bash: /usr/share/debianutils/shells.d/bash
+bash: /usr/share/doc/bash/COMPAT.gz
+bash: /usr/share/doc/bash/INTRO.gz
+bash: /usr/share/doc/bash/NEWS.gz
+bash: /usr/share/doc/bash/POSIX.gz
+bash: /usr/share/doc/bash/RBASH
+bash: /usr/share/doc/bash/README.Debian.gz
+bash: /usr/share/doc/bash/README.abs-guide
+bash: /usr/share/doc/bash/README.commands.gz
+bash: /usr/share/doc/bash/README.gz
+bash: /usr/share/doc/bash/changelog.Debian.gz
+bash: /usr/share/doc/bash/copyright
+bash: /usr/share/doc/bash/inputrc.arrows
+bash: /usr/share/lintian/overrides/bash
+bash: /usr/share/man/man1/bash.1.gz
+bash: /usr/share/man/man1/bashbug.1.gz
+bash: /usr/share/man/man1/clear_console.1.gz
+bash: /usr/share/man/man1/rbash.1.gz
+bash: /usr/share/man/man7/bash-builtins.7.gz
+bash: /usr/share/menu/bash
+
+```
+
+Same as:
+
+```bash
+
+apt-file list -x ^bash$
+
+```
+
+Therefore, to get all the files owned by packages whose names contains a substring equal to the input value, we just do:
+
+```bash
+
+apt-file list -x pkg
+
+```
+
+Which returns a much larger output:
+
+For example:
+
+```bash
+
+apt-file list -x bash | wc -l
+
+```
+
+Returns:
+
+```
+
+1407
+
+```
+
+Or:
+
+```bash
+
+apt-file show -x bash | sed -n '25,45p'
+
+```
+
+Returns:
+
+```
+
+bash: /usr/share/man/man1/clear_console.1.gz
+bash: /usr/share/man/man1/rbash.1.gz
+bash: /usr/share/man/man7/bash-builtins.7.gz
+bash: /usr/share/menu/bash
+bash-argsparse: /usr/share/bash-argsparse/argsparse-completion.sh
+bash-argsparse: /usr/share/bash-argsparse/argsparse.sh
+bash-argsparse: /usr/share/doc/bash-argsparse/README.md
+bash-argsparse: /usr/share/doc/bash-argsparse/changelog.Debian.gz
+bash-argsparse: /usr/share/doc/bash-argsparse/copyright
+bash-argsparse: /usr/share/doc/bash-argsparse/html/argsparse-completion_8sh.html
+bash-argsparse: /usr/share/doc/bash-argsparse/html/argsparse_8sh.html
+bash-argsparse: /usr/share/doc/bash-argsparse/html/bc_s.png
+bash-argsparse: /usr/share/doc/bash-argsparse/html/bc_sd.png
+bash-argsparse: /usr/share/doc/bash-argsparse/html/closed.png
+bash-argsparse: /usr/share/doc/bash-argsparse/html/doc.svg
+bash-argsparse: /usr/share/doc/bash-argsparse/html/docd.svg
+bash-argsparse: /usr/share/doc/bash-argsparse/html/doxygen.css
+bash-argsparse: /usr/share/doc/bash-argsparse/html/doxygen.svg
+bash-argsparse: /usr/share/doc/bash-argsparse/html/dynsections.js
+bash-argsparse: /usr/share/doc/bash-argsparse/html/files.html
+bash-argsparse: /usr/share/doc/bash-argsparse/html/folderclosed.svg
+
+```
 
 
+We also have a way to see wichi types of `Contents` indexes files are set up so `apt-file` can search in:
+
+```bash
+
+apt-file list-indices 
+
+```
+
+On my system, it returns:
+
+```
+
++-----------------+-----------------------------+-----------------+
+| Index Name (-I) | DefaultEnabled (Apt config) | Index Status    |
++-----------------+-----------------------------+-----------------+
+| deb             | <unset>                     | Ok              |
+| udeb            | false                       | Empty (code: 4) |
+| dsc             | false                       | Empty (code: 4) |
++-----------------+-----------------------------+-----------------+
+
+```
+
+Meaning that APT knows about the `deb`, `udeb` and the `dsc` (source packages), but only the normal `deb` `Contents` are downloaded.
+
+The usage of the `deb` `Contents` files is unset, but from what we already did it appears that their usable by `apt-file`.
+
+But the usage of the others `Contents` types by `apt-file` is explicitly disabled.
+
+Btw, it's a good time to introduce you to the `-I` flag for `apt-file` sub-command.
+
+Indeed, that's the flag that will temporary set the `Contents` indexes files types `apt-file` is allowed to search in.
+
+For example, passing it the `deb` value won't change anything in my current setup because that's already the only available type:
+
+```bash
+
+apt-file -I deb show -x ^bash$ | wc -l
+
+```
+
+Returns:
+
+```
+
+28
+
+```
+
+But look at what happen if I set it to `udeb` type which isn't set:
+
+```bash
+
+apt-file -I udeb show -x ^bash$
+
+```
+
+It returns a cache error:
+
+```
+
+Finding relevant cache files to search ...E: No Contents in the cache with the given restrictions
+
+```
+
+### The `apt-mark` command familly
+
+`apt-mark` is the APT utility used to inspect and modify package state flags rather than to install, remove, or query repository metadata directly. 
+
+Its main role is to record why an installed binary package is present on the system; either because it was explicitly requested (manual) or because it was installed as a dependency (auto) and to manage `dpkg` selection states such as `hold`, `install`, `remove`, and `purge`. 
+
+So first, we can see the packages whose install reason is manual or auto with respectively:
+
+```bash
+
+apt-mark showmanual
+
+```
+
+And:
+
+```bash
+
+apt-mark showauto
+
+```
+
+We can also directly test if the install reason of a package is `manual` or `auto` with:
+
+```bash
+
+apt-mark showmanual pkg
+
+```
+
+If the command returns the package name passed (`pkg`), then its install reason is `manual`, if no, then it returns nothing.
+
+That's a bit like:
+
+```bash
+
+pacman -T expression
+
+```
+
+in that sense.
+
+For example:
+
+```bash
+
+apt-mark showmanual openssh-client
+
+```
+
+Returns:
+
+```
+
+openssh-client
+
+```
+
+Of course, we have the `auto` equivalent:
+
+```bash
+
+apt-mark showauto auto
+
+```
+
+Now, the equivalent of:
+
+```bash
+
+pacman -D --asexplicit pkg
+
+```
+
+and:
+
+```bash
+
+pacman -D --asdeps pkg
+
+```
+
+are respectively:
+
+```bash
+
+apt-mark manual pkg
+
+```
+
+and:
+
+```bash
+
+apt-mark auto pkg
+
+```
+
+Packages whose install reason is `auto` are written inside:
+
+```
+
+/var/lib/apt/extended_states
+
+```
+
+as blocks such as:
+
+```
+
+Package: libsasl2-modules-gssapi-mit
+Architecture: amd64
+Auto-Installed: 1
+
+Package: libzxing3
+Architecture: amd64
+Auto-Installed: 1
+
+...
+
+```
+
+We don't need to manually update this file when we change the install reason of a package because `apt-mark` automatically handles it.
+
+We also have the `hold` concept on a package.
+
+It tells APT to keep the package(s) at its current state/version and prevent normal automatic installation, upgrade, or removal operations from changing it.
+
+Example:
+
+```bash
+
+apt-mark hold openssh-client
+
+```
+
+And to remove its `hold` state, we simply do:
+
+```bash
+
+apt-mark unhold openssh-client
+
+```
+
+We can also list the packages that have the `hold` state with:
+
+```bash
+
+apt-mark showhold
+
+```
+
+Now, this is a good time to introduce you to the `apt-get dselect-upgrade` command, yess I know that's an `apt-get` command that I did not mention in the appropriate part but it would be better understood in combinations with:
+
+```bash
+
+apt-mark install pkg
+
+```
+
+That will set the `install` state to `pkg` (installable from configured repos). So we don't install `pkg` but just tell APT that it would have to install `pkg` later if we perform the command that will reconciliate the current system and the desired states.
+
+This operation is done with:
+
+```bash
+
+apt-get dselect-upgrade
+
+```
+
+And it's not just about installing packages, but also removing packages with:
+
+```bash
+
+apt-mark remove pkg
+
+```
+
+And also purging them with:
+
+```bash
+
+apt-mark purge pkg
+
+```
+
+We can inspect those selections with:
+
+```bash
+
+apt-mark showinstall
+apt-mark showremove
+apt-mark showpurge
+
+```
+
+Note that `hold`, `install`, `remove` and `purge` are exclusive states (think of "disjoints" sets), meaning that a package can not belong to more than one state at the same time.
+
+Now, we have this command:
+
+```
+
+apt-cache minimize-manual
+
+```
 
 
+It's usefull to run after the installation process, where a lot of packages that later becomes depedencies for other packages were manually installed.
+
+Indeed, because at first it can look normal:
+
+```
+
+pkgA # manual
+pkgB # manual
+pkgC # manual
+
+```
+
+But maybe those packages are depedencies to future installed `pkgD`, then when `pkgD` is installed it may be better to change certain graph metadata.
+
+In this case see which packages install reason is `manual` but are effectively only depedencies to other package(s).
+
+### The `apt-config` command familly
+
+This is the command relative to the APT configuration.
+
+We can for example dump all configuration variables and their associated value(s) with:
+
+```bash
+
+apt-config dump
+
+```
+
+This will search them into files under:
+
+```
+
+/etc/apt/apt.conf.d
+
+```
+
+There are A LOT of rows:
+
+```bash
+
+apt-config dump | wc -l
+
+```
+
+Returns something like:
 
 
+```
+
+341
+
+```
+
+Here's the result's head:
+
+```bash
+
+apt-config dump | head -n 30
+
+```
+
+Output:
+
+```
+
+APT "";
+APT::Architecture "amd64";
+APT::Build-Essential "";
+APT::Build-Essential:: "build-essential";
+APT::Install-Recommends "1";
+APT::Install-Suggests "0";
+APT::Key "";
+APT::Key::Assert-Pubkey-Algo ">=rsa1024,ed25519,ed448,nistp256,nistp384,nistp512,brainpoolP256r1,brainpoolP320r1,brainpoolP384r1,brainpoolP512r1,secp256k1";
+APT::Key::Assert-Pubkey-Algo::Next ">=rsa2048,ed25519,ed448,nistp256,nistp384,nistp512";
+APT::Key::Assert-Pubkey-Algo::Future ">=rsa3072,ed25519,ed448";
+APT::Sandbox "";
+APT::Sandbox::User "_apt";
+APT::Authentication "";
+APT::Authentication::TrustCDROM "true";
+APT::NeverAutoRemove "";
+APT::NeverAutoRemove:: "^firmware-linux.*";
+APT::NeverAutoRemove:: "^linux-firmware$";
+APT::NeverAutoRemove:: "^linux-image-[a-z0-9]*$";
+APT::NeverAutoRemove:: "^linux-image-[a-z0-9]*-[a-z0-9]*$";
+APT::NeverAutoRemove:: "^postgresql.*-16";
+APT::VersionedKernelPackages "";
+APT::VersionedKernelPackages:: "linux-.*";
+APT::VersionedKernelPackages:: "kfreebsd-.*";
+APT::VersionedKernelPackages:: "gnumach-.*";
+APT::VersionedKernelPackages:: ".*-modules";
+APT::VersionedKernelPackages:: ".*-kernel";
+APT::Never-MarkAuto-Sections "";
+APT::Never-MarkAuto-Sections:: "metapackages";
+APT::Never-MarkAuto-Sections:: "tasks";
+APT::Move-Autobit-Sections "";
+
+```
+
+See ?
+
+Some variable are in fact lists/arrays containing multiple values, that's why we have the following for example:
+
+```
+
+APT::NeverAutoRemove "";
+APT::NeverAutoRemove:: "^firmware-linux.*";
+APT::NeverAutoRemove:: "^linux-firmware$";
+APT::NeverAutoRemove:: "^linux-image-[a-z0-9]*$";
+APT::NeverAutoRemove:: "^linux-image-[a-z0-9]*-[a-z0-9]*$";
+APT::NeverAutoRemove:: "^postgresql.*-16";
+
+```
+
+If we know the variable name, we can directly query its value and set it to a personal shell value, for example:
+
+```bash
+
+apt-config shell FOO APT::Install-Recommends
+
+```
+
+Returns:
+
+```
+
+FOO='1'
+
+```
+
+And in shell scripting, I can evaluate that expression to make "FOO" a usable variables:
+
+```bash
+
+eval $(apt-config shell FOO APT::Install-Recommends)
+echo $FOO
+
+```
+
+Returns `1`.
 
 
+### The `dpkg` command familly
 
+APT handles repositories, dependency resolution, downloads, candidate selection, upgrade planning, etc. `dpkg` handles the local `.deb` transaction itself: unpacking files, configuring packages, running maintainer scripts, removing packages, and maintaining the local package database.
+
+
+The most important dpkg commands are these.
+
+```bash
+
+dpkg -i package.deb
+dpkg --install package.deb
+
+```
+
+This installs a local `.deb`. The operation is more than just extracting files: `dpkg` extracts control information, runs maintainer scripts such as `preinst`, unpacks the payload, handles replacement of an older version if necessary, and then configures the package.
+
+The following command only does the unpacking step:
+
+```bash
+
+dpkg --unpack package.deb
+
+```
+
+This installs the package files but deliberately leaves the package unconfigured.
+
+Then:
+
+```bash
+
+dpkg --configure package
+
+```
+
+finishes configuring it, mainly adding conffiles (configurations files) and running postinst script.
+
+We can configure every unpacked-but-unconfigured package with:
+
+```bash
+
+sudo dpkg --configure -a
+
+```
+
+or:
+
+```bash
+
+sudo dpkg --configure --pending
+
+```
+
+So "installed" in `dpkg` terminology means the package has been correctly unpacked and configured.
+
+Removal has two levels, just like we already saw with APT.
+
+```bash
+
+sudo dpkg -r foo
+
+```
+
+or:
+
+```bash
+
+sudo dpkg --remove foo
+
+```
+
+removes the installed files but retains `dpkg-managed` configuration files (conffiles).
+
+To remove those configuration files too:
+
+```bash
+
+dpkg -P foo
+
+```
+
+or:
+
+```bash
+
+dpkg --purge foo
+
+```
+
+That can also purge a package that was already removed but still has residual configuration state.
+
+Other files created dynamically by package scripts may need to be cleaned by the package’s `postrm` script (but the `postrm` and `prerm` package script are also run by `dpkg --remove pkg`, that's not just the same layer). Btw, user files under `$HOME` are not automatically deleted by a purge.
+
+How do we make the distinction between package configuration files and the total amount of the files the package can dynamically create ?
+
+A Debian binary package can declare certain shipped files as conffiles using a `conffiles` metadata file inside the `.deb` `control` archive. During package creation, this is typically `debian/conffiles`; after installation, `dpkg` records the information in its local database.
+
+Here's what happen with `dpkg --remove pkg`:
+
+```
+
+1. runs prerm remove
+
+2. removes the package’s normal installed files
+   (but keeps conffiles)
+
+3. runs postrm remove
+
+```
+
+And with `dpkg --purge pkg`:
+
+```
+
+1. runs prerm purge
+
+2. removes the package’s normal installed files
+   (but keeps conffiles)
+
+3. runs postrm purge
+
+```
+
+In general, `postrm purge` / `prerm purge` delete more files than `postrm remove` and `prerm purge`.
+
+Because `postrm/prerm purge` is the deeper cleanup path: it is where the package can remove generated config, package-specific state, caches, databases, or other leftovers that should disappear only on a full purge.
+
+`dpkg` also exposes the selection-state machinery we just studied through `apt-mark`.
+
+For example:
+
+```bash
+
+dpkg --get-selections
+
+```
+
+shows states such as:
+
+```
+
+install
+hold
+deinstall
+purge
+
+```
+
+On my system:
+
+```bash
+
+dpkg --get-selections | head -n 30
+
+```
+
+Returns:
+
+```
+
+7zip						install
+accountsservice					install
+acl						install
+adb						install
+adduser						install
+adwaita-icon-theme				install
+aglfn						install
+alacritty					install
+alsa-base					install
+alsa-topology-conf				install
+alsa-ucm-conf					install
+alsa-utils					install
+amd64-microcode					install
+anacron						install
+android-libbase:amd64				install
+android-libboringssl:amd64			install
+android-libcutils:amd64				install
+android-liblog:amd64				install
+android-libziparchive:amd64			install
+android-sdk-platform-tools-common		install
+apg						install
+app-install-data				install
+apparmor					install
+appstream					install
+apt						install
+apt-file					install
+apt-utils					install
+aptdaemon					install
+aptdaemon-data					install
+aptitude					install
+
+```
+
+We can save them:
+
+```bash
+
+dpkg --get-selections > selections.txt
+
+```
+
+and restore them with:
+
+```bash
+
+dpkg --set-selections < selections.txt
+
+```
+
+`dpkg` also proposes:
+
+```ash
+
+dpkg --clear-selections
+
+```
+
+That will mark all non-essential packages for removal (`deinstall` state).
+
+`dpkg` knows that a package is essential or no by reading its metadata, indeed they expose this information in their metadata stanza with this field:
+
+```
+
+Essential: yes # or no
+
+```
+
+For package consistency/debugging, another useful action is:
+
+```bash
+
+dpkg -V
+
+```
+
+or:
+
+```bash
+
+dpkg --verify
+
+```
+
+which verifies package files against metadata where verification information is available.
+
+This is a bit the equivalent of:
+
+```bash
+
+pacman -Qkk
+
+```
+
+We also have those commands:
+
+```
+
+dpkg --remove --pending
+dpkg --purge --pending
+dpkg --configure --pending
+
+```
+
+They apply the corresponding action to packages whose current dpkg state says that operation is pending.
+
+But, wait a second, there is no `apt-mark configure pkg`, so why is that ? And why `dpkg --install --pending` does not exist?
+
+This is where the distinction between **selection state** (`apt-mark state` thing) and **package processing state** matters.
+
+`configure` is not a dpkg selection state, it's an actual processing action/state transition performed by `dpkg` on a package that has already been unpacked.
+
+That is why this works:
+
+```bash
+
+dpkg --configure --pending
+
+```
+
+It finds every package that is already **unpacked** but **not yet configured**, and finish configuring it.
+
+For `removal` and `purge`, `--pending` has a slightly different basis:
+
+```bash
+
+dpkg --remove --pending
+
+```
+
+Finds packages that are unpacked but whose selection state is `deinstall`, and remove them.
+
+And:
+
+```bash
+
+dpkg --purge --pending
+
+```
+
+Finds packages that are unpacked or already removed but whose selection state is `purge`, and purge them.
+
+Now the reason there is no:
+
+```bash
+
+dpkg --install --pending
+
+```
+
+is that `dpkg` cannot install a package merely from a package name or a selection state. To install, it needs the actual related `.deb` archive:
+
+```bash
+
+dpkg --install foo.deb
+
+```
+
+or:
+
+```bash
+
+dpkg --unpack foo.deb
+
+```
+
+The install selection state only says that the related package is desired to be installed.
 
 
 
