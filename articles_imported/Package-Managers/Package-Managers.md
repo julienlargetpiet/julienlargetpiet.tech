@@ -2682,8 +2682,7 @@ apt-get source pkg
 
 ```
 
-That won't download the `.deb` file of the associated package but its source package, in other terms the files that were used to make the corresponding `.deb` file.
-
+That won't download the `.deb` file of the associated package but its source package, in other terms the files that were used to make the corresponding `.deb` file (and normally also extract the source tree as we'll see later).
 
 It requires to configure a source package repository entry.
 
@@ -6840,6 +6839,31 @@ debian/patches/series
 
 ```
 
+### The `dpkg-buildpackage` command familly
+
+`dpkg-buildpackage` is the build orchestrator of the dpkg toolchain.
+
+In more elaborated terms, `dpkg-source` knows how to represent and reconstruct a Debian source package; `debian/rules` knows how that particular package should be built; and `dpkg-buildpackage` orchestrates the complete process around them, including dependency checks, build targets, binary/source package generation, build metadata, and signing.
+
+So, if I get the source tree of a package through:
+
+```bash
+
+apt-get source pkg
+
+```
+
+That will download the source files AND unpack them.
+
+Now we can enter the source tree and directly run:
+
+```bash
+
+dpkg-buildpackage
+
+```
+
+inside the root of the source tree.
 
 
 
