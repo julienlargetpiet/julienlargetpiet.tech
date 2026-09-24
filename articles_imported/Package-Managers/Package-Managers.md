@@ -5781,6 +5781,1076 @@ dpkg --unpack foo.deb
 
 The install selection state only says that the related package is desired to be installed.
 
+### The `dpkg-query` command familly
+
+`dpkg-query` is the read/query side of `dpkg`’s local database. It does not install or remove anything.
+
+First, we have the command that will list the **installed** packages on the system with:
+
+```bash
+
+dpkg-query -l
+
+```
+
+or:
+
+```bash
+
+dpkg-query --list
+
+```
+
+We can also limit the listed packages to only the one that matches given pattern(s), for example:
+
+```
+
+dpkg-query --list 'apt*' 'libc6*'
+
+```
+
+Which outputs something like:
+
+```
+
+ii  apt                   2.8.3                  amd64        commandline package manager
+un  apt-config-icons      <aucune>               <aucune>     (aucune description n'est disponible)
+un  apt-doc               <aucune>               <aucune>     (aucune description n'est disponible)
+ii  apt-file              3.3                    all          search for files within Debian packages (command-line interface)
+un  apt-show-versions     <aucune>               <aucune>     (aucune description n'est disponible)
+un  apt-transport-https   <aucune>               <aucune>     (aucune description n'est disponible)
+ii  apt-utils             2.8.3                  amd64        package management related utility programs
+un  apt-verify            <aucune>               <aucune>     (aucune description n'est disponible)
+un  apt-xapian-index      <aucune>               <aucune>     (aucune description n'est disponible)
+ii  aptdaemon             1.1.1+bzr982-0ubuntu44 all          transaction based package management service
+ii  aptdaemon-data        1.1.1+bzr982-0ubuntu44 all          data files for clients
+ii  aptitude              0.8.13-5ubuntu5        amd64        terminal-based package manager
+ii  aptitude-common       0.8.13-5ubuntu5        all          architecture independent files for the aptitude package manager
+un  aptitude-doc          <aucune>               <aucune>     (aucune description n'est disponible)
+un  aptitude-doc-en       <aucune>               <aucune>     (aucune description n'est disponible)
+ii  aptkit                1.0.7                  all          transaction based package management service
+ii  libc6:amd64           2.39-0ubuntu8.8        amd64        GNU C Library: Shared libraries
+ii  libc6:i386            2.39-0ubuntu8.8        i386         GNU C Library: Shared libraries
+un  libc6-amd64           <aucune>               <aucune>     (aucune description n'est disponible)
+ii  libc6-dbg:amd64       2.39-0ubuntu8.8        amd64        GNU C Library: detached debugging symbols
+un  libc6-dbgsym          <aucune>               <aucune>     (aucune description n'est disponible)
+ii  libc6-dev:amd64       2.39-0ubuntu8.8        amd64        GNU C Library: Development Libraries and Header Files
+un  libc6-dev-amd64-cross <aucune>               <aucune>     (aucune description n'est disponible)
+un  libc6-dev-bin         <aucune>               <aucune>     (aucune description n'est disponible)
+un  libc6-dev-i386        <aucune>               <aucune>     (aucune description n'est disponible)
+ii  libc6-i386            2.39-0ubuntu8.8        amd64        GNU C Library: 32-bit shared libraries for AMD64
+un  libc6-i686            <aucune>               <aucune>     (aucune description n'est disponible)
+un  libc6-mips32          <aucune>               <aucune>     (aucune description n'est disponible)
+
+```
+
+The confusing columns is the first one.
+
+Indeed, it represent the state of the related package.
+
+The status colun is composes of 2 or 3 characters.
+
+The first one indicates the desired state, the second indicates the current effective state and the third one, if it exists, represents the error flag.
+
+| Letter | State | Meaning |
+|---|---|---|
+| `n` | Not-installed | Package is not installed. |
+| `c` | Config-files | Package payload is gone, but config files and/or `postrm` cleanup state remain. |
+| `H` | Half-installed | Installation/unpacking started but failed before completing. |
+| `U` | Unpacked | Files were unpacked from the `.deb`, but package configuration has not happened yet. |
+| `F` | Half-configured | Configuration started, but failed before completing. |
+| `W` | Triggers-awaited | This package is waiting for another package's trigger processing to complete. |
+| `t` | Triggers-pending | This package itself has pending trigger work to process. |
+| `i` | Installed | Package is correctly unpacked and configured. |
+
+The difference between `H`, `U`, and `F` is easiest to see as a lifecycle:
+
+```
+
+.deb
+ |
+ | unpack starts
+ v
+Half-installed (H)      <- unpack/install process failed midway
+ |
+ | unpack completed
+ v
+Unpacked (U)            <- files are there, but configuration not done
+ |
+ | configuration starts
+ v
+Half-configured (F)     <- postinst/configuration failed midway
+ |
+ | configuration completed
+ v
+Installed (i)
+
+```
+
+So `H` means the installation/unpacking phase itself is incomplete. For example, `dpkg` may have started replacing files and then something failed. 
+
+`U` is actually a clean intermediate state: unpacking succeeded, but configuration still needs to run. 
+
+`F` means unpacking succeeded and configuration was attempted but the latter failed.
+
+That is why:
+
+```bash
+
+dpkg --configure --pending
+
+```
+
+is relevant to packages in states such as U and F: the package files are already present, and dpkg can try to finish the configuration phase.
+
+`c` is also worth understanding carefully.
+
+Indeed, we can often see the following couple:
+
+```
+
+rc  foo
+
+```
+
+meaning:
+
+```
+
+r = desired state: remove/deinstall
+c = actual state: config-files
+
+```
+
+So the program itself is gone, but `dpkg` still retains enough package state to preserve or later purge configuration.
+
+Now, we have to explain the "triggers" thing.
+
+Imagine packages `A` and `B` and that they both uses some files under the same directory / same ressources but that the latter initially belongs to `B` on the system.
+
+And that `A` must modify something under the shared ressources.
+
+Does `A` do the work itself? 
+
+No, because the work belongs logically to `B`, not to `A`. B owns the shared resource, cache, database, index, registry, etc., and knows how to rebuild/update it.  
+
+This lets many packages notify the same interested package, and `dpkg` can defer and coalesce the work instead of rebuilding the same resource repeatedly.
+
+Now the states:
+
+```
+
+t = triggers-pending
+W = triggers-awaited
+
+```
+
+are:
+
+```
+
+B -> t (triggers-pending)
+A -> W (triggers-awaited)
+
+```
+
+So t is from `B`’s point of view, not `A`’s.
+
+`B` says:
+
+“I have been triggered; I have pending trigger work to execute.”
+
+While `W` is from `A`'s point of view, it says:
+
+"I caused trigger work in `B` and I am waiting for `B` to finish it before `dpkg` considers me completely installed."
+
+Then, the following command:
+
+```bash
+
+dpkg --triggers-only --pending
+
+```
+
+Tells all the packages that have been notified of some work to do by others packages to perform it.
+
+To list the fies a package have installed (owns), we do:
+
+```bash
+
+dpkg-query -L pkg
+
+```
+
+or:
+
+```bash
+
+dpkg-query --listfiles pkg
+
+```
+
+We can input multiple packages at once of course:
+
+```bash
+
+dpkg-query --listfiles pkgA pkgB
+
+```
+
+For example:
+
+```bash
+
+dpkg-query --listfiles openssh-client apt
+
+```
+
+This is the equivalent of:
+
+```bash
+
+pacman -Ql pkg
+
+```
+
+This is also the local variant of:
+
+```bash
+
+apt-file show pkg
+
+```
+
+But it only accepts explicit package names. (not RegEx neither `"*"`).
+
+We also have the local equivalent of:
+
+```bash
+
+apt-file search /path/to/some/file
+
+```
+
+Which is:
+
+```bash
+
+dpkg-query --search /path/to/some
+
+```
+
+or:
+
+```bash
+
+dpkg-query -S /path/to/some
+
+```
+
+It does not accept RegEx expression as `apt-file search` but accepts `*`, for example:
+
+```bash
+
+sudo dpkg-query -S /usr/bin/bash*
+
+```
+
+Returns (onmy system):
+
+```
+
+bash: /usr/bin/bash
+bash: /usr/bin/bashbug
+
+```
+
+
+Now, we have a command which, at first glance, does the same thing than `dpkg-query -l`, which is:
+
+```bash
+
+dpkg-query -W
+
+```
+
+But, the great thing with the `-W` variant, is that we can control the output format with `-f` or `--showformat`.
+
+This is super usefull in scripts.
+
+Example:
+
+```bash
+
+dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\n' | head
+
+```
+
+Returns this on my system:
+
+```
+
+7zip	23.01+dfsg-11	amd64
+accountsservice	23.13.9-2ubuntu6.1	amd64
+acl	2.3.2-1build1.1	amd64
+adb	1:34.0.4-1build3	amd64
+adduser	3.137ubuntu1	all
+adwaita-icon-theme	46.0-1	all
+aglfn	1.7+git20191031.4036a9c-2	all
+alacritty	0.13.2-1ubuntu1	amd64
+alsa-base	1.0.25+dfsg-0ubuntu7	all
+alsa-topology-conf	1.2.5.1-2	all
+
+```
+
+Here are all the value you can use:
+
+```
+
+${Package}
+${Version}
+${Architecture}
+${Status}
+
+${Maintainer}
+${Priority}
+${Section}
+${Installed-Size}
+${Homepage}
+
+${Essential}
+${Protected}
+${Multi-Arch}
+
+${Depends}
+${Pre-Depends}
+${Recommends}
+${Suggests}
+${Enhances}
+
+${Provides}
+${Conflicts}
+${Breaks}
+${Replaces}
+
+${Description}
+${Conffiles}
+
+${Source}
+${Origin}
+
+```
+
+### The `dpkg-deb` command familly
+
+`dpkg-deb` is the tool for working directly with .deb archive files. It does not install packages into the system database; it inspects, extracts, and builds Debian binary archives.
+
+Quick remainder, a `.deb` is an `ar` archive containing roughly:
+
+```
+
+package.deb
+|-- debian-binary
+|-- control.tar.*
+|-- data.tar.*
+
+```
+
+First, we can query infromations from a `.deb` file with:
+
+```bash
+
+dpkg-query -I file.deb
+
+```
+
+or:
+
+```bash
+
+dpkg-query --info file.deb
+
+```
+
+For example:
+
+```
+
+dpkg-deb --info lz4_1.9.4-1build1.1_amd64.deb
+
+```
+
+Returns:
+
+```
+
+ nouveau paquet Debian, version 2.0.
+ taille 93790 octets : archive de contrôle=757 octets.
+     842 bytes,    21 lines      control
+     362 bytes,     6 lines      md5sums
+ Package: lz4
+ Version: 1.9.4-1build1.1
+ Architecture: amd64
+ Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+ Installed-Size: 232
+ Depends: libc6 (>= 2.34), liblz4-1 (= 1.9.4-1build1.1)
+ Conflicts: liblz4-tool (<< 1.8.0-1)
+ Replaces: liblz4-tool (<< 1.8.0-1)
+ Provides: liblz4-tool
+ Section: utils
+ Priority: optional
+ Multi-Arch: foreign
+ Homepage: https://github.com/lz4/lz4
+ Description: Fast LZ compression algorithm library - tool
+  LZ4 is a very fast lossless compression algorithm, providing compression speed
+  at 400 MB/s per core, scalable with multi-cores CPU. It also features an
+  extremely fast decoder, with speed in multiple GB/s per core, typically
+  reaching RAM speed limits on multi-core systems.
+  .
+  This package contains files that is tool using liblz4.
+ Original-Maintainer: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+
+```
+
+Here, we see the archive summary, which is this part:
+
+```
+
+ nouveau paquet Debian, version 2.0.
+ taille 93790 octets : archive de contrôle=757 octets.
+     842 bytes,    21 lines      control
+     362 bytes,     6 lines      md5sums
+
+
+```
+
+And the `control` stanza.
+
+If we just want the latter, we can precise it:
+
+```bash
+
+dpkg-deb --info lz4_1.9.4-1build1.1_amd64.deb control
+
+```
+
+In fact, the last argument is the file inside `control.tar.*` we temporary extract and display its content.
+
+For example, we could have done:
+
+```bash
+
+dpkg-deb --info lz4_1.9.4-1build1.1_amd64.deb postinst
+
+```
+
+If `postinst` directly inside `control.tar.*` would exist.
+
+Then, there is the equivalent of:
+
+```bash
+
+tar -tvf file.tar
+
+```
+
+That displays the files that will be extracted (those who lives under `data.tar.*`), with:
+
+```bash
+
+dpkg-deb -c file.deb
+
+```
+
+For example:
+
+```bash
+
+dpkg-deb -c lz4_1.9.4-1build1.1_amd64.deb
+
+```
+
+That outputs:
+
+```
+
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./usr/
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./usr/bin/
+-rwxr-xr-x root/root    202992 2024-08-09 04:33 ./usr/bin/lz4
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./usr/share/
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./usr/share/doc/
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./usr/share/doc/lz4/
+-rw-r--r-- root/root      3275 2022-08-28 05:00 ./usr/share/doc/lz4/copyright
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./usr/share/man/
+drwxr-xr-x root/root         0 2024-08-09 04:33 ./usr/share/man/man1/
+-rw-r--r-- root/root      3464 2024-08-09 04:33 ./usr/share/man/man1/lz4.1.gz
+-rw-r--r-- root/root      3464 2024-08-09 04:33 ./usr/share/man/man1/lz4c.1.gz
+-rw-r--r-- root/root      3464 2024-08-09 04:33 ./usr/share/man/man1/lz4cat.1.gz
+-rw-r--r-- root/root      3464 2024-08-09 04:33 ./usr/share/man/man1/unlz4.1.gz
+lrwxrwxrwx root/root         0 2024-08-09 04:33 ./usr/bin/lz4c -> lz4
+lrwxrwxrwx root/root         0 2024-08-09 04:33 ./usr/bin/lz4cat -> lz4
+lrwxrwxrwx root/root         0 2024-08-09 04:33 ./usr/bin/unlz4 -> lz4
+lrwxrwxrwx root/root         0 2024-08-09 04:33 ./usr/share/doc/lz4/changelog.Debian.gz -> ../liblz4-1/changelog.Debian.gz
+
+```
+
+Now, when you want to extract the `.deb/data.tar.*` file to the `output` dir for example, you do:
+
+```bash
+
+dpkg-deb -x package.deb output/
+
+```
+
+Or:
+
+```bash
+
+dpkg-deb --extract package.deb output/
+
+```
+
+Then, we have:
+
+```bash
+
+dpkg-deb -X package.deb output/
+
+```
+
+Which is the verbose version: same extraction, but it prints the files as they are extracted.
+
+And to extract the files that lives inside `control.tar.*`, we do:
+
+```bash
+
+dpkg-deb -e file.deb output/
+
+```
+
+Quick remainder, `control.tar.*` can contain:
+
+```
+
+control-dir/
+├── control # always
+├── conffiles
+├── md5sums # always
+├── preinst
+├── postinst
+├── prerm
+└── postrm
+
+```
+
+And to extract both at the same time, we use the `--raw-extract` or `-R` command:
+
+```bash
+
+dpkg-deb -R file.deb output/
+
+```
+
+or:
+
+```bash
+
+dpkg-deb --raw-extract file.deb output/
+
+```
+
+Which makes approximately the following filesystem architecture:
+
+```
+
+output/
+|-- DEBIAN/
+|   |-- control
+|   |-- postinst
+|   |-- ...
+|-- usr/
+|   |-- ...
+|-- etc/
+    |-- ...
+
+```
+
+Also, to query special fields from the `control` metadata file, we do:
+
+```bash
+
+dpkg-deb -f file.deb FIELDNAME1 FIELDNBAME2 ...
+
+```
+
+For example:
+
+```bash
+
+dpkg-deb -f lz4_1.9.4-1build1.1_amd64.deb Version Package
+
+```
+
+Returns:
+
+```
+
+Version: 1.9.4-1build1.1
+Package: lz4
+
+```
+
+If we don't precise any field, it willl behave like `dpkg-deb -I file.deb control`.
+
+Now, the reverse operation of `dpkg-deb -R file.deb output/` that means building a `.deb` file from a package files.
+
+For example, if we have:
+
+```
+
+foo-package/
+|-- DEBIAN/
+|   |-- control
+|   |-- postinst
+|-- usr/
+    |-- bin/
+        |-- foo
+
+```
+
+We do:
+
+```bash
+
+dpkg-deb --build foo-package
+
+```
+
+or:
+
+```bash
+
+dpkg-deb -b foo-package
+
+```
+
+Which produces:
+
+```
+
+foo-package.deb
+
+```
+
+Now, if you explicit an existing directory as the output like:
+
+```bash
+
+dpkg-deb -b foo-package out-dir/
+
+```
+
+It will produce:
+
+```
+
+out-dir/foo-package_version_architecture.deb
+
+```
+
+But you can also explicit an output filename like:
+
+```bash
+
+dpkg-deb --build foo-package foo-package-deb.deb
+
+```
+
+We can also whoose the compression of the inner archives (`data.tar.*` and `control.tar.*`) with the `-Z` flag:
+
+```
+
+-Z xz
+-Z gzip
+-Z zstd
+-Z none
+
+```
+
+And the compression level with `-z` (from 1 to 9).
+
+We can also limit the threads that will be used for the compressions (for the one that supports it) with `--threads-max=` option.
+
+So, for example:
+
+```bash
+
+dpkg-deb -b -Z xz -z 8 --threads-max=4 foo-package out
+
+```
+
+### The `dpkg-source` familly command
+
+After looking at dpkg-deb, which manipulates binary `.deb` archives, the next logical tool is `dpkg-source`.
+
+`dpkg-source` works one level earlier in the Debian packaging pipeline: it packs and unpacks Debian source packages. A source package is generally described by a `.dsc` file and accompanied by one or more source archives such as an upstream `orig.tar.*` archive and a Debian-specific `debian.tar.*` archive (as we saw earlier). `dpkg-source` knows how to read that metadata, reconstruct the debianized source tree, apply Debian patches when required, and build the source-package files again from a prepared source tree.
+
+First, there is the unpacking/extracting step with the `-x` flag.
+
+So here you have the source package files in the same directory like:
+
+```
+
+~/src/openssh/
+|-- openssh_9.6p1-3ubuntu13.dsc
+|-- openssh_9.6p1.orig.tar.gz
+|-- openssh_9.6p1.orig.tar.gz.asc
+|-- openssh_9.6p1-3ubuntu13.debian.tar.xz
+
+```
+
+The `.asc` file is not another source archive. It is a signature that can be used to verify that the tarball really came from the expected upstream signer and was not modified afterward.
+
+Then, from this directory we can run:
+
+```bash
+
+dpkg-source -x openssh_9.6p1-3ubuntu13.dsc
+
+```
+
+Indeed, the `.dsc` contains entries naming and hashing of the companion files.
+
+It then finds them next to the `.dsc` and reconstructs:
+
+```
+
+openssh-9.6p1/
+|-- upstream source code
+|-- debian/
+    |-- control
+    |-- rules
+    |-- changelog
+    |-- patches/
+    |-- ...
+
+```
+
+Note that `openssh-9.6p1` is the default output directory in this context.
+
+But we could have explicit an output directory like:
+
+```bash
+
+dpkg-source -x openssh_9.6p1-3ubuntu13.dsc openssh-tree
+
+```
+
+Quick remainder.
+
+For a modern package using:
+
+```
+
+Format: 3.0 (quilt)
+
+```
+
+the process is conceptually:
+
+```
+
+orig.tar.*
+    | unpack upstream source
+    V
+debian.tar.*
+    | add debian/ packaging directory
+    V
+debian/patches/series
+    | apply Debian patches
+    V
+final debianized source tree
+
+```
+
+So it's not just `tar xf`; it understands the Debian source-package format and reconstructs the source tree accordingly.
+
+Now, we also have this option for the extraction (`--require-valid-signature`):
+
+```bash
+
+dpkg-source --require-valid-signature -x package.dsc
+
+```
+
+This will check if the `.dsc` file have an OpenPGP signature, and if yes, if it's valid.
+
+Indeed, it can verify if that's valid because internally `dpkg` uses the trusted public keys to verify `.dsc` signatures.
+
+If there is no signature or that it's not valid, then the extraction is aborted.
+
+We can also explicitly provide a keyring:
+
+```bash
+
+dpkg-source \
+  --signer-certs=/path/to/keyring.gpg \
+  --require-valid-signature \
+  -x package.dsc
+
+```
+
+The opposite exists:
+
+```bash
+
+dpkg-source --no-check -x package.dsc
+
+```
+
+which disables signature/checksum checks during extraction.
+
+By default, the extraction will verify the source-package checksums recorded in the `.dsc`, but it does not require that the `.dsc` itself have a valid trusted OpenPGP signature.
+
+We also have:
+
+```bash
+
+dpkg-source --require-strong-checksums -x package.dsc
+
+```
+
+which requires strong checksums such as SHA-256.
+
+The reverse operation is:
+
+```bash
+
+dpkg-source -b source-directory
+
+```
+
+For example:
+
+```bash
+
+dpkg-source -b openssh-9.6p1
+
+```
+
+You get it, `openssh9.6p1` is a **debianized** source tree.
+
+`dpkg-source` determines the source format, commonly from:
+
+```
+
+debian/source/format
+
+```
+
+For example a common one is:
+
+```
+
+3.0 (quilt)
+
+```
+
+We can also explicitly select the source format:
+
+```bash
+
+dpkg-source --format='3.0 (quilt)' -b openssh-9.6p1
+
+```
+
+and then produces:
+
+```
+
+openssh_9.6p1-3ubuntu13.dsc
+openssh_9.6p1.orig.tar.gz
+openssh_9.6p1.orig.tar.gz.asc
+openssh_9.6p1-3ubuntu13.debian.tar.xz
+
+```
+
+The location of the output is in fact the parent directory of `openssh9.6p1`.
+
+There are also compression controls very similar to what you just saw with `dpkg-deb`:
+
+```bash
+
+dpkg-source -Zxz -z6 -b source-directory
+
+```
+
+While building, I can also tell that the default location of `changelog` and `control` have changed to a custom one (instead of `/debian/*`), for example if I have the following:
+
+```
+
+source-directory/
+|-- packaging/
+|   |-- control
+|   |-- changelog
+|-- src/
+
+```
+
+I do:
+
+```bash
+
+dpkg-source \
+  -cpackaging/control \
+  -lpackaging/changelog \
+  -b source-directory
+
+```
+
+`-c` means control file, and `-l` means changelog file.
+
+There is also the `--include-binaries` option:
+
+```bash
+
+dpkg-source --include-binaries -b source-directory
+
+```
+
+It's usefull when we apply a modification that a patch can not take in count such as adding/modifying a binary file in the upstream content for example.
+
+It tells `dpkg-source`:
+
+"If you find modified binary files that cannot be represented as `quilt` patches, include those files directly inside the generated `debian.tar.*`."
+
+For example:
+
+```
+
+upstream orig.tar.*
+|-- src/foo.c
+|-- docs/logo.png       <- original version
+
+```
+
+We modify:
+
+```
+
+docs/logo.png
+
+```
+
+Now a **text patch is unsuitable**. With `--include-binaries`, we can generate the wanted `debian.tar.*` and `orig.tar.*` etcetera.
+
+The opposite is:
+
+```bash
+
+dpkg-source --abort-on-upstream-changes -b source-directory
+
+```
+
+Which makes the build fail if there are changes to upstream files that have not been properly represented as Debian patches.
+
+Now, when I have the debianized source tree thanks to `dpkg-source -x file.dsc`, I can ensure that the patches in `debian/patches/` are applied with:
+
+```bash
+
+dpkg-source --before-build source-dir
+
+```
+
+`source-dir` is the debianized tree.
+
+We’d use it mainly for debugging, experimentation... (because as we'll see `dpkg-buildpackage` will automatically handle it).
+
+Now, we also have the matching operation that will restore the debianized tree to its prior state to what `dpkg-source --before-build source-dir` did to it.
+
+This is the following command:
+
+```bash
+
+dpkg-source --after-build source-dir
+
+```
+
+Normally, `dpkg-buildpackage` also handles it.
+
+Now, suppose we've unpacked a source package:
+
+```bash
+
+dpkg-source -x foo_1.2.3-1.dsc
+cd foo-1.2.3
+
+```
+
+Then we manually edit an upstream file:
+
+```
+
+src/foo.c
+
+```
+
+At that point, our change exists in the working tree, but it is not yet represented in `debian/patches/`.
+
+Now we run:
+
+```bash
+
+dpkg-source --commit .
+
+```
+
+For `3.0 (quilt)`, `dpkg-source` compares our current tree against the source state represented by the existing `quilt` patch series, finds the changes that are not already managed by `quilt`, generates a new patch, and integrates it into the patch system. If we do not supply a patch name, it asks you interactively for one.
+
+For example:
+
+```bash
+
+dpkg-source --commit . fix-crash
+
+```
+
+may create:
+
+```
+
+debian/patches/fix-crash
+
+```
+
+and add:
+
+```
+
+fix-crash
+
+```
+
+to:
+
+```
+
+debian/patches/series
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
