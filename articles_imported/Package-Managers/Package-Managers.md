@@ -1,9 +1,11 @@
 
 ## Introduction
 
-In this article, we'll detail the different package managers in Linux (and OpenBSD).
+Package managers are often reduced to a few commands: install, update, remove.
 
-We'll see the great principles that lead to designing a package managers and how they philosophy can differ a bit.
+But behind those commands sits a much larger system involving repositories, metadata, dependency resolution, local package databases, binary archives and source packages.
+
+In this article, we will look at pacman, APT and dpkg to understand how these responsibilities are separated, how their toolchains are organized, and what actually happens between fetching a package and installing its files on the system.
 
 ## `pacman`, the Arch familly
 
@@ -2977,7 +2979,7 @@ foo (1.2.3-2) noble; urgency=medium
 
 Back to the `apt-get` familly.
 
-To resolve and instlall depedencies required to **build** a package from its source files we run:
+To resolve and instlall depedencies required to **build** a package from its source package name:
 
 ```bash
 
@@ -3004,6 +3006,8 @@ Build-Depends: gcc, make, libssl-dev, pkg-config
 Then, it will resolve and normally install those dependencies.
 
 If one or more of the required packages conflicts with installed package(s), then they are removed.
+
+We'll see this in more details in this part: [The `dpkg-buildpackage` command familly](The `dpkg-buildpackage` command familly)
 
 We also have the `apt-get satisfy` command.
 
@@ -6142,7 +6146,7 @@ ${Origin}
 
 ### The `dpkg-deb` command familly
 
-`dpkg-deb` is the tool for working directly with .deb archive files. It does not install packages into the system database; it inspects, extracts, and builds Debian binary archives.
+`dpkg-deb` is the tool for working directly with `.deb` archive files. It does not install packages into the system database; it inspects, extracts, and builds Debian binary archives.
 
 Quick remainder, a `.deb` is an `ar` archive containing roughly:
 
@@ -6865,11 +6869,412 @@ dpkg-buildpackage
 
 inside the root of the source tree.
 
+Note that one source package can generate several `.deb` packages.
+
+The latter are declared inside `debian/control`.
+
+We'll take the `openssh` package as example.
+
+Indeed, `openssh` defines several `.deb` such as:
+
+```
+
+openssh-client
+openssh-server
+openssh-sftp-server
+ssh
+
+```
+
+They will be generated in the source tree parent directory like:
+
+```
+
+../openssh-client_<version>_amd64.deb
+../openssh-server_<version>_amd64.deb
+../openssh-sftp-server_<version>_amd64.deb
+../ssh_<version>_all.deb
+
+```
+
+And with metadata:
+
+```
+
+../openssh_<version>_amd64.buildinfo
+../openssh_<version>_amd64.changes
+
+```
+
+As we saw earlier, the package-sepcific build procedure is defined through `debian/rules`.
+
+A simplified build flow is:
+
+```
+
+dpkg-buildpackage
+        |
+        |-- prepare build environment
+        |
+        |-- dpkg-source --before-build
+        |
+        |-- verify Build-Depends / Build-Conflicts
+        |
+        |-- debian/rules clean
+        |
+        |-- dpkg-source -b
+        |       |
+        |       |-- generate/update source package artifacts
+        |           such as .dsc and .debian.tar.*
+        |           and reference/reuse the .orig.tar.*
+        |
+        |-- debian/rules build
+        |
+        |-- debian/rules binary
+        |       |
+        |       |-- final .deb archives are built
+        |
+        |-- generate .buildinfo
+        |-- generate .changes
+
+```
+
+And yess, we literally have call like:
+
+```bash
+
+debian/rules clean
+debian/rules build
+debian/rules binary
+
+```
+
+Because remember, `debian/rules` usually starts with something like:
+
+```bash
+
+#!/usr/bin/make -f
+
+```
+
+So, it's effectively run as:
+
+```bash
+
+make -f debian/rules build
+
+```
+
+Now, what are the different specific "build" commands ?
+
+1. `clean` resets the source tree so we start from a known state. It removes generated files, temporary staging directories, and anything left by previous `build`/`binary` runs, while leaving already-produced package files in the parent directory alone.
+
+Conceptually:
+
+```
+
+before clean:
+
+foo-1.0/
+├── src/
+├── build/
+│   ├── foo.o
+│   └── foo
+├── debian/
+│   ├── foo/
+│   │   └── usr/bin/foo
+│   └── ...
+└── ...
+
+after:
+
+debian/rules clean
+
+foo-1.0/
+├── src/
+├── debian/
+└── ...
+
+```
+
+2. `build` will compile and configure the programms but won't create the final `.deb` packages.
+
+3. `binary` is the packaging phase. It'll take the results of the build and create all binary packages desired by this source package.
+
+So, yess in the `binary` phase, one or more `dpkg-deb --build` command are run agains staging directories.
+
+Those staging directories provides all the informations to generate a `.deb`, so their structure is therefore like (as seen before):
+
+```
+
+foo-package/
+|-- DEBIAN/
+|   |-- control
+|   |-- postinst
+|-- usr/
+    |-- bin/
+        |-- foo
+
+```
+
+The interesting question is: who creates those staging directories and fills `DEBIAN/`?
+
+Usually, modern packages use `debhelper`.
+
+```
+
+Helpers do things such as:
+dh_auto_install
+-> install upstream-built files into staging
+
+dh_install
+-> distribute files among debian/foo/, debian/foo-doc/, etc.
+
+dh_installdocs
+-> install docs
+
+dh_installdeb
+-> prepare DEBIAN/ maintainer scripts/conffile metadata
+
+dh_gencontrol
+-> generate DEBIAN/control
+
+dh_md5sums
+-> generate DEBIAN/md5sums
+
+dh_builddeb
+-> call dpkg-deb for each binary-package staging tree
+
+```
+
+Now, the question is why does it kind of regenrate the source package files it is run on with the `dpkg-source` command ?
+
+The key idea is reproducibility and traceability:
+
+```
+
+current source tree
+        |
+        V
+source package files
+        +
+binary package files
+
+```
+
+A full build wants both sides to correspond to the same package version and source state.
+
+If we changed:
+
+```
+
+debian/control
+debian/changelog
+debian/patches/*
+...
+
+```
+
+and `dpkg-buildpackage` only emitted new `.deb` files, we end up with new binaries but no matching source package that represents exactly what was built.
+
+So by default it rebuilds the source package too.
+
+A normal full `dpkg-buildpackage` rebuilds the Debian source package files from the source tree it is run in.
+
+To separate the steps, we have the `-b` flag:
+
+```bash
+
+dpkg-buildpackage -b .
+
+```
+
+That will skip the source files rebuild and only build the `.deb` files.
+
+The opposite is:
+
+```
+
+dpkg-buildpackage -S
+
+```
+
+That only builds the source package files.
+
+So in the flow it stops here:
+
+```
+
+dpkg-buildpackage
+        |
+        |-- prepare build environment
+        |
+        |-- dpkg-source --before-build
+        |
+        |-- verify Build-Depends / Build-Conflicts
+        |
+        |-- debian/rules clean
+        |
+        |-- dpkg-source -b
+        |       |
+        |       |-- generate/update source package artifacts
+        |           such as .dsc and .debian.tar.*
+        |           and reference/reuse the .orig.tar.*
+        |
+        | <-- STOPS
+        |
+        |-- debian/rules build
+        |
+        |-- debian/rules binary
+        |       |
+        |       |-- final .deb archives are built
+        |
+        | <-- CONTINUES
+        |
+        |-- generate .buildinfo
+        |-- generate .changes
+
+```
+
+Now, we also can distinguish packages relative to if they are architecture-dependent.
+
+Indeed:
+
+```bash
+
+dpkg-buildpackage -B
+
+```
+
+Build only architecture-dependent binary packages, meaning packages declared with:
+
+```
+
+Architecture: any
+
+```
+
+These usually refers to compiled code, so the resulting package is architecture-specific, for example:
+
+```
+
+foo_1.0-1_amd64.deb
+
+```
+
+Then:
+
+```bash
+
+dpkg-buildpackage -A
+
+```
+
+Build only architecture-independent binary packages, those are packages declared with:
+
+```
+
+Architecture: all
+
+```
+
+These are typically documentation, scripts, data files, etc., producing something like:
+
+```
+
+foo-doc_1.0-1_all.deb
+
+```
+
+For local experiments, signing is often unnecessary, so we can use:
+
+```bash
+
+dpkg-buildpackage -us -uc
+
+```
+
+where:
+
+- `-us` -> do not sign the source package (`.dsc` file)
+
+- `-uc` -> do not sign the `.changes`/`.buildinfo` metadata
+
+We can also skip the initial clean step:
+
+```bash
+
+dpkg-buildpackage -nc
+
+```
+
+or clean the source tree after a successful build:
+
+```bash
+
+dpkg-buildpackage -tc
+
+```
+
+Parallel compilation can be requested with:
+
+```
+
+dpkg-buildpackage -j8
+
+```
+
+Finally, `dpkg-buildpackage` checks the source package's build dependencies before starting. Those are declared in `debian/control` through fields such as:
+
+```
+
+Build-Depends:
+Build-Conflicts:
+
+```
+
+If they are missing, the build normally stops.
+
+As seen earlier, APT can install those dependencies beforehand with:
+
+```bash
+
+apt-get build-dep openssh
+
+```
+
+Here, `openssh` is the source package name.
+
+Formany packages, their source-package name are the same, but for those that produces several `.deb`, they differ.
+
+`openssh` is a good example, because that's the source package name, but it produces binaries such as:
+
+```
+
+openssh-client
+openssh-server
+openssh-sftp-server
+ssh
+
+```
+
+Now, when the `.deb` are generated, we can finally install them, for example:
+
+```bash
+
+sudo dpkg -i ../openssh-server_9.6p1-3ubuntu13_amd64.deb
+
+```
 
 
 
+## Conclusion
 
+`pacman`, APT and `dpkg` show the same core ideas behind a good package-management system: clear separation of responsibilities, composable tools, explicit metadata and reproducible builds.
 
+Pacman exposes these responsibilities through command families, while Debian goes further by splitting repository management, local package management and package building across several tools.
+
+That separation gives users control: packages can be queried, inspected, extracted, rebuilt and installed independently instead of everything being hidden behind one command.
 
 
 
