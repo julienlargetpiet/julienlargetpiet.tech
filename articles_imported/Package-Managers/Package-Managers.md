@@ -7539,6 +7539,130 @@ tells who registered the diversion. It prints the package name, `LOCAL` for a lo
 
 ### Tha `dpkg-statoverride` command familly
 
+`dpkg-statoverride` lets us tell `dpkg`:
+
+“for this path, keep this owner, group, and permission mode, even when packages are installed or upgraded.”
+
+For example:
+
+```bash
+
+dpkg-statoverride --add root adm 0750 /usr/bin/foo
+
+```
+
+means:
+
+```
+
+owner = root
+group = adm
+mode  = 0750
+path  = /usr/bin/foo
+
+```
+
+You get it, the synthax is:
+
+```
+
+dpkg-statoverride command [options] OWNER GROUP MODE PATH
+
+```
+
+The important point is that this override is stored in `dpkg`’s database. So when the package owning `/usr/bin/foo` is upgraded, `dpkg` knows that this path has a special local state.
+
+We can list files that have such a rule with:
+
+```bash
+
+dpkg-override --list
+
+```
+
+And, like for `dpkg-divert --list`, we can see that certain files on our system have such a rule (supposedly given by package maintainers scripts), for example on my system it returns the following:
+
+```
+
+root plocate 2755 /usr/bin/plocate
+geoclue geoclue 755 /var/lib/geoclue
+root lp 775 /var/log/hp/tmp
+root crontab 2755 /usr/bin/crontab
+root ssl-cert 710 /etc/ssl/private
+root messagebus 4754 /usr/lib/dbus-1.0/dbus-daemon-launch-helper
+
+```
+
+We can also query with a glob or a special filepath:
+
+```bash
+
+dpkg-statoverride --list /var/lib/*
+
+```
+
+Also, we have the same application model of `dpkg-divert`.
+
+Meaning that if we do only:
+
+```bash
+
+dpkg-statoverride --add root adm 0750 /usr/bin/foo
+
+```
+
+The rule is recorded, but the current file may remain unchanged until some later package operation creates/updates that path and honors the override.
+
+So for the rule to take immediate effect, we add the `--update` flag:
+
+```bash
+
+dpkg-statoverride --add --update root adm 0750 /usr/bin/foo
+
+```
+
+Now,
+
+```bash
+
+dpkg-statoverride --remove PATH
+
+```
+
+simply removes the rule and leaves the current filesystem state unchanged.
+
+So if the override had set:
+
+```
+
+root:adm
+0750
+
+```
+
+then after:
+
+```bash
+
+dpkg-statoverride --remove PATH
+
+```
+
+the file will still be:
+
+```
+
+root:adm
+0750
+
+```
+
+There is no automatic knowledge of what the previous mode was.
+
+A later package installation/upgrade may set the file again according to the package's normal metadata.
+
+### The `dpkg-trigger` command familly
+
 
 
 ## Conclusion
