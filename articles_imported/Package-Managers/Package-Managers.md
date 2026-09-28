@@ -1,11 +1,21 @@
 
 ## Introduction
 
-Package managers are often reduced to a few commands: install, update, remove.
+Package managers are often reduced to a few commands: `install`, `update`, `remove`.
 
-But behind those commands sits a much larger system involving repositories, metadata, dependency resolution, local package databases, binary archives and source packages.
+But behind those commands sits a much larger system involving repository metadata, dependency graphs, local package databases, binary archives, source packages and build tooling.
 
-In this article, we will look at pacman, APT and dpkg to understand how these responsibilities are separated, how their toolchains are organized, and what actually happens between fetching a package and installing its files on the system.
+In this article, we will start from the user-facing commands of `pacman`, `APT` and `dpkg`, then progressively move underneath them: how packages are queried, downloaded and tracked, how dependencies are represented, how `.deb` and source packages are structured, and finally how packages are rebuilt and managed at a lower level.
+
+Fair warning: this one goes deep.
+
+But if you have the guts to read through it, you should come out with a much stronger understanding of package managers. And that kind of understanding transfers surprisingly well to programming in general: separation of responsibilities, metadata-driven systems, dependency graphs, reproducibility, layered tooling and good CLI design.
+
+A lot of this information exists, but it is usually scattered across man pages, documentation and maintainer-oriented resources. The goal here is to gather the useful pieces into one place and connect them into a single mental model.
+
+So yes, it is a long article.
+
+But by the end of it, you should be pretty cracked at package managers.
 
 ## `pacman`, the Arch familly
 
