@@ -701,7 +701,7 @@ We can add the `q` flag to only have the names, which can be usefull in bash scr
 
 ```bash
 
-pacma,n -Qdq
+pacman -Qdq
 
 ```
 
@@ -1896,7 +1896,7 @@ I can now also use the `apt install` command to install the manually downloaded 
 
 ```bash
 
-apt install pkg.deb
+apt install ./pkg.deb
 
 ```
 
@@ -7085,7 +7085,7 @@ To separate the steps, we have the `-b` flag:
 
 ```bash
 
-dpkg-buildpackage -b .
+dpkg-buildpackage -b
 
 ```
 
@@ -7399,9 +7399,9 @@ package-managed /usr/bin/foo
 
 ```
 
-So later, when the related package tries to install `/usr/bin/foo`, `dpkg` will place it at `/usr/bin/foo.diverted`.
+So later, when the related package tries to install `/usr/bin/foo`, `dpkg` will place it at `/usr/bin/foo.distrib`.
 
-But it **does not directly move the concerned file** to the new location (`/usr/bin/foo.diverted`).
+But it **does not directly move the concerned file** to the new location (`/usr/bin/foo.distrib`).
 
 In other terms, `--rename` just makes the transition immediate by moving the current file to the diversion path at the moment we register the diversion.
 
@@ -7452,7 +7452,7 @@ sudo dpkg-divert \
 
 ```
 
-Instead of defaulting to `file.diverted`.
+Instead of defaulting to `file.distrib`.
 
 Also, we can explicitely tell to not directly apply the effect of the given command with, for example:
 
@@ -7513,13 +7513,13 @@ We can compose it with other options like that:
 
 ```bash
 
-sudo dpkg-divert --add --package mypackage /usr/bin/foo
+sudo dpkg-divert --add --local mypackage /usr/bin/foo
 
 ```
 
 That's what happen **by default** -> rule for every package.
 
-But if we just want one particular package to have this rule, we can describe it via the `--package packagename` command:
+But if we want to exclude a particular package from having this rule, we can describe it via the `--package packagename` command:
 
 ```bash
 
@@ -7576,7 +7576,7 @@ We can list files that have such a rule with:
 
 ```bash
 
-dpkg-override --list
+dpkg-statoverride --list
 
 ```
 
@@ -7597,7 +7597,7 @@ We can also query with a glob or a special filepath:
 
 ```bash
 
-dpkg-statoverride --list /var/lib/*
+dpkg-statoverride --list '/var/lib/*'
 
 ```
 
@@ -7807,7 +7807,7 @@ We also have the `--no-await` option:
 
 ```bash
 
-dpkg-divert --no-await TRIGGER
+dpkg-trigger --no-await TRIGGER
 
 ```
 
@@ -7857,7 +7857,7 @@ To explicitly make it wait (like it behaves by default) we can pass the `--await
 
 ```bash
 
-dpkg-divert --await TRIGGER
+dpkg-trigger --await TRIGGER
 
 ```
 
@@ -7865,7 +7865,7 @@ Also, we can specify the package that launch the trigger, meaning the package th
 
 ```bash
 
-dpkg-divert --by-package=foo TRIGGER
+dpkg-trigger --by-package=foo TRIGGER
 
 ```
 
