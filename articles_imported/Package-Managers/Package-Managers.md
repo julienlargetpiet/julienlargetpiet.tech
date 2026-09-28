@@ -7663,7 +7663,213 @@ A later package installation/upgrade may set the file again according to the pac
 
 ### The `dpkg-trigger` command familly
 
+This is the command familly related to the triggers we covered in the `dpkg` command familly, with the `dpkg --triggers-only --pending` and also the status letters with `dpkg-query --list`.
 
+For a quick remainder, a package can trigger an action to anotehr package such as refreshing a shared cache, so just one refresh is done instead of several (refresh number does not increase with the number of packages requiring it).
+
+First, to verify that the trigger system is supported, do:
+
+```bash
+
+dpkg-trigger --check-supported
+
+```
+
+If it returns nothing, that's supported (you can check with outputing the exit value of this command immediatly after with `echo $?`).
+
+A simple trigger activation looks like:
+
+```bash
+
+dpkg-trigger TRIGGER-NAME
+
+```
+
+For example:
+
+```bash
+
+dpkg-trigger update-icon-caches
+
+```
+
+Conceptually:
+
+```
+
+package A changes something
+        |
+        V
+dpkg-trigger update-something
+        |
+        V
+trigger becomes pending
+        |
+        V
+package B, which declared interest in that trigger,
+runs its trigger-handling logic
+
+```
+
+The interested package usually declares triggers through a file such as:
+
+```
+
+DEBIAN/triggers
+
+```
+
+or, in the source package:
+
+```
+
+debian/package.triggers
+
+```
+
+with entries such as:
+
+```
+
+interest update-something
+
+```
+
+The package handling that trigger will typically receive something like:
+
+```bash
+
+postinst triggered update-something
+
+```
+
+And yes, it' processed through its `postinst` maintainer script.
+
+So, some recapitulation, whe we do:
+
+```bash
+
+dpkg-trigger TRIGGER-NAME
+
+```
+
+It marks `TRIGGER-NAME` as activated.
+
+Then any package that declared interest in that trigger can become pending, and `dpkg` later runs that package’s trigger-handling logic, usually through its `postinst` script.
+
+And it's not the first interested package that can run the trigger related action that consumes it.
+
+Indeed, if several packages declare interest in the same trigger:
+
+```
+
+package B -> interest TRIGGER-X
+package C -> interest TRIGGER-X
+package D -> interest TRIGGER-X
+
+```
+
+And we run:
+
+```bash
+
+dpkg-trigger TRIGGER-X
+
+```
+
+Then `dpkg` conceptually marks that trigger as `pending` for each interested package:
+
+```
+
+TRIGGER-X activated
+        |
+        +--> package B pending
+        |
+        +--> package C pending
+        |
+        `--> package D pending
+
+```
+
+Then `dpkg` may process them one after another:
+
+```
+
+B postinst triggered TRIGGER-X
+C postinst triggered TRIGGER-X
+D postinst triggered TRIGGER-X
+
+```
+
+When `B` finishes, only `B`'s pending trigger state is cleared. `C` and `D` still have to process theirs.
+
+We also have the `--no-await` option:
+
+```bash
+
+dpkg-divert --no-await TRIGGER
+
+```
+
+To understand it, here's the detailed flow of a normal trigger:
+
+```
+
+A activates TRIGGER
+    |
+    V
+B gets trigger work pending
+    |
+    V
+A may enter triggers-awaited
+    |
+    V
+B eventually processes TRIGGER
+    |
+    V
+A can then become fully installed/configured
+
+```
+
+And with the `--no-await` option, we have:
+
+```
+
+A activates TRIGGER
+    |
+    V
+B gets trigger work pending
+    |
+    V
+A does NOT wait for B
+    |
+    V
+A can be considered installed/configured
+    |
+    V
+B processes TRIGGER later
+
+```
+
+So `--no-await` doesn't make the package that activated it wait for the interested package to process it.
+
+To explicitly make it wait (like it behaves by default) we can pass the `--await` option:
+
+```bash
+
+dpkg-divert --await TRIGGER
+
+```
+
+Also, we can specify the package that launch the trigger, meaning the package that can enter `trigger-awaited` state like so:
+
+```bash
+
+dpkg-divert --by-package=foo TRIGGER
+
+```
+
+Normally the package is specified through an environment variable inside maintainers scripts (`DPKG_MAINTSCRIPT_PACKAGE`).
 
 ## Conclusion
 
