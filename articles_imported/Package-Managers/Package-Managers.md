@@ -7266,6 +7266,279 @@ sudo dpkg -i ../openssh-server_9.6p1-3ubuntu13_amd64.deb
 
 ```
 
+### The `dpkg-divert` command familly
+
+`dpkg-divert` tells dpkg:
+
+“when a package wants to install this file at path X, redirect that managed file somewhere else.”
+
+Suppose a package normally owns:
+
+```
+
+/usr/bin/foo
+
+```
+
+We could create a diversion:
+
+```bash
+
+sudo dpkg-divert --add --rename /usr/bin/foo
+
+```
+
+By default, that moves the original file to something like:
+
+```
+
+/usr/bin/foo.distrib
+
+```
+
+and **records the diversion in** `dpkg`**’s database**.
+
+Then we can place our own file at:
+
+```bash
+
+/usr/bin/foo
+
+```
+
+Now when the package is upgraded, `dpkg` knows that its normal file path is diverted and keeps the package’s version at the diversion path instead of clobbering our replacement.
+
+We can inspect diversions with:
+
+```bash
+
+dpkg-divert --list
+
+```
+
+We can also filter with a glob like:
+
+```bash
+
+dpkg-divert --list '/usr/bin/*'
+
+```
+
+Btw, on my system, even if I didn't ever manually used it, I still have several files that have been "diverted", supposely by maintainer/package-related scripts.
+
+Example:
+
+```bash
+
+dpkg-divert --list
+
+```
+
+Returns:
+
+```
+
+détournement de /lib/x86_64-linux-gnu/libhistory.so.8.2 en /lib/x86_64-linux-gnu/libhistory.so.8.2.usr-is-merged par libreadline8t64
+détournement de /usr/bin/apturl-gtk en /usr/bin/apturl-gtk.distrib par captain
+détournement de /usr/share/dict/words en /usr/share/dict/words.pre-dictionaries-common par dictionaries-common
+détournement de /lib/x86_64-linux-gnu/libreadline.so.8 en /lib/x86_64-linux-gnu/libreadline.so.8.usr-is-merged par libreadline8t64
+détournement de /lib/x86_64-linux-gnu/libe2p.so.2 en /lib/x86_64-linux-gnu/libe2p.so.2.usr-is-merged par libext2fs2t64
+détournement de /usr/bin/pg_config en /usr/bin/pg_config.libpq-dev par postgresql-common
+détournement de /lib en /lib.usr-is-merged par base-files
+détournement de /lib/x86_64-linux-gnu/libext2fs.so.2.4 en /lib/x86_64-linux-gnu/libext2fs.so.2.4.usr-is-merged par libext2fs2t64
+détournement de /sbin en /sbin.usr-is-merged par base-files
+détournement de /usr/bin/apturl en /usr/bin/apturl.distrib par captain
+détournement de /lib64/ld-linux-x86-64.so.2 en /lib64/ld-linux-x86-64.so.2.usr-is-merged par libc6
+détournement de /lib/x86_64-linux-gnu/libext2fs.so.2 en /lib/x86_64-linux-gnu/libext2fs.so.2.usr-is-merged par libext2fs2t64
+détournement de /lib/x86_64-linux-gnu/libhistory.so.8 en /lib/x86_64-linux-gnu/libhistory.so.8.usr-is-merged par libreadline8t64
+détournement de /lib/x86_64-linux-gnu/libreadline.so.8.2 en /lib/x86_64-linux-gnu/libreadline.so.8.2.usr-is-merged par libreadline8t64
+détournement de /lib64 en /lib64.usr-is-merged par base-files
+détournement de /lib/x86_64-linux-gnu/libe2p.so.2.3 en /lib/x86_64-linux-gnu/libe2p.so.2.3.usr-is-merged par libext2fs2t64
+détournement de /lib/ld-linux.so.2 en /lib/ld-linux.so.2.usr-is-merged par libc6
+détournement de /bin en /bin.usr-is-merged par base-files
+détournement de /lib32 en /lib32.usr-is-merged par base-files
+détournement de /libo32 en /libo32.usr-is-merged par base-files
+détournement de /lib/x86_64-linux-gnu/libtirpc.so.3 en /lib/x86_64-linux-gnu/libtirpc.so.3.usr-is-merged par libtirpc3t64
+détournement de /lib/x86_64-linux-gnu/libtirpc.so.3.0.0 en /lib/x86_64-linux-gnu/libtirpc.so.3.0.0.usr-is-merged par libtirpc3t64
+
+```
+
+We can remove one with:
+
+```bash
+
+dpkg-divert --remove --rename /usr/bin/foo
+
+```
+
+It's better to proceed that way instead of manually redirecting / overwriting package-owned files (with `cp`, `touch` ...) because the latter is not a persistent configuration, so in the next package-related update, our custom file could be ovrwritten.
+
+But we still have the following question to answer:
+
+"Why do we need to put the `--rename` flag at all, it should be by default no ?" 
+
+In fact, `--rename` is there because recording a diversion and moving the currently existing file are two separate operations.
+
+Without `--rename`, `dpkg-divert` only records the rule in `dpkg`’s diversion database.
+
+For example:
+
+```bash
+
+dpkg-divert --add /usr/bin/foo
+
+```
+
+conceptually says:
+
+```
+
+from now on:
+package-managed /usr/bin/foo
+-> should be diverted elsewhere
+
+```
+
+So later, when the related package tries to install `/usr/bin/foo`, `dpkg` will place it at `/usr/bin/foo.diverted`.
+
+But it **does not directly move the concerned file** to the new location (`/usr/bin/foo.diverted`).
+
+In other terms, `--rename` just makes the transition immediate by moving the current file to the diversion path at the moment we register the diversion.
+
+And complementarly, with just:
+
+```bash
+
+dpkg-divert --remove /usr/bin/foo
+
+```
+
+`dpkg` removes the diversion rule from its database, but does not move any files back.
+
+Then on a later reinstall/upgrade of the package that owns that file, `dpkg` will once again install its file at the normal path:
+
+```
+
+/usr/bin/foo
+
+```
+
+And we can't apply the modification directly afterward independenly of the related operation in the command like so:
+
+```bash
+
+dpkg-divert --rename /usr/bin/foo
+
+```
+
+Indeed, `--rename` is an option attached to the `add`/`remove` operation, not a separate “synchronize the files now” command. The current `dpkg-divert` syntax is `dpkg-divert [options] command file`, where the `command` is things like `--add` or `--remove`; `--rename` modifies what that operation does.
+
+Btw, we can also explicitly choose the destination file of the diverted source with the `--divert` command:
+
+```bash
+
+dpkg-divert --divert NEWPATH FILE
+
+```
+
+For example:
+
+```bash
+
+sudo dpkg-divert \
+  --divert /usr/bin/foo.original \
+  --rename \
+  /usr/bin/foo
+
+```
+
+Instead of defaulting to `file.diverted`.
+
+Also, we can explicitely tell to not directly apply the effect of the given command with, for example:
+
+```bash
+
+dpkg-divert --add --no-rename file
+
+```
+
+Which is the same as:
+
+```bash
+
+dpkg-divert --add file
+
+```
+
+And:
+
+```bash
+
+dpkg-divert --truename /usr/bin/foo
+
+```
+
+returns the actual package-side path after taking the diversion into account.
+
+For example, if:
+
+```
+
+/usr/bin/foo
+-> /usr/bin/foo.distrib
+
+```
+
+then:
+
+```bash
+
+dpkg-divert --truename /usr/bin/foo
+
+```
+
+can tell us that the package's real destination is:
+
+```
+
+/usr/bin/foo.distrib
+
+```
+
+Now, we'll explain the 2 layers of who is allowed to own the diverted file.
+
+Indeed, first we have the `--local` options that tells that this is us/the administrator that wants this divertion rule, so it applies agains all package. So every package that will install the file the divertion rule is applied on will install it at its given destination.
+
+We can compose it with other options like that:
+
+```bash
+
+sudo dpkg-divert --add --package mypackage /usr/bin/foo
+
+```
+
+That's what happen **by default** -> rule for every package.
+
+But if we just want one particular package to have this rule, we can describe it via the `--package packagename` command:
+
+```bash
+
+sudo dpkg-divert --add --package mypackage /usr/bin/foo
+
+```
+
+Then:
+
+```bash
+
+dpkg-divert --listpackage /usr/bin/foo
+
+```
+
+tells who registered the diversion. It prints the package name, `LOCAL` for a locally-created diversion, or nothing if there is no diversion.
+
+### Tha `dpkg-statoverride` command familly
+
 
 
 ## Conclusion
