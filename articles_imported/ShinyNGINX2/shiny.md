@@ -1,4 +1,6 @@
 
+![../../assets/common_files/thumbnails/ShinyNGINX2.png](../../assets/common_files/thumbnails/ShinyNGINX2.png)
+
 My previous article was somewhat polarizing.
 
 Most readers responded positively, but some disagreed with the benchmarking methodology I used. That criticism is precisely why this article exists.
