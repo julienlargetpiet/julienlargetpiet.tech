@@ -1,10 +1,15 @@
+
+![../../assets/common_files/thumbnails/the-archeology-of-a-dead-ova.png](../../assets/common_files/thumbnails/the-archeology-of-a-dead-ova.png)
+s
+
+
 > _"It should be easy to download."_
 >
 > Famous last words.
 
 ---
 
-## 🧠 The Premise
+## The Premise
 
 There exists (or _existed_) a certain `.ova` file.
 
@@ -27,7 +32,7 @@ Like it never happened.
 
 ---
 
-## 🔎 Phase 1 — Denial
+## Phase 1 — Denial
 
 Naturally, I assumed:
 
@@ -53,7 +58,7 @@ Classic.
 
 ---
 
-## 🤖 Phase 2 — Automation (aka coping)
+## Phase 2 — Automation (aka coping)
 
 At this point, I did what any reasonable person would do:
 
@@ -67,7 +72,7 @@ Because clearly:
 
 ---
 
-## 🐍 The Script
+## The Script
 
 I used DuckDuckGo's HTML endpoint (because APIs are for people who gave up on life):
 
@@ -146,14 +151,14 @@ if __name__ == "__main__":
 
 ---
 
-## 🧠 What I Learned
+## What I Learned
 
 - "Download" pages without downloads are extremely popular
 - Half the internet is just SEO ghosts
 
 ---
 
-## 🔥 Phase 3 — OSINT Mode
+## Phase 3 — OSINT Mode
 
 At this point, the strategy evolved:
 
@@ -172,7 +177,7 @@ Basically:
 
 ---
 
-## 💀 Phase 4 — Reality Hits
+## Phase 4 — Reality Hits
 
 After minutes of searching:
 
@@ -190,7 +195,7 @@ Just references. Everywhere.
 
 ---
 
-## 🧑‍💻 Phase 5 — Human Layer
+## Phase 5 — Human Layer
 
 At this point the strategy became:
 
@@ -200,7 +205,7 @@ Because the internet had clearly moved on.
 
 ---
 
-## 🧬 Phase 6 — The Breakthrough
+## Phase 6 — The Breakthrough
 
 And then…
 
@@ -221,7 +226,7 @@ An actual file.
 
 ---
 
-## 📦 Phase 7 — The Download
+## Phase 7 — The Download
 
 ~2 GB file
 
@@ -245,7 +250,7 @@ At this point, trust is optional.
 
 ---
 
-## 🧪 Phase 8 — Validation
+## Phase 8 — Validation
 
 Checklist:
 
@@ -257,7 +262,7 @@ Suspiciously legitimate.
 
 ---
 
-## 🚀 Phase 9 — Booting the VM
+## Phase 9 — Booting the VM
 
 Import into VirtualBox
 
@@ -274,7 +279,7 @@ Classic vintage experience.
 
 ---
 
-## 🎭 Phase 10 — The Twist
+## Phase 10 — The Twist
 
 It boots.
 
@@ -292,7 +297,7 @@ Of course.
 
 ---
 
-## 🧠 Final Realization
+## Final Realization
 
 After all that:
 
@@ -304,7 +309,7 @@ Which is somehow worse than not finding it at all.
 
 ---
 
-## 🧾 Conclusion
+## Conclusion
 
 What started as:
 
@@ -322,7 +327,7 @@ And ended with:
 
 ---
 
-## 🧠 Key Takeaway
+## Key Takeaway
 
 The internet doesn't delete things.
 
@@ -332,7 +337,7 @@ It just:
 
 ---
 
-## 🏁 Epilogue
+## Epilogue
 
 Would I do it again?
 
@@ -341,3 +346,7 @@ Would I do it again?
 Will I do it again?
 
 > Probably.
+
+
+
+
