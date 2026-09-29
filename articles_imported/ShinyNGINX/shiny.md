@@ -1,4 +1,6 @@
 
+![../../assets/common_files/thumbnails/ShinyNGINX.png](../../assets/common_files/thumbnails/ShinyNGINX.png)
+
 Recently, I wanted to create an analytical dashboard for the visits on this blog, entirely server-side.
 
 This means reading the `NGINX` `/var/log/statix.log` file, reducing bot noise as precisely as possible, and outputting useful visualizations.
