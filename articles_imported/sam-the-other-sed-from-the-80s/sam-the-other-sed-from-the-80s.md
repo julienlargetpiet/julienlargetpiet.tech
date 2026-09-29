@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/sam-the-other-sed-from-the-80s.png](../../assets/common_files/thumbnails/sam-the-other-sed-from-the-80s.png)
+
 ## Prerequisites
 
 This article will reference SED syntax that is described here:
