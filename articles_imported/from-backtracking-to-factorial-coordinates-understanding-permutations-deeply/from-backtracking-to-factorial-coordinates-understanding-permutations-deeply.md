@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/from-backtracking-to-factorial-coordinates-understanding-permutations-deeply.png](../../assets/common_files/thumbnails/from-backtracking-to-factorial-coordinates-understanding-permutations-deeply.png)
+
 Most developers learn permutation generation through recursion and swapping.
 
 It works, it's elegant… but it often feels a bit _magical_.
@@ -452,3 +455,6 @@ Once you see permutations as coordinates:
 - performance becomes predictable
 
 ---
+
+
+
