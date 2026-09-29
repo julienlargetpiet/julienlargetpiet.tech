@@ -26,13 +26,13 @@ No announcement.
 
 No archive.
 
-Just… gone.
+Just... gone.
 
 Like it never happened.
 
 ---
 
-## Phase 1 — Denial
+## Phase 1 - Denial
 
 Naturally, I assumed:
 
@@ -58,11 +58,11 @@ Classic.
 
 ---
 
-## Phase 2 — Automation (aka coping)
+## Phase 2 - Automation (aka coping)
 
 At this point, I did what any reasonable person would do:
 
-👉 wrote a Python crawler
+wrote a Python crawler
 
 Because clearly:
 
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
 ---
 
-## Phase 3 — OSINT Mode
+## Phase 3 - OSINT Mode
 
 At this point, the strategy evolved:
 
@@ -177,17 +177,17 @@ Basically:
 
 ---
 
-## Phase 4 — Reality Hits
+## Phase 4 - Reality Hits
 
 After minutes of searching:
 
-👉 No official mirrors
-
-👉 No archive.org save
-
-👉 No CDN leftovers
-
-👉 No random Google Drive miracle
+- No official mirrors
+ 
+- No archive.org save
+ 
+- No CDN leftovers
+ 
+- No random Google Drive miracle
 
 Just references. Everywhere.
 
@@ -195,7 +195,7 @@ Just references. Everywhere.
 
 ---
 
-## Phase 5 — Human Layer
+## Phase 5 - Human Layer
 
 At this point the strategy became:
 
@@ -205,7 +205,7 @@ Because the internet had clearly moved on.
 
 ---
 
-## Phase 6 — The Breakthrough
+## Phase 6 - The Breakthrough
 
 And then…
 
@@ -214,7 +214,7 @@ Somewhere deep inside:
 - a bash script
 - referencing a download
 
-👉 a real URL
+-> a real URL
 
 Not a landing page
 
@@ -254,9 +254,9 @@ At this point, trust is optional.
 
 Checklist:
 
-- file size looks right ✅
-- archive structure valid ✅
-- contains `.vmdk` ✅
+- file size looks right 
+- archive structure valid 
+- contains `.vmdk` 
 
 Suspiciously legitimate.
 
@@ -285,9 +285,9 @@ It boots.
 
 Kind of.
 
-- Web interface works ✅
-- Buttons exist ✅
-- UI loads ✅
+- Web interface works 
+- Buttons exist 
+- UI loads 
 
 Then:
 
