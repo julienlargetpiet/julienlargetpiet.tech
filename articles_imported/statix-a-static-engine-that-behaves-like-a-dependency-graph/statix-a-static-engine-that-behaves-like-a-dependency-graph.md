@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph.png](../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph.png)
+
 Most static site generators rebuild everything.
 
 Statix doesn’t.
