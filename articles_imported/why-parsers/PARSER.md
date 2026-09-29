@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/PARSER.png](../../assets/common_files/thumbnails/PARSER.png)
+
 A lot of text-processing tools can get surprisingly far without a real parser.
 
 For simple patterns, tools like `sed`, `awk`, or small ad-hoc string transformations are often enough. You match a fragment, replace it, split on a delimiter, maybe scan left to right, and the job is done. For flat data, it's often the most direct and elegant solution.
