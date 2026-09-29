@@ -1,4 +1,6 @@
 
+![../../assets/common_files/thumbnails/install-gentoo.png](../../assets/common_files/thumbnails/install-gentoo.png)
+
 In this article, we'll proceed to install Gentoo.
 
 This article follows the story of manually installing Linux distros which begins here [https://julienlargetpiet.tech/articles/manually-installing-arch-and-void-linux-on-the-same-disk-with-uefi-and-grub.html](https://julienlargetpiet.tech/articles/manually-installing-arch-and-void-linux-on-the-same-disk-with-uefi-and-grub.html) where non Gentoo relative commands are explained in depth.
