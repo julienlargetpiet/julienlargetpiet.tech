@@ -1,5 +1,5 @@
 
-![../../assets/common_files/thumbnails/the-archeology-of-a-dead-ova.png](../../assets/common_files/thumbnails/the-archeology-of-a-dead-ova.png)
+![../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova.png](../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova.png)
 s
 
 
