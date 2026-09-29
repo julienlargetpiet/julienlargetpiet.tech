@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/sed-a-powerfull-mini-language-from-the-70s.png](../../assets/common_files/thumbnails/sed-a-powerfull-mini-language-from-the-70s.png)
+
 There's a moment when using `sed` stops feeling like typing weird incantations… and starts feeling like you're programming a living stream of text.
 
 At first, it looks like this:
