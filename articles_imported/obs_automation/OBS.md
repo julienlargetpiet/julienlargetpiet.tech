@@ -9,8 +9,6 @@ I already had a (very) messy YouTube experience.
 
 I was absolutely brainwashed by the LukeSmith Wave at the time.
 
-![lukewave.png](/assets/common_files/obs_article/lukewave.png)
-
 With my Patched DWM ( larbs config for the initiated ;) ).
 
 I had just plugged a cheap webcam into USB 2.0, without tweaking any firmware-level settings to make the image look decent.
