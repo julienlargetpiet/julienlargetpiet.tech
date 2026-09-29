@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/building-a-chatgpt-like-cli-in-bash-a-journey-through-pipes-json-streaming-and-shell-weirdness.png](../../assets/common_files/thumbnails/building-a-chatgpt-like-cli-in-bash-a-journey-through-pipes-json-streaming-and-shell-weirdness.png)
+
 There is something deeply satisfying about building a serious tool with primitive Unix bricks.
 
 The mentioned in this article comes from:
