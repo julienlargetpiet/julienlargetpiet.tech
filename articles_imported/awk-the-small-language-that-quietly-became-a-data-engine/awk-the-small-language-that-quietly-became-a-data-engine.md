@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/awk-the-small-language-that-quietly-became-a-data-engine.png](../../assets/common_files/thumbnails/awk-the-small-language-that-quietly-became-a-data-engine.png)
+
 There is a moment every engineer hits.
 
 You're staring at a text file-logs, CSVs, metrics, something messy-and you think:
