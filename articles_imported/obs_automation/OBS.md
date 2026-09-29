@@ -1,4 +1,5 @@
 
+![../../assets/common_files/thumbnails/OBS.png](../../assets/common_files/thumbnails/OBS.png)
 
 On `Sun May 17 21:35:37 CEST 2026`, I decided it was time to start a YouTube channel to promote my articles.
 
