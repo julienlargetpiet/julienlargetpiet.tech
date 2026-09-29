@@ -1,5 +1,5 @@
 
-![../../assets/common_files/thumbnails/wifi_story.md](../../assets/common_files/thumbnails/wifi_story.md)
+![../../assets/common_files/thumbnails/wifi_story.png](../../assets/common_files/thumbnails/wifi_story.png)
 
 About a week ago, I needed to set up a laptop for my mum to use while working remotely.
 
