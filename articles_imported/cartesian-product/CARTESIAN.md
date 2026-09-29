@@ -1,4 +1,6 @@
 
+![../../assets/common_files/thumbnails/CARTESIAN.png](../../assets/common_files/thumbnails/CARTESIAN.png)
+
 In this article, we’ll explore something that looks innocent: computing the cartesian product of several lists.
 
 In Haskell, it is almost boring:
