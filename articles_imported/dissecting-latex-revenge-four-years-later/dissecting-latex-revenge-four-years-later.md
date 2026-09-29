@@ -1,5 +1,6 @@
 
 ![../../assets/common_files/thumbnails/dissecting-latex-revenge-four-years-later.png](../../assets/common_files/thumbnails/dissecting-latex-revenge-four-years-later.png)
+s
 
 When I was a chemist, I wrote my internship report in LaTeX.
 
