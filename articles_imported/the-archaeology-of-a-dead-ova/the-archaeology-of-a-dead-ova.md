@@ -1,6 +1,6 @@
 
 ![../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova.png](../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova.png)
-s
+
 
 
 > _"It should be easy to download."_
