@@ -1,4 +1,6 @@
 
+[../../assets/common_files/thumbnails/PackageManagers.png](../../assets/common_files/thumbnails/PackageManagers.png)
+
 ## Introduction
 
 Package managers are often reduced to a few commands: `install`, `update`, `remove`.
