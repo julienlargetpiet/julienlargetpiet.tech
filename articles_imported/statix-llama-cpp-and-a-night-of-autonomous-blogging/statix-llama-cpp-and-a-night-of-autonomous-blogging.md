@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/statix-llama-cpp-and-a-night-of-autonomous-blogging.png](../../assets/common_files/thumbnails/statix-llama-cpp-and-a-night-of-autonomous-blogging.png)
+
 This article is about this repo:
 
 [autoBlog](https://github.com/julienlargetpiet/autoBlog)
