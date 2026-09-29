@@ -1,6 +1,5 @@
 
 ![../../assets/common_files/thumbnails/how-modern-browsers-render-the-web-a-deep-technical-journey.png](../../assets/common_files/thumbnails/how-modern-browsers-render-the-web-a-deep-technical-journey.png)
-s
 
 > From HTML bytes to GPU pixels — the complete architecture of a modern browser rendering engine.
 
