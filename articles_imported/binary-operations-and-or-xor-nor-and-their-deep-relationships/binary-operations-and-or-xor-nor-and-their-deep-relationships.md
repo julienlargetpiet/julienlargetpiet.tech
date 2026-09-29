@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/binary-operations-and-or-xor-nor-and-their-deep-relationships.png](binary-operations-and-or-xor-nor-and-their-deep-relationships.png)
+
 Binary operations are the foundation of computation. At the lowest level, everything reduces to simple operations on bits: `true` (1) and `false` (0).
 
 In this article, we explore the core logical operations:
