@@ -1,5 +1,5 @@
 
-![../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasnt-slow.png](../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasnt-slow.png)
+![../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasn-t-slow.png](../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasn-t-slow.png)
 
 My VPS suddenly felt _extremely slow_:
 
