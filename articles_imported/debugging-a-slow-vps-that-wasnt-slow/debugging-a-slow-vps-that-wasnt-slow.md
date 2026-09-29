@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasnt-slow.png](../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasnt-slow.png)
+
 My VPS suddenly felt _extremely slow_:
 
 - pages taking 3–5 seconds
