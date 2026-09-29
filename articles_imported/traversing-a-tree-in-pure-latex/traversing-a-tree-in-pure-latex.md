@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/traversing-a-tree-in-pure-latex.png](../../assets/common_files/thumbnails/traversing-a-tree-in-pure-latex.png)
+
 This article is a part of my full LaTeX guide here [article](https://julienlargetpiet.tech/articles/dissecting-latex-revenge-four-years-later.html)
 
 At the end of the article, you'll be able to traverse a tree in pure TeX.
