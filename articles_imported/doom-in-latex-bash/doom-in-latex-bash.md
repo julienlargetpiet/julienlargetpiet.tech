@@ -1,6 +1,6 @@
 
 ![../../assets/common_files/thumbnails/doom-in-latex.png](../../assets/common_files/thumbnails/doom-in-latex.png)
-
+s
 
 This article is a part of my full LaTeX guide here [article](https://julienlargetpiet.tech/articles/dissecting-latex-revenge-four-years-later.html)
 
