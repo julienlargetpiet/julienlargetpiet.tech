@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/java-deep-dive-architecture-memory-oop-modern-features.png](../../assets/common_files/thumbnails/java-deep-dive-architecture-memory-oop-modern-features.png)
+
 > A comprehensive technical reference — from JVM internals to streams, lambdas, and the philosophy behind Java's design choices.
 
 ---
