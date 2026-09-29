@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples.png](../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples.png)
+
 In Go (since **Go 1.20**), `errors.Join` lets you **combine multiple errors into a single error** while still preserving each individual error inside it.
 
 This is especially useful when:
