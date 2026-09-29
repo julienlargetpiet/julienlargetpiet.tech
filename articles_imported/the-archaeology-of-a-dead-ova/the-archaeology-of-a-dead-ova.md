@@ -226,7 +226,7 @@ An actual file.
 
 ---
 
-## Phase 7 — The Download
+## Phase 7 - The Download
 
 ~2 GB file
 
@@ -250,7 +250,7 @@ At this point, trust is optional.
 
 ---
 
-## Phase 8 — Validation
+## Phase 8 - Validation
 
 Checklist:
 
@@ -262,7 +262,7 @@ Suspiciously legitimate.
 
 ---
 
-## Phase 9 — Booting the VM
+## Phase 9 - Booting the VM
 
 Import into VirtualBox
 
@@ -279,7 +279,7 @@ Classic vintage experience.
 
 ---
 
-## Phase 10 — The Twist
+## Phase 10 - The Twist
 
 It boots.
 
