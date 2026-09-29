@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumnails/doom-in-latex.png](../../assets/common_files/thumnails/doom-in-latex.png)
+
 This article is a part of my full LaTeX guide here [article](https://julienlargetpiet.tech/articles/dissecting-latex-revenge-four-years-later.html)
 
 Here some captions of the game:
