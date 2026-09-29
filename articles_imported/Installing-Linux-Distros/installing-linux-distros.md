@@ -1,5 +1,6 @@
 
 ![../../assets/common_files/thumbnails/installing-linux-distros.png](../../assets/common_files/thumbnails/installing-linux-distros.png)
+s
 
 In this article, we'll deep dive into the manual installation of multi-distrributions in one disk.
 
