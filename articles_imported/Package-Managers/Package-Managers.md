@@ -1,5 +1,5 @@
 
-[../../assets/common_files/thumbnails/PackageManagers.png](../../assets/common_files/thumbnails/PackageManagers.png)
+![../../assets/common_files/thumbnails/PackageManagers.png](../../assets/common_files/thumbnails/PackageManagers.png)
 
 ## Introduction
 
