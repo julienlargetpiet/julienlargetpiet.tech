@@ -10,7 +10,7 @@ This is especially useful when:
 
 ---
 
-## 🧠 Basic idea
+## Basic idea
 
 ```go
 
@@ -26,7 +26,7 @@ err := errors.Join(err1, err2, err3)
 
 ---
 
-## ✅ Simple example
+## Simple example
 
 ```go
 
@@ -63,7 +63,7 @@ permission denied
 
 ---
 
-## 🔍 Checking errors with `errors.Is`
+## Checking errors with `errors.Is`
 
 This is where `errors.Join` becomes powerful:
 
@@ -91,11 +91,11 @@ func main() {
 
 ```
 
-👉 `errors.Is` works across all joined errors.
+`errors.Is` works across all joined errors.
 
 ---
 
-## 🔎 Extracting errors kind with `errors.As`
+## Extracting errors kind with `errors.As`
 
 ```go
 
@@ -132,7 +132,7 @@ func main() {
 
 ---
 
-## 🧪 Real-world pattern: collecting multiple errors
+## Real-world pattern: collecting multiple errors
 
 ```go
 
@@ -156,11 +156,11 @@ func validate() error {
 
 ```
 
-👉 Instead of failing fast, you return _everything wrong at once_.
+Instead of failing fast, you return _everything wrong at once_.
 
 ---
 
-## ⚠️ Important behaviors
+## Important behaviors
 
 ### 1\. `nil` handling
 
@@ -198,7 +198,7 @@ prints each error on a new line.
 
 ---
 
-## 🧬 Under the hood (important insight)
+## Under the hood (important insight)
 
 The value returned by `errors.Join` is not a simple wrapper — it implements a **multi-error unwrapping interface**:
 
@@ -224,13 +224,13 @@ interface {
 
 ```
 
-👉 Classic wrapping ( `fmt.Errorf("%w", err)`) creates a **chain** (linked list of errors)
+Classic wrapping ( `fmt.Errorf("%w", err)`) creates a **chain** (linked list of errors)
 
-👉 `errors.Join` creates a **tree (or graph)** of errors
+`errors.Join` creates a **tree (or graph)** of errors
 
 ---
 
-### 🔗 Chain vs 🌳 Tree
+### Chain vs Tree
 
 #### Standard wrapping (chain)
 
@@ -249,7 +249,7 @@ Structure:
 ```text
 
 
-err3 → err2 → err1
+err3 -> err2 -> err1
 
 
 ```
@@ -284,7 +284,7 @@ Each error unwraps to **multiple children**.
 
 ---
 
-### 🔍 How `errors.Is` works internally
+### How `errors.Is` works internally
 
 When you call:
 
@@ -308,7 +308,7 @@ Go does roughly:
 
 ---
 
-### 🧪 Example: traversal in action
+### Example: traversal in action
 
 ```go
 
@@ -350,9 +350,9 @@ Structure:
 
 ```
 
-👉 `errors.Is` finds `ErrC` even though it's nested.
+`errors.Is` finds `ErrC` even though it's nested.
 
-## 🔍 Traversal with `fmt.Errorf` (chain example)
+## Traversal with `fmt.Errorf` (chain example)
 
 To understand the difference clearly, let’s look at how traversal works with **classic wrapping**:
 
@@ -387,26 +387,29 @@ Structure:
 
 
 err
- ↓
+ |
+ V
 level 2
- ↓
+ |
+ V
 level 1
- ↓
+ |
+ V
 ErrRoot
 
 
 ```
 
-👉 Here, `errors.Is` walks **linearly down the chain**:
+Here, `errors.Is` walks **linearly down the chain**:
 
 - check level 3
 - unwrap → level 2
 - unwrap → level 1
-- unwrap → ErrRoot ✅
+- unwrap → ErrRoot 
 
 ---
 
-### ⚖️ Key difference in traversal
+### Key difference in traversal
 
 
 
@@ -422,7 +425,7 @@ ErrRoot
 
 ---
 
-### 🔎 `errors.As` works the same way
+### `errors.As` works the same way
 
 ```go
 
@@ -433,11 +436,11 @@ errors.As(err, &target)
 
 ```
 
-👉 It also traverses the entire tree until it finds a matching type.
+It also traverses the entire tree until it finds a matching type.
 
 ---
 
-### ⚠️ Important implications
+### Important implications
 
 #### 1\. Order does NOT matter
 
@@ -450,7 +453,7 @@ errors.Join(err2, err1)
 
 ```
 
-👉 Both behave the same for `Is` / `As`
+Both behave the same for `Is` / `As`
 
 ---
 
@@ -458,7 +461,7 @@ errors.Join(err2, err1)
 
 Even if the first error matches, Go may still explore others internally.
 
-👉 Don’t rely on evaluation order.
+Don’t rely on evaluation order.
 
 ---
 
@@ -475,11 +478,11 @@ err := errors.Join(
 
 ```
 
-👉 This builds a **tree of trees**, and Go will traverse all of it.
+This builds a **tree of trees**, and Go will traverse all of it.
 
 ---
 
-### 🧠 Mental model
+### Mental model
 
 Think of `errors.Join` as:
 
@@ -491,26 +494,26 @@ Not:
 
 That distinction is key:
 
-- `fmt.Errorf("%w")` → **causality**
-- `errors.Join(...)` → **aggregation**
+- `fmt.Errorf("%w")` -> **causality**
+- `errors.Join(...)` -> **aggregation**
 
 ---
 
-### 🚀 Why this design is powerful
+### Why this design is powerful
 
 Because Go extended the error model from:
 
-- **linear chains** → to → **general trees**
+- **linear chains** -> to -> **general trees**
 
 Without breaking compatibility.
 
-👉 Old code still works
+- Old code still works
 
-👉 New code can express richer failure states
+- New code can express richer failure states
 
 ---
 
-### 💡 Bonus: inspect manually
+### Bonus: inspect manually
 
 You can type-assert and inspect the tree:
 
@@ -528,18 +531,20 @@ if u, ok := err.(interface{ Unwrap() []error }); ok {
 
 ---
 
-👉 This is the core reason `errors.Join` feels “magical”:
+This is the core reason `errors.Join` feels “magical”:
 
-it upgrades Go’s error model from a **linked list → to a traversable graph**
+it upgrades Go’s error model from a **linked list -> to a traversable graph**
 
 ---
 
-## 💡 When to use `errors.Join`
+## When to use `errors.Join`
 
 Use it when:
 
 - validating input (multiple fields)
+
 - batch processing (multiple failures)
+
 - cleanup operations (multiple resources failing to close)
 
 Avoid it when:
@@ -548,7 +553,7 @@ Avoid it when:
 
 ---
 
-## 🚀 Pro tip
+## Pro tip
 
 If you want structured error handling, combine it with sentinel errors:
 
@@ -572,3 +577,6 @@ if errors.Is(err, ErrInvalidEmail) {
 
 
 ```
+
+
+
