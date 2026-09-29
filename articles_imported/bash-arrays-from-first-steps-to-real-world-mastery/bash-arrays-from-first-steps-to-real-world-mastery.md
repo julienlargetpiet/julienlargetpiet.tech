@@ -60,7 +60,7 @@ c d
 
 ```
 
-> 👉 Without quotes, Bash:
+>  Without quotes, Bash:
 >
 > - splits on spaces
 > - expands wildcards
@@ -71,7 +71,7 @@ c d
 
 Let's start doing something real.
 
-**❌ Wrong way**
+** Wrong way**
 
 ```bash
 
@@ -86,7 +86,7 @@ Breaks on:
 - spaces
 - special characters
 
-**✅ Correct way**
+** Correct way**
 
 ```bash
 
@@ -126,16 +126,16 @@ done
 
 ## 4\. Real Pattern: Build a Reverse Lookup Map
 
-**Goal:** 👉 Given a filename → find its index
+**Goal:**  Given a filename → find its index
 
-**❌ Naive (broken)**
+** Naive (broken)**
 
 ```bash
 
 
 declare -A map
 for i in "${!arr3[@]}"; do
-  map[${arr3[$i]}]=$i   # ❌ WRONG
+  map[${arr3[$i]}]=$i   #  WRONG
 done
 
 
@@ -174,7 +174,7 @@ echo "${map["$file"]}"
 
 ```
 
-> 👉 O(1) lookup instead of scanning the array.
+>  O(1) lookup instead of scanning the array.
 
 ---
 
@@ -200,7 +200,7 @@ file -> map[file]
 
 ```
 
-> 👉 That's just a string.
+>  That's just a string.
 
 **Correct**
 
@@ -212,7 +212,7 @@ echo "$k -> ${map["$k"]}"
 
 ```
 
-> 👉 `${...}` triggers evaluation.
+>  `${...}` triggers evaluation.
 
 ---
 
@@ -325,7 +325,7 @@ done
 
 ```
 
-> 👉 `arr` is empty after loop.
+>  `arr` is empty after loop.
 
 **Correct**
 
@@ -365,7 +365,7 @@ cmd=(grep -i "error" logfile.txt)
 
 ```
 
-> 👉 No `eval`, no injection risk.
+>  No `eval`, no injection risk.
 
 ---
 
@@ -517,7 +517,7 @@ Arrays in Bash are:
 
 **The key insight:**
 
-> Bash arrays are not "data structures" — they are **word control mechanisms**
+> Bash arrays are not "data structures", they are **word control mechanisms**
 
 They exist to:
 
@@ -563,4 +563,7 @@ You're already touching the hard parts:
 - expansion
 - associative arrays with real data
 
-That's where most Bash scripts break — and where good ones are made.
+That's where most Bash scripts break and where good ones are made.
+
+
+
