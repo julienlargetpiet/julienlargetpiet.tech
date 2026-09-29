@@ -1,8 +1,6 @@
 
 ![../../assets/common_files/thumbnails/PackageManagers.png](../../assets/common_files/thumbnails/PackageManagers.png)
 
-## Introduction
-
 Package managers are often reduced to a few commands: `install`, `update`, `remove`.
 
 But behind those commands sits a much larger system involving repository metadata, dependency graphs, local package databases, binary archives, source packages and build tooling.
