@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/personal.png](../../assets/common_files/thumbnails/personal.png)
+
 The other day, I was searching for the name of a friend on Google, and his personal Curriculum Vitae appeared as the second search result, just after his LinkedIn profile.
 
 It was a plain CV.
