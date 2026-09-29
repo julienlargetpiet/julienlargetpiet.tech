@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/bash-arrays-from-first-steps-to-real-world-mastery.png](../../assets/common_files/thumbnails/bash-arrays-from-first-steps-to-real-world-mastery.png)
+
 Bash arrays aren't just containers, they're a way to control how data flows through the shell.
 
 This guide builds from zero to production-grade patterns, using real examples like file processing and reverse lookups.
