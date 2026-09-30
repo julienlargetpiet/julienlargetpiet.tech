@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/how-do-they-display-trees-three-layout-algorithms-in-haskell.png](../../assets/common_files/thumbnails/how-do-they-display-trees-three-layout-algorithms-in-haskell.png)
+
 ![](/assets/common_files/tree1.jpg)
 
 ![](/assets/common_files/tree2.jpg)
