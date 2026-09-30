@@ -1,4 +1,7 @@
-# 🦀 Metaprogramming in Rust: Exploring `macro_rules!` Power
+
+![../../assets/common_files/thumbnails/exploring-the-power-of-metaprogramming-in-rust.png](../../assets/common_files/thumbnails/exploring-the-power-of-metaprogramming-in-rust.png)
+
+# Metaprogramming in Rust: Exploring `macro_rules!` Power
 
 Rust offers one of the most expressive and hygienic metaprogramming systems in modern languages.
 Through **declarative macros** ( `macro_rules!`), we can generate functions, handle code repetition, and even emulate control-flow constructs — all at compile time.
