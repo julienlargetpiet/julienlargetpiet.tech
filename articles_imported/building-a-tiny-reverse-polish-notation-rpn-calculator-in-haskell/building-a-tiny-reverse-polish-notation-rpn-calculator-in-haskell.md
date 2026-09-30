@@ -1,5 +1,5 @@
 
-![../../assets/common_files/thumbnaisl/building-a-tiny-reverse-polish-notation-rpn-calculator-in-haskell.png](../../assets/common_files/thumbnaisl/building-a-tiny-reverse-polish-notation-rpn-calculator-in-haskell.png)
+![../../assets/common_files/thumbnails/building-a-tiny-reverse-polish-notation-rpn-calculator-in-haskell.png](../../assets/common_files/thumbnails/building-a-tiny-reverse-polish-notation-rpn-calculator-in-haskell.png)
 s
 
 In this project, we’ll build a small expression evaluator using **Reverse Polish Notation** (RPN) —
