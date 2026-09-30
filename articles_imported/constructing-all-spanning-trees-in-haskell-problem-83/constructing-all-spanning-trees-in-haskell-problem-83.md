@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/constructing-all-spanning-trees-in-haskell-problem-83.png](../../assets/common_files/thumbnails/constructing-all-spanning-trees-in-haskell-problem-83.png)
+
 In graph theory, a **spanning tree** of a connected graph is a subgraph that includes all the nodes
 of the original graph, connected with the minimum number of edges (exactly `n − 1` for `n` nodes)
 and without any cycles.
