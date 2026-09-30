@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/jq-as-a-stream-calculus-and-tree-algebra.png](../../assets/common_files/thumbnails/jq-as-a-stream-calculus-and-tree-algebra.png)
+
 ## A Deep Semantic and Operational Mini-Book
 
 This is not documentation.
