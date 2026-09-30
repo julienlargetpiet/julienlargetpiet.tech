@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/building-a-new-determinant-engine-an-iterative-combinatorial-approach.png](../../assets/common_files/thumbnails/building-a-new-determinant-engine-an-iterative-combinatorial-approach.png)
+
 One morning, I decided to compute a determinant from scratch — no recursion, no Gaussian elimination,
 no library shortcuts. I wanted to understand what really happens behind the determinant and see if it
 could be expressed as a purely iterative combinatorial process.
