@@ -1,6 +1,6 @@
 
-![../../assets/common_files/thumbnails/Dispatch Responsibility: C++ Compile-Time Power vs Go Runtime Reflection.png](../../assets/common_files/thumbnails/Dispatch Responsibility: C++ Compile-Time Power vs Go Runtime Reflection.png)
-s
+![../../assets/common_files/thumbnails/dispatch-responsibility-c-compile-time-power-vs-go-runtime-reflection.png](../../assets/common_files/thumbnails/dispatch-responsibility-c-compile-time-power-vs-go-runtime-reflection.png)
+ 
 
 When comparing C++ and Go, one of the most interesting differences is not syntax,
 not performance, and not even generics — it is **where the responsibility for dispatch logic lives**.
