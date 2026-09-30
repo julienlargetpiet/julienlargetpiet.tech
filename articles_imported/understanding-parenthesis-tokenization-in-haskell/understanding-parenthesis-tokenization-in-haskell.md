@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/understanding-parenthesis-tokenization-in-haskell.png](../../assets/common_files/thumbnails/understanding-parenthesis-tokenization-in-haskell.png)
+
 ## Context
 
 Before building a full arithmetic calculator in Haskell, there was one key challenge I needed to solve first:
