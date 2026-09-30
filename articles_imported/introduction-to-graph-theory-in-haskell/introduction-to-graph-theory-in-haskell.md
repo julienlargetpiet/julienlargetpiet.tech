@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/introduction-to-graph-theory-in-haskell.png](../../assets/common_files/thumbnails/introduction-to-graph-theory-in-haskell.png)
+
 Graph theory is one of the most fascinating areas of computer science and mathematics,
 forming the foundation for countless real-world applications: from social networks
 and routing systems to dependency trees in compilers.
