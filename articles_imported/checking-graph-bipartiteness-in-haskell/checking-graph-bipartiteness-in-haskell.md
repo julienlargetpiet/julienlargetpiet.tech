@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/checking-graph-bipartiteness-in-haskell.png](../../assets/common_files/thumbnails/checking-graph-bipartiteness-in-haskell.png)
+
 One of the most elegant problems in graph theory is determining whether a given graph is **bipartite**.
 A bipartite graph is one whose nodes can be divided into two disjoint sets such that _no two nodes within the same set are connected by an edge_.
 
