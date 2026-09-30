@@ -1,3 +1,6 @@
+
+![../assets/common_files/thumbnails/implementing-huffman-encoding-in-haskell.png](../assets/common_files/thumbnails/implementing-huffman-encoding-in-haskell.png)
+
 Huffman encoding is one of the foundational algorithms in data compression — elegant, efficient, and entirely
 based on simple mathematical principles.
 It converts symbols and their frequencies into binary codes where the most frequent symbols receive shorter codes.
