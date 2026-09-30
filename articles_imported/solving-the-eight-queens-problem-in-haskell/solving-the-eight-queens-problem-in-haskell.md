@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/solving-the-eight-queens-problem-in-haskell.png](../../assets/common_files/thumbnails/solving-the-eight-queens-problem-in-haskell.png)
+
 The **Eight Queens Problem** is one of the most famous challenges in computer science and mathematics.
 The goal is simple to state yet surprisingly rich in structure:
 _Place eight queens on a chessboard so that no two queens threaten each other._
