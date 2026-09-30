@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/statix-i-built-my-own-blog-engine-because-i-refuse-to-negotiate-with-markdown-toolchains.png](../../assets/common_files/thumbnails/statix-i-built-my-own-blog-engine-because-i-refuse-to-negotiate-with-markdown-toolchains.png)
+
 Let me clarify something immediately.
 
 
