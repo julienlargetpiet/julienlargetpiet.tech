@@ -1,5 +1,6 @@
 
 ![../../assets/common_files/thumbnails/Dispatch Responsibility: C++ Compile-Time Power vs Go Runtime Reflection.png](../../assets/common_files/thumbnails/Dispatch Responsibility: C++ Compile-Time Power vs Go Runtime Reflection.png)
+s
 
 When comparing C++ and Go, one of the most interesting differences is not syntax,
 not performance, and not even generics — it is **where the responsibility for dispatch logic lives**.
