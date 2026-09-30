@@ -1,4 +1,8 @@
+
+![../../assets/common_files/thumbnails/streaming-a-mariadb-dump-from-go-pipes-syscalls-backpressure-and-the-runtime.png](../../assets/common_files/thumbnails/streaming-a-mariadb-dump-from-go-pipes-syscalls-backpressure-and-the-runtime.png)
+
 We start from a very simple handler:
+
 spawn `mysqldump`, capture its stdout, and stream it directly to the browser.
 No intermediate file. No full buffering in memory.
 
