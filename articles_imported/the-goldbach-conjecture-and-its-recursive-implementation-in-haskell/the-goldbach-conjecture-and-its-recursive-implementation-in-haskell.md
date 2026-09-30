@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/the-goldbach-conjecture-and-its-recursive-implementation-in-haskell.png](../../assets/common_files/thumbnails/the-goldbach-conjecture-and-its-recursive-implementation-in-haskell.png)
+
 The **Goldbach Conjecture** is one of the oldest unsolved problems in mathematics.
 It states that _every even integer greater than 2 can be expressed as the sum of two prime numbers_.
 
