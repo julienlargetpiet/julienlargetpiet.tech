@@ -1,10 +1,13 @@
+
+![../../assets/common_files/thumbnails/the-knight-s-tour-in-haskell-from-brute-force-to-warnsdorff-s-heuristic.png](../../assets/common_files/thumbnails/the-knight-s-tour-in-haskell-from-brute-force-to-warnsdorff-s-heuristic.png)
+
 One of the most fascinating and ancient problems in recreational mathematics is the **Knight’s Tour** — the challenge of moving a chess knight so that it visits every square of an N×N chessboard exactly once.
 
 It’s not just a puzzle: it’s a deep exploration of **backtracking**, **graph traversal**, and even **heuristic search**.
 
 In this post, I’ll show how I implemented the Knight’s Tour in Haskell — first using a basic DFS (Depth-First Search), and then improved it with **Warnsdorff’s rule**, a clever heuristic that dramatically improves performance.
 
-## ♟️ The Problem
+## The Problem
 
 The knight’s movement pattern is unique: it moves two squares in one direction and one in the perpendicular direction.
 
@@ -21,7 +24,7 @@ The challenge:
 - **Open tour:** start and end anywhere.
 - **Closed tour:** the last square connects back to the first via a legal knight move.
 
-## 🧠 Step 1 – The Depth-First Search (DFS) Approach
+## Step 1 – The Depth-First Search (DFS) Approach
 
 My first implementation was a pure **DFS backtracking search**. It tries every possible knight move recursively, backtracking when a move leads to a dead end.
 
@@ -41,7 +44,7 @@ This function tries all 8 possible moves, updating the chessboard each time. Whe
 
 It works… but very slowly. There are **billions** of possible paths on an 8×8 board, so pure DFS can take forever.
 
-## ⚙️ Step 2 – Enter Warnsdorff’s Rule
+## Step 2 – Enter Warnsdorff’s Rule
 
 **Warnsdorff’s heuristic** is a brilliant observation from 1823:
 
@@ -56,7 +59,7 @@ This heuristic doesn’t guarantee a solution — but it dramatically increases 
 
 I combined this heuristic with DFS to create an elegant, efficient hybrid.
 
-## 🚀 Step 3 – DFS + Warnsdorff Implementation
+## Step 3 – DFS + Warnsdorff Implementation
 
 ```haskell
 
@@ -103,7 +106,7 @@ betterKnightTo2 :: Pos -> Maybe [Pos]
 betterKnightTo2 start = knightDFS initBoard start [start]
 ```
 
-## 🧩 How It Works
+## How It Works
 
 1. `initBoard` creates an 8×8 grid of `False` values (unvisited squares).
 2. `knightMoves` lists all possible knight jumps that stay within bounds.
@@ -113,7 +116,7 @@ betterKnightTo2 start = knightDFS initBoard start [start]
 
 Because of the heuristic ordering, the DFS rarely has to backtrack much — in most cases, it finds a complete tour almost immediately.
 
-## 💡 Example Run
+## Example Run
 
 ```haskell
 
@@ -125,7 +128,7 @@ Just [(1,1),(3,2),(5,1),(7,2),(8,4), ... (2,3)]
 
 It outputs one valid knight’s tour starting from (1,1). You can visualize it as a continuous path covering every cell exactly once.
 
-## 🧮 Complexity and Performance
+## Complexity and Performance
 
 - **Naive DFS:** exponential in N². Practically infeasible for 8×8.
 - **DFS + Warnsdorff:** near-linear average runtime — solves in under a second.
@@ -133,7 +136,7 @@ It outputs one valid knight’s tour starting from (1,1). You can visualize it a
 
 This hybrid balances completeness (DFS ensures a solution) with efficiency (Warnsdorff guides the search).
 
-## 🔍 Closing Thoughts
+## Closing Thoughts
 
 The Knight’s Tour problem is a beautiful blend of **graph traversal**, **backtracking**, and **heuristic reasoning**. Implementing it in Haskell highlights how cleanly recursion can express complex search logic.
 
@@ -144,3 +147,6 @@ The Knight’s Tour problem is a beautiful blend of **graph traversal**, **backt
 - Representing the board functionally with immutability keeps logic pure.
 - Warnsdorff’s heuristic transforms a brute-force search into a guided one.
 - DFS remains the foundation — heuristics just make it smarter.
+
+
+
