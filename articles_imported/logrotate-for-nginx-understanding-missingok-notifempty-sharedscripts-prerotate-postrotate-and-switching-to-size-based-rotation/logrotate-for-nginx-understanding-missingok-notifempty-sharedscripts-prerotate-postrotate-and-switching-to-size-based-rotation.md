@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/logrotate-for-nginx-understanding-missingok-notifempty-sharedscripts-prerotate-postrotate-and-switching-to-size-based-rotation.png](../../assets/common_files/thumbnails/logrotate-for-nginx-understanding-missingok-notifempty-sharedscripts-prerotate-postrotate-and-switching-to-size-based-rotation.png)
+
 If you run Nginx in production, your access and error logs can grow fast. On most Linux systems, log rotation is handled
 by **logrotate**. It periodically renames log files (e.g. `access.log` → `access.log.1`),
 optionally compresses old ones, and (critically) tells Nginx to reopen its log file descriptors so it starts writing to the new files.
