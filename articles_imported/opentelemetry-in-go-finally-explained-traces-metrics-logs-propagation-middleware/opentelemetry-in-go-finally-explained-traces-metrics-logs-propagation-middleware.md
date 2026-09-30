@@ -1,3 +1,7 @@
+
+![../../assets/common_files/thumbnails/opentelemetry-in-go-finally-explained-traces-metrics-logs-propagation-middleware.png](../../assets/common_files/thumbnails/opentelemetry-in-go-finally-explained-traces-metrics-logs-propagation-middleware.png)
+s
+
 I spent the day digging into OpenTelemetry in Go and, honestly, a lot of things that look magical at first finally clicked.
 
 The code snippet of this article come from my recreational/tutorial repo:
