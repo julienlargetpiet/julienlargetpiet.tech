@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/understanding-recursion-through-combinations-permutations-and-trees-in-haskell.png](../../assets/common_files/thumbnails/understanding-recursion-through-combinations-permutations-and-trees-in-haskell.png)
+
 Recursion often feels like a mysterious concept when you first encounter it — until you realize that it’s not about doing something repeatedly, but about **breaking a problem into smaller, self-similar parts**.
 In this post, we’ll explore how recursion allows us to generate combinations, random permutations, and even manipulate trees and graphs elegantly in Haskell.
 
