@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/exploring-reachability-in-directed-graphs-with-haskell.png](../../assets/common_files/thumbnails/exploring-reachability-in-directed-graphs-with-haskell.png)
+
 # Exploring Reachability in Directed Graphs with Haskell
 
 Graphs are a natural way to represent systems of connections — from flight networks to dependencies in code or social networks.
