@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/rebuilding-the-lu-decomposition-and-benchmarking-it-against-my-own-determinant-algorithms.png](../../assets/common_files/thumbnails/rebuilding-the-lu-decomposition-and-benchmarking-it-against-my-own-determinant-algorithms.png)
+
 When I first started playing with determinant algorithms in C++, I wanted to _really_ understand what happens behind Eigen’s `.determinant()` call.
 So I decided to reimplement the **LU decomposition** from scratch — the same method used inside Eigen and LAPACK — and compare it with two determinant algorithms I built myself:
 
