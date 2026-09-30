@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/understanding-the-haskell-type-system-from-typeclasses-to-data-structures.png](../../assets/common_files/thumbnails/understanding-the-haskell-type-system-from-typeclasses-to-data-structures.png)
+
 In this tutorial — inspired by my video _“Structure de données et système de types en Haskell”_ —
 we dive into the heart of what makes Haskell so expressive: its **type system**.
 
