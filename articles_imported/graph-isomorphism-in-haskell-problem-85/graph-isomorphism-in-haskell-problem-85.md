@@ -1,5 +1,6 @@
 
 ![../../assets/common_files/thumbnails/graph-isomorphism-in-haskell-problem-85.png](../../assets/common_files/thumbnails/graph-isomorphism-in-haskell-problem-85.png)
+s
 
 Graph isomorphism is one of the classic challenges in graph theory and computer science.
 It involves determining whether two graphs have the same structure — that is, whether one can be transformed into the other simply by relabeling its nodes.
