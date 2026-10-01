@@ -1,4 +1,4 @@
-![](/assets/common_files/cauchy.gif)
+![../../assets/common_files/thumbnails/reimplementing-the-cauchy-distribution-in-fulgurance-c-statistics-library.png](../../assets/common_files/thumbnails/reimplementing-the-cauchy-distribution-in-fulgurance-c-statistics-library.png)
 
 ## Introduction
 
