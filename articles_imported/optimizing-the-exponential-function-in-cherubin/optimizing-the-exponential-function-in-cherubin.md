@@ -1,4 +1,5 @@
-![](/assets/common_files/exp.jpg)
+
+![../../assets/common_files/thumbnails/optimizing-the-exponential-function-in-cherubin.png](../../assets/common_files/thumbnails/optimizing-the-exponential-function-in-cherubin.png)
 
 **Cherubin** is my C++ library for computing **very large numbers represented as strings**. One of the hardest functions to implement efficiently in this context is the exponential `exp(x)`. A naïve implementation using the Taylor series converges slowly, requires repeated big-number multiplications and divisions, and becomes impractical very quickly.
 
