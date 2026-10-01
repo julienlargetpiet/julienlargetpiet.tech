@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/editing-my-youtube-videos-the-weird-way-with-nothing-but-ffmpeg.png](../../assets/common_files/thumbnails/editing-my-youtube-videos-the-weird-way-with-nothing-but-ffmpeg.png)
+
 Most people edit their YouTube videos with slick GUIs: Premiere, DaVinci Resolve, Final Cut Pro, even OBS + Shotcut for the open-source crowd. Me? I’m allergic to timelines and mouse-dragging. I prefer to edit in the most brutalist way possible: directly from the terminal, using nothing but ffmpeg.
 
 Yes, I’m basically editing like a robot with a text editor and command lines. It’s unusual, it’s nerdy, but it works. Let me walk you through my strange ritual.
