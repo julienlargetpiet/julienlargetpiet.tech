@@ -1,4 +1,5 @@
-# Context
+
+![../../assets/common_files/thumbnails/authentication-without-cookies.png](../../assets/common_files/thumbnails/authentication-without-cookies.png)
 
 Recently, i've been programming a simple cloud webserver in Go.
 
