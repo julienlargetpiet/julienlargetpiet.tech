@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/reimplementing-diff-in-c-a-minimalist-approach.png](../../assets/common_files/thumbnails/reimplementing-diff-in-c-a-minimalist-approach.png)
+
 ## Why Rebuild Something That Already Exists?
 
 The `diff` command is one of the cornerstones of the GNU/Linux ecosystem. It’s simple in appearance, yet behind the scenes it powers version control, code reviews, and collaborative software development.
