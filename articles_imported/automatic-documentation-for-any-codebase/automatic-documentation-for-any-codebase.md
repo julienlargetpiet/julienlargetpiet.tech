@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/automatic-documentation-for-any-codebase.png](../../assets/common_files/thumbnails/automatic-documentation-for-any-codebase.png)
 
 When working with R, I loved how **Roxygen** lets you generate clean documentation directly from comments in your source code. But I often wished there was something similar for _every language_, not just R. That’s why I built **[simple\_doc](https://github.com/julienlargetpiet/simple_doc)**: a lightweight documentation tool that works on any codebase.
 
