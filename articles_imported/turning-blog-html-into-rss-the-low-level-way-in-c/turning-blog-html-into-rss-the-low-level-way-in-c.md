@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/turning-blog-html-into-rss-the-low-level-way-in-c.png](../../assets/common_files/thumbnails/turning-blog-html-into-rss-the-low-level-way-in-c.png)
+
 If you publish long-form posts on the web, you’ve probably felt the friction of keeping your RSS feed in sync. I did too. So I wrote a tiny command-line tool in C++ that converts a finished blog post page (the raw HTML file itself, not just the body) into a ready-to-drop `<item>` block for your RSS feed. Because yes—CLI is fun, and C++ is low-level, baby. 🛠️
 
 ## TL;DR
