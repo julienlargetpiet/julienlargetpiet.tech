@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/symetric-encryption-protocol.png](../../assets/common_files/thumbnails/symetric-encryption-protocol.png)
 
 **How i've implemented an original symetric encryption protocol with combinatorial mathematics**
 
