@@ -1,8 +1,6 @@
 
 ![../../assets/common_files/thumbnails/unsolved-problem.png](../../assets/common_files/thumbnails/unsolved-problem.png)
 
-# FormalismConversion (Haskell)
-
 ## Statement and motivation (inspired from pb.93 of 99 Problems in Haskell)
 
 This problem originates from the motivation to find all possible results given a formula with \`n\` values, like:
