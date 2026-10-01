@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/cheating-a-bit-approximating-atan-arccos-and-arcsin-in-the-cherubin-library.png](../../assets/common_files/thumbnails/cheating-a-bit-approximating-atan-arccos-and-arcsin-in-the-cherubin-library.png)
 
 This project is part of my **Cherubin** library — a C++ library for computing **very large numbers represented as strings**. Because Cherubin works outside the world of hardware floats and doubles, I couldn’t just call `std::atan`, `std::asin`, or `std::acos`. Instead, I had to invent approximations that made sense within the string-based arithmetic of Cherubin. ( [GitHub link](https://github.com/julienlargetpiet/Cherubin))
 
