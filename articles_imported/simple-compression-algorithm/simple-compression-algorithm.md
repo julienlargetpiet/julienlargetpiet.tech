@@ -1,4 +1,5 @@
-![](/assets/common_files/compression_algo.jpg)
+
+![../../assets/common_files/thumbnails/simple-compression-algorithm.png](../../assets/common_files/thumbnails/simple-compression-algorithm.png)
 
 _Ghost in the Shell, 1995_
 
