@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/custom-encoding-for-integers.png](../../assets/common_files/thumbnails/custom-encoding-for-integers.png)
+
 Ok, so i had to encode a structured data, a positive integer in this case representing the space for the server to reserve a byte slice for a file content, image, text...
 
 Basically, how to convert any **positive integer to a vector of number that accepts value from 0 to 255**.
