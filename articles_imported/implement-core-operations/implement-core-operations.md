@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/implement-core-operations.png](../../assets/common_files/thumbnails/implement-core-operations.png)
+
 I have just finished developing a library for manipulating numbers so large and/or precise that no conventional datatype can encode them.
 
 You can find this library there:
