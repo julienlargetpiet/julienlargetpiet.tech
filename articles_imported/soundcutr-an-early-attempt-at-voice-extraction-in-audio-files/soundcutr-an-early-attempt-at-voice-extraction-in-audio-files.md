@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/soundcutr-an-early-attempt-at-voice-extraction-in-audio-files.png](../../assets/common_files/thumbnails/soundcutr-an-early-attempt-at-voice-extraction-in-audio-files.png)
 
 Think of this article as a small time capsule of my programming journey — proof that everyone starts somewhere, and that projects don’t need to be perfect to be fun and functional.
 
