@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/reimplementing-cross-validation-for-knn-in-r-from-scratch.png](../../assets/common_files/thumbnails/reimplementing-cross-validation-for-knn-in-r-from-scratch.png)
 
 After reimplementing **K-Nearest Neighbors (KNN)** from scratch, I wanted to take things a step further: build a **cross-validation system** entirely in base R. This meant re-creating folds, evaluating accuracy across them, and tuning both `k` (the number of neighbors) and the training proportion. No caret, no external frameworks — just my own code.
 
