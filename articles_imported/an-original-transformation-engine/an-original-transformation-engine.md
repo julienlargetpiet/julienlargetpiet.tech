@@ -1,4 +1,5 @@
-# Introduction
+
+![../../assets/common_files/thumbnails/an-original-transformation-engine.png](../../assets/common_files/thumbnails/an-original-transformation-engine.png)
 
 In this article i will introduce you, in short, how i've implemented transformation engine XSLT like from scratch (with C++).
 
