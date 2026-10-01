@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/a-new-way-to-explore-your-system-on-linux.png](../../assets/common_files/thumbnails/a-new-way-to-explore-your-system-on-linux.png)
 
 On Linux, productivity often comes from small but powerful tools. `dmenu` and `rofi` are great examples: minimalist application launchers that make your desktop more efficient.
 
