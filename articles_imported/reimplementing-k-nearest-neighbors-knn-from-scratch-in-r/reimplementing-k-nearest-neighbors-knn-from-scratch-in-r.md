@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/https://julienlargetpiet.tech/articles/reimplementing-k-nearest-neighbors-knn-from-scratch-in-r.png](../../assets/common_files/thumbnails/https://julienlargetpiet.tech/articles/reimplementing-k-nearest-neighbors-knn-from-scratch-in-r.png)
+
 As part of my exploration of machine learning fundamentals, I decided to reimplement classic algorithms from scratch instead of relying directly on existing libraries. One of the first I tackled was **K-Nearest Neighbors (KNN)**, a simple yet powerful classification method.
 
 ## Why KNN?
