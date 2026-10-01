@@ -1,6 +1,6 @@
 
 ![../../assets/common_files/thumbnails/building-an-encrypted-terminal-chatroom-in-c-a-personal-engineering-story.png](../../assets/common_files/thumbnails/building-an-encrypted-terminal-chatroom-in-c-a-personal-engineering-story.png)
-s
+ 
 
 I built a tiny chatroom that runs entirely in the terminal, written in C, with all messages encrypted.
 This article is my engineering story: why I did it, how the design evolved, what broke (and why), and the practical
