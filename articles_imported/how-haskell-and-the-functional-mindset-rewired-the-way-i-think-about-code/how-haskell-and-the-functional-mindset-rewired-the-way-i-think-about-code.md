@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/how-haskell-and-the-functional-mindset-rewired-the-way-i-think-about-code.png](../../assets/common_files/thumbnails/how-haskell-and-the-functional-mindset-rewired-the-way-i-think-about-code.png)
+
 I didn’t set out to “become a functional programmer.” I stumbled into Haskell after years of imperative and OOP work, mostly focused on getting features out the door. I knew about lambdas and “map/filter,” but those were just utilities, not a worldview.
 
 
