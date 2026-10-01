@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/building-my-own-parser-in-r-a-custom-syntax-experiment.png](../../assets/common_files/thumbnails/building-my-own-parser-in-r-a-custom-syntax-experiment.png)
 
 This was one of my older projects, a little bit eccentric but very educational. I wanted to see if I could design and implement a parser from scratch in R, complete with a brand-new syntax and functions to both read and write data. The project is part of my old data manipulation library written in R avaiable on this [repo](https://github.com/julienlargetpiet/edm1/blob/main/R/all_fun.R)
 
