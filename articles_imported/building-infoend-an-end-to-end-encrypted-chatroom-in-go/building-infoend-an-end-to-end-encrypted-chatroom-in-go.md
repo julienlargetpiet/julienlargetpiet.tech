@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/building-infoend-an-end-to-end-encrypted-chatroom-in-go.png](../../assets/common_files/thumbnails/building-infoend-an-end-to-end-encrypted-chatroom-in-go.png)
 
 _InFoEnd_ is my first experiment with building a secure chatroom application in Go. The goal: create a real-time messaging system where messages are encrypted end-to-end, such that even the server cannot read them.
 
