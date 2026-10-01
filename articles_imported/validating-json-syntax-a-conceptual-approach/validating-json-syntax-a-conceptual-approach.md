@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/validating-json-syntax-a-conceptual-approach.png](../../assets/common_files/thumbnails/validating-json-syntax-a-conceptual-approach.png)
+
 In modern systems, JSON has become the de facto standard for exchanging structured data. Its popularity comes from its simplicity and readability. Yet, beneath this apparent simplicity lies a crucial question: how can we be sure that what we call “JSON” actually respects the rules of the format? Parsing alone is not enough — validation is essential.
 
 In this article, I share a way of thinking about JSON validation that goes beyond existing tools. The objective is not to provide a new parser or a piece of software, but to propose a conceptual algorithm for understanding what it really means to validate JSON.
