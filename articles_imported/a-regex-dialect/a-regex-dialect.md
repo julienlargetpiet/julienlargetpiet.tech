@@ -1,4 +1,5 @@
-# Introduction
+
+![../../assets/common_files/thumbnails/a-regex-dialect.png](../../assets/common_files/thumbnails/a-regex-dialect.png)
 
 In this article i'm gonna present you a method to implement `RegEx`.
 
