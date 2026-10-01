@@ -1,8 +1,6 @@
 
 ![../../assets/common_files/thumbnails/simple-compression-algorithm.png](../../assets/common_files/thumbnails/simple-compression-algorithm.png)
 
-_Ghost in the Shell, 1995_
-
 **I've just finished implementing a simple text compression algorithm in C++, i will talk about its implementation in this article.**
 
 The programm is available here [repo](https://github.com/julienlargetpiet/Simple_compression)
