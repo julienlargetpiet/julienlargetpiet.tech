@@ -1,4 +1,5 @@
-![](/assets/common_files/unsolved.jpg)
+
+![../../assets/common_files/thumbnails/unsolved-problem.png](../../assets/common_files/thumbnails/unsolved-problem.png)
 
 # FormalismConversion (Haskell)
 
