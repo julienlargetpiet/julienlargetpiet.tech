@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/building-an-http-server-in-rust-without-a-framework.png](../../assets/common_files/thumbnails/building-an-http-server-in-rust-without-a-framework.png)
+
 All code excerpts below are **highlights** of the full implementation.
 See the complete source on GitHub:
 [julienlargetpiet/HTTP\_Server](https://github.com/julienlargetpiet/HTTP_Server).
