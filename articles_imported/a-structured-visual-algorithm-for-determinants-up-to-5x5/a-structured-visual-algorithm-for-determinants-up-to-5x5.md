@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/a-structured-visual-algorithm-for-determinants-up-to-5-5.png](../../assets/common_files/thumbnails/a-structured-visual-algorithm-for-determinants-up-to-5-5.png)
+
 ## 1\. Introduction
 
 Determinants are fundamental objects in linear algebra, yet direct computation beyond 3×3 can be tedious.
