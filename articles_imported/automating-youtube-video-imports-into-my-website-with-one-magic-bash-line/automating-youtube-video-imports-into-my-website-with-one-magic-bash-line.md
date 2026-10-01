@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/automating-youtube-video-imports-into-my-website-with-one-magic-bash-line.png](../../assets/common_files/thumbnails/automating-youtube-video-imports-into-my-website-with-one-magic-bash-line.png)
 
 Over the past months I’ve been downloading my own YouTube videos with
 [yt-dlp](https://github.com/yt-dlp/yt-dlp). It’s a fantastic tool for archiving,
