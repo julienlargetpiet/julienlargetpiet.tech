@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/emulating-binary-level-operations-and-number-representations.png](../../assets/common_files/thumbnails/emulating-binary-level-operations-and-number-representations.png)
+
 At the heart of every computer lies a simple truth: everything is binary. Whether you are working with integers, floating-point numbers, or characters, all data is ultimately represented as sequences of 0s and 1s.
 
 To truly understand how computers operate, developers must go beyond high-level abstractions and study how numbers are represented and manipulated at the binary level. This article covers three pillars of low-level computation:
