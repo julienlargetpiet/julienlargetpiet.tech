@@ -1,4 +1,5 @@
-## Introduction
+
+![../../assets/common_files/thumbnails/brute-forcing-pythagorean-triples-with-haskell-list-comprehensions-up-to-100.png](../../assets/common_files/thumbnails/brute-forcing-pythagorean-triples-with-haskell-list-comprehensions-up-to-100.png)
 
 We want all integer solutions `(a,b,c)` to the equation
 `a^2 = b^2 + c^2` with `0 < a < 100`. This is a great place to use Haskell’s
