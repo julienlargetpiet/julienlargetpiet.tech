@@ -3,7 +3,7 @@
 
 In this article, we'll proceed to install Gentoo.
 
-This article follows the story of manually installing Linux distros which begins here [here](https://julienlargetpiet.tech/articles/manually-installing-arch-and-void-linux-on-the-same-disk-with-uefi-and-grub.html) where non Gentoo relative commands are explained in depth.
+This article follows the story of manually installing Linux distros which begins here **[here](https://julienlargetpiet.tech/articles/manually-installing-arch-and-void-linux-on-the-same-disk-with-uefi-and-grub.html)** where non Gentoo relative commands are explained in depth.
 
 Indeed, we'll focus on Gentoo specific architecture here.
 
