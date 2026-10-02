@@ -1,5 +1,11 @@
 
-![../../assets/common_files/thumbnails/ShinyNGINX2.png](../../assets/common_files/thumbnails/ShinyNGINX2.png)
+<div class="img-loading">
+    <img
+        src="../../assets/common_files/thumbnails/ShinyNGINX2.png"
+        alt="../../assets/common_files/thumbnails/ShinyNGINX2.png"
+        onload="this.parentElement.classList.add('loaded')"
+    >
+</div>
 
 My previous article was somewhat polarizing.
 
