@@ -383,8 +383,8 @@ In fact, we have:
 ```
       /G
      F
-    / \F 
-   /   
+    / \ 
+   /   F
   /   
  /     F
 /     / 
@@ -395,8 +395,8 @@ In fact, we have:
    \   F
     \ /
      G
-      \G
-
+      \
+       G
 
 ```
 
