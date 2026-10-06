@@ -381,7 +381,9 @@ But wait, let's try to visualize the problem.
 In fact, we have:
 
 ```
-      /G
+
+       G
+      /
      F
     / \ 
    /   F
