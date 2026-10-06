@@ -106,12 +106,9 @@ By the way, the probability of detecting the heavier ball at a given weighing is
 
 $$
 \begin{aligned}
-f(n)=
-\begin{cases}
-\dfrac{1}{9-2n}+\dfrac{1}{8-2n}, & n\in[0,3],\\[6pt]
-1, & n\in[4,+\infty).
-\end{cases}
-\end{aligned}
+P_n = \frac{2}{9 - 2n},
+\qquad n \in \{0,1,2,3\}\
+end{aligned}
 $$
 
 where `n` is the weighing number.
