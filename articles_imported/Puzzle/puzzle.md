@@ -213,10 +213,10 @@ So each scientist can test:
 
 $$
 \begin{aligned}
-f(n)=
+f(n) =
 \begin{cases}
-\dfrac{n+1}{2}-1, & \text{if } (n+1)\bmod 2 = 0, \\[6pt]
-\left\lfloor \dfrac{n+1}{2}-1 \right\rfloor, & \text{otherwise.}
+\frac{n+1}{2} - 1, & \text{if } (n+1) \bmod 2 = 0, \\
+\left\lfloor \frac{n+1}{2} - 1 \right\rfloor, & \text{otherwise}
 \end{cases}
 \end{aligned}
 $$
