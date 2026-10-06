@@ -1,4 +1,6 @@
 
+![../../assets/common_files/thumbnails/puzzle.png](../../assets/common_files/thumbnails/puzzle.png)
+
 This article is about several mathematical puzzles which will sharpen your reasoning.
 
 There will be several well-known ones, such as the Monty Hall problem, but also lesser-known ones, such as the mechanical scale and the balls.
