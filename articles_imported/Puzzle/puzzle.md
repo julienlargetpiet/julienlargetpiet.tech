@@ -427,10 +427,7 @@ The number of such outcomes is given by the binomial coefficient:
 
 $$
 \begin{aligned}
-\binom{4}{3}
-=
-\frac{4!}{3!(4-3)!}
-\end{aligned}
+\binom{4}{3} = \frac{4!}{3!(4-3)!}\end{aligned}
 $$
 
 So the answer is `4 / 16 = 1 / 4`.
