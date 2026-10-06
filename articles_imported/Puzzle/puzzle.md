@@ -105,10 +105,7 @@ If we're lucky, we can find it on the first weighing, but here we want to be sur
 By the way, the probability of detecting the heavier ball at a given weighing is:
 
 $$
-\begin{aligned}
-P_n = \frac{2}{9 - 2n},
-\qquad n \in \{0,1,2,3\}\
-end{aligned}
+P_n = \frac{2}{9 - 2n}, \quad n \in \{0,1,2,3\}
 $$
 
 where `n` is the weighing number.
