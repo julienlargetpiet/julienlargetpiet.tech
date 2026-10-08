@@ -210,7 +210,7 @@ $$
 f(n) =
 \begin{cases}
 \frac{n+1}{2} - 1, & \text{if } (n+1) \bmod 2 = 0, \\
-\left\lfloor \frac{n+1}{2} - 1 \right\rfloor, & \text{otherwise}
+\left\lfloor \frac{n+1}{2} \right\rfloor, & \text{otherwise}
 \end{cases}
 \end{aligned}
 $$
