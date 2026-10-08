@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/sports.webp](../../assets/common_files/thumbnails/sports.webp)
+
 During my teenage years, I was quite into weightlifting. When the COVID-19 pandemic hit, I decided to buy some equipment and build my own little home gym.
 
 Yes, this is a rather unusual article for my blog! But since I'm about to sell all this equipment, I thought it would be nice to document what I owned and preserve a little memory of that period.
