@@ -376,23 +376,23 @@ In fact, we have:
 
 ```
 
-       G
+       G # we change to G
       /
      F
     / \ 
-   /   F
+   /   F # we stay to F
   /   
- /     F
+ /     F # we change to F
 /     / 
 -----G
 \     \
- \     G
+ \     G # we stay to G
   \    
-   \   F
+   \   F # we change to F
     \ /
      G
       \
-       G
+       G # we stay to G
 
 ```
 
