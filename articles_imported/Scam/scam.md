@@ -5,7 +5,7 @@ So, 13 listings and about four hours later, I received an offer, which I accepte
 
 And boom: in Leboncoin’s rather terrible chat interface, a very professional-looking sales notification suddenly appeared:
 
-[../../assets/common_files/scam/scam1.jpg](../../assets/common_files/scam/scam1.jpg)
+![../../assets/common_files/scam/scam1.jpg](../../assets/common_files/scam/scam1.jpg)
 
 For someone who doesn’t know how the platform works, someone who has never used it before, or who has only ever been paid in cash during an in-person sale, this can look completely legitimate.
 
@@ -23,7 +23,7 @@ So I did.
 
 And this is what it looked like:
 
-[../../assets/common_files/scam/scam2.jpg](../../assets/common_files/scam/scam2.jpg)
+![../../assets/common_files/scam/scam2.jpg](../../assets/common_files/scam/scam2.jpg)
 
 “Maybe Leboncoin uses generative AI,” I thought to myself.
 
@@ -31,7 +31,7 @@ Then I clicked on **“Voir les détails”**.
 
 It redirected me to a domain name that, at first glance, looked like it belonged to Leboncoin:
 
-[../../assets/common_files/scam/scam3.jpg](../../assets/common_files/scam/scam3.jpg)
+![../../assets/common_files/scam/scam3.jpg](../../assets/common_files/scam/scam3.jpg)
 
 But it didn’t.
 
