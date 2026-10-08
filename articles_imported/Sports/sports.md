@@ -20,63 +20,63 @@ In other words, there's no single standard, and the specifications can vary cons
 
 ## The 10 kg, 28 mm Weight Plates
 
-[../../assets/common_files/sports/domyos1.jpg](../../assets/common_files/sports/domyos1.jpg)
+![../../assets/common_files/sports/domyos1.jpg](../../assets/common_files/sports/domyos1.jpg)
 
-[../../assets/common_files/sports/domyos2.jpg](../../assets/common_files/sports/domyos2.jpg)
+![../../assets/common_files/sports/domyos2.jpg](../../assets/common_files/sports/domyos2.jpg)
 
-[../../assets/common_files/sports/domyos3.jpg](../../assets/common_files/sports/domyos3.jpg)
+![../../assets/common_files/sports/domyos3.jpg](../../assets/common_files/sports/domyos3.jpg)
 
 This was a good fit for my previous 28mm barbell.
 
 ## A pair of adjustable dumbbells with their weight plates - 28mm
 
-[../../assets/common_files/sports/kit1.jpg](../../assets/common_files/sports/kit1.jpg)
+![../../assets/common_files/sports/kit1.jpg](../../assets/common_files/sports/kit1.jpg)
 
-[../../assets/common_files/sports/kit2.jpg](../../assets/common_files/sports/kit2.jpg)
+![../../assets/common_files/sports/kit2.jpg](../../assets/common_files/sports/kit2.jpg)
 
 There are 12 plates of 0.5kg and 4 plates of 1kg.
 
 ## The kettlebell
 
-[../../assets/common_files/sports/kettlebell1.jpg](../../assets/common_files/sports/kettlebell1.jpg)
+![../../assets/common_files/sports/kettlebell1.jpg](../../assets/common_files/sports/kettlebell1.jpg)
 
-[../../assets/common_files/sports/kettlebell2.jpg](../../assets/common_files/sports/kettlebell2.jpg)
+![../../assets/common_files/sports/kettlebell2.jpg](../../assets/common_files/sports/kettlebell2.jpg)
 
 ## The curl EZ bar - 50mm
 
-[../../assets/common_files/sports/ez1.jpg](../../assets/common_files/sports/ez1.jpg)
+![../../assets/common_files/sports/ez1.jpg](../../assets/common_files/sports/ez1.jpg)
 
-[../../assets/common_files/sports/ez2.jpg](../../assets/common_files/sports/ez2.jpg)
+![../../assets/common_files/sports/ez2.jpg](../../assets/common_files/sports/ez2.jpg)
 
 ## The olympic bar
 
-[../../assets/common_files/sports/bar1.jpg](../../assets/common_files/sports/bar1.jpg)
+![../../assets/common_files/sports/bar1.jpg](../../assets/common_files/sports/bar1.jpg)
 
-[../../assets/common_files/sports/bar2.jpg](../../assets/common_files/sports/bar2.jpg)
+![../../assets/common_files/sports/bar2.jpg](../../assets/common_files/sports/bar2.jpg)
 
 ## The olympic squat bar
 
-[../../assets/common_files/sports/bar_squat1.jpg](../../assets/common_files/sports/bar_squat1.jpg)
+![../../assets/common_files/sports/bar_squat1.jpg](../../assets/common_files/sports/bar_squat1.jpg)
 
-[../../assets/common_files/sports/bar_squat2.jpg](../../assets/common_files/sports/bar_squat2.jpg)
+![../../assets/common_files/sports/bar_squat2.jpg](../../assets/common_files/sports/bar_squat2.jpg)
 
 ## The grey 25kg plates - 50mm
 
-[../../assets/common_files/sports/25kg_gris1.jpg](../../assets/common_files/sports/25kg_gris1.jpg)
+![../../assets/common_files/sports/25kg_gris1.jpg](../../assets/common_files/sports/25kg_gris1.jpg)
 
-[../../assets/common_files/sports/25kg_gris2.jpg](../../assets/common_files/sports/25kg_gris2.jpg)
+![../../assets/common_files/sports/25kg_gris2.jpg](../../assets/common_files/sports/25kg_gris2.jpg)
 
 ## The black 25kg plates - 50mm
 
-[../../assets/common_files/sports/25kg_black1.jpg](../../assets/common_files/sports/25kg_black1.jpg)
+![../../assets/common_files/sports/25kg_black1.jpg](../../assets/common_files/sports/25kg_black1.jpg)
 
-[../../assets/common_files/sports/25kg_black2.jpg](../../assets/common_files/sports/25kg_black2.jpg)
+![../../assets/common_files/sports/25kg_black2.jpg](../../assets/common_files/sports/25kg_black2.jpg)
 
 ## The black 15kg plates - 50mm
 
-[../../assets/common_files/sports/afw1.jpg](../../assets/common_files/sports/afw1.jpg)
+![../../assets/common_files/sports/afw1.jpg](../../assets/common_files/sports/afw1.jpg)
 
-[../../assets/common_files/sports/afw2.jpg](../../assets/common_files/sports/afw2.jpg)
+![../../assets/common_files/sports/afw2.jpg](../../assets/common_files/sports/afw2.jpg)
 
 ## The calibrated 10kg plates - 50mm
 
@@ -86,31 +86,31 @@ This means that a 10 kg plate can weigh anywhere between 9.99 kg and 10.01 kg.
 
 The brand is "Pallini".
 
-[../../assets/common_files/sports/palini_vert1.jpg](../../assets/common_files/sports/palini_vert1.jpg)
+![../../assets/common_files/sports/palini_vert1.jpg](../../assets/common_files/sports/palini_vert1.jpg)
 
-[../../assets/common_files/sports/palini_vert2.jpg](../../assets/common_files/sports/palini_vert2.jpg)
+![../../assets/common_files/sports/palini_vert2.jpg](../../assets/common_files/sports/palini_vert2.jpg)
 
 ## The calibrated 5kg plates - 50mm
 
 They are also calibrated.
 
-[../../assets/common_files/sports/palini_blanc1.jpg](../../assets/common_files/sports/palini_blanc1.jpg)
+![../../assets/common_files/sports/palini_blanc1.jpg](../../assets/common_files/sports/palini_blanc1.jpg)
 
-[../../assets/common_files/sports/palini_blanc2.jpg](../../assets/common_files/sports/palini_blanc2.jpg)
+![../../assets/common_files/sports/palini_blanc2.jpg](../../assets/common_files/sports/palini_blanc2.jpg)
 
 ## The 2.5kg plates - 50mm
 
-[../../assets/common_files/sports/afw_small1.jpg](../../assets/common_files/sports/afw_small1.jpg)
+![../../assets/common_files/sports/afw_small1.jpg](../../assets/common_files/sports/afw_small1.jpg)
 
-[../../assets/common_files/sports/afw_small2.jpg](../../assets/common_files/sports/afw_small2.jpg)
+![../../assets/common_files/sports/afw_small2.jpg](../../assets/common_files/sports/afw_small2.jpg)
 
 ## The calibrates 1.25kg plates - 50mm
 
 The brand is "Rogue".
 
-[../../assets/common_files/sports/rogue1.jpg](../../assets/common_files/sports/rogue1.jpg)
+![../../assets/common_files/sports/rogue1.jpg](../../assets/common_files/sports/rogue1.jpg)
 
-[../../assets/common_files/sports/rogue2.jpg](../../assets/common_files/sports/rogue2.jpg)
+![../../assets/common_files/sports/rogue2.jpg](../../assets/common_files/sports/rogue2.jpg)
 
 
 
