@@ -1,4 +1,6 @@
 
+![../../assets/common_files/thumbnails/scam.webp](../../assets/common_files/thumbnails/scam.webp)
+
 Yesterday, I was uploading listings for some fitness equipment I bought during the COVID period on the French equivalent of Craigslist (not [https://www.craigslist.org/area/paris](https://www.craigslist.org/area/paris) lol, but [leboncoin.com](leboncoin.com) ), which I was using for the first time.
 
 So, 13 listings and about four hours later, I received an offer, which I accepted.
