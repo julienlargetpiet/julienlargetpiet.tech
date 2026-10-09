@@ -115,5 +115,46 @@ The brand is "Rogue".
 
 ![../../assets/common_files/sports/rogue2.jpg](../../assets/common_files/sports/rogue2.jpg)
 
+## The bench
+
+This bench has been heavily reinforced to support heavier loads and widened to provide better shoulder support and stability during exercises.
+
+![../../assets/common_files/sports/banc1.jpg](../../assets/common_files/sports/banc1.jpg)
+
+![../../assets/common_files/sports/banc2.jpg](../../assets/common_files/sports/banc2.jpg)
+
+![../../assets/common_files/sports/banc3.jpg](../../assets/common_files/sports/banc3.jpg)
+
+![../../assets/common_files/sports/banc4.jpg](../../assets/common_files/sports/banc4.jpg)
+
+![../../assets/common_files/sports/banc5.jpg](../../assets/common_files/sports/banc5.jpg)
+
+![../../assets/common_files/sports/banc6.jpg](../../assets/common_files/sports/banc6.jpg)
+
+![../../assets/common_files/sports/banc7.jpg](../../assets/common_files/sports/banc7.jpg)
+
+![../../assets/common_files/sports/banc8.jpg](../../assets/common_files/sports/banc8.jpg)
+
+## Pair of Adjustable Squat and Bench Press Stands
+
+These stands have also been modified to provide additional support against a wall, significantly improving their overall stability.
+
+![../../assets/common_files/sports/supports.jpg](../../assets/common_files/sports/supports.jpg)
+
+![../../assets/common_files/sports/supports2.jpg](../../assets/common_files/sports/supports2.jpg)
+
+![../../assets/common_files/sports/supports3.jpg](../../assets/common_files/sports/supports3.jpg)
+
+## Massage Foam Roller
+
+![../../assets/common_files/sports/back_massage1.jpg](../../assets/common_files/sports/back_massage1.jpg)
+
+## Squat Shoes
+
+![../../assets/common_files/sports/squat_shoes1.jpg](../../assets/common_files/sports/squat_shoes1.jpg)
+
+![../../assets/common_files/sports/squat_shoes2.jpg](../../assets/common_files/sports/squat_shoes2.jpg)
+
+
 
 
