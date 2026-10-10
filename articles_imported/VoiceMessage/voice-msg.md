@@ -1,3 +1,6 @@
+
+![../../assets/common_files/thumbnails/voice-msg.webp](../../assets/common_files/thumbnails/voice-msg.webp)
+
 This article comes from a frustration I had with Discord Web.
 
 I didn't have the possibility to directly send a voice message.
