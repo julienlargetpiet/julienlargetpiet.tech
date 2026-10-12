@@ -927,3 +927,11 @@ The composition is easy to reproduce and standardize from the command line, eith
 
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

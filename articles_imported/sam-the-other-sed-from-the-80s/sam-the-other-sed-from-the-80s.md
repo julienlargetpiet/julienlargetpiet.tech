@@ -724,3 +724,11 @@ Trying to translate one directly into the other is often the wrong approach. You
 piekvorst mentioned these ressources on HN:
 
 [sam\_tut.pdf](https://ratfactor.com/papers/sam_tut.pdf) [struct-regex.pdf](https://9p.io/sources/contrib/steve/other-docs/struct-regex.pdf)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

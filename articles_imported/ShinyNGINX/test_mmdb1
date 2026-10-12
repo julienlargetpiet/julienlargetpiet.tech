@@ -1,0 +1,93 @@
+root@srv549506:/var/www/RShinyApp# mmdblookup --file geo/GeoLite2-City.mmdb --ip 1.11.1.2
+
+  {
+    "continent":
+      {
+        "code":
+          "AS" <utf8_string>
+        "geoname_id":
+          6255147 <uint32>
+        "names":
+          {
+            "de":
+              "Asien" <utf8_string>
+            "en":
+              "Asia" <utf8_string>
+            "es":
+              "Asia" <utf8_string>
+            "fr":
+              "Asie" <utf8_string>
+            "ja":
+              "アジア" <utf8_string>
+            "pt-BR":
+              "Ásia" <utf8_string>
+            "ru":
+              "Азия" <utf8_string>
+            "zh-CN":
+              "亚洲" <utf8_string>
+          }
+      }
+    "country":
+      {
+        "geoname_id":
+          1835841 <uint32>
+        "iso_code":
+          "KR" <utf8_string>
+        "names":
+          {
+            "de":
+              "Südkorea" <utf8_string>
+            "en":
+              "South Korea" <utf8_string>
+            "es":
+              "Corea del Sur" <utf8_string>
+            "fr":
+              "Corée du Sud" <utf8_string>
+            "ja":
+              "大韓民国" <utf8_string>
+            "pt-BR":
+              "Coreia do Sul" <utf8_string>
+            "ru":
+              "Республика Корея" <utf8_string>
+            "zh-CN":
+              "韩国" <utf8_string>
+          }
+      }
+    "location":
+      {
+        "accuracy_radius":
+          200 <uint16>
+        "latitude":
+          37.511200 <double>
+        "longitude":
+          126.974100 <double>
+        "time_zone":
+          "Asia/Seoul" <utf8_string>
+      }
+    "registered_country":
+      {
+        "geoname_id":
+          1835841 <uint32>
+        "iso_code":
+          "KR" <utf8_string>
+        "names":
+          {
+            "de":
+              "Südkorea" <utf8_string>
+            "en":
+              "South Korea" <utf8_string>
+            "es":
+              "Corea del Sur" <utf8_string>
+            "fr":
+              "Corée du Sud" <utf8_string>
+            "ja":
+              "大韓民国" <utf8_string>
+            "pt-BR":
+              "Coreia do Sul" <utf8_string>
+            "ru":
+              "Республика Корея" <utf8_string>
+            "zh-CN":
+              "韩国" <utf8_string>
+          }
+      }
+  }

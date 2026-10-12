@@ -76,3 +76,11 @@ This inserts a new node `(ii:olm)` under the path `ok → oui`. The dataset grow
 This was one of my older projects, but it shows how much you can learn by reinventing the wheel intentionally. By creating my own parser in R, I not only invented a mini data format but also trained myself in handling nested structures, indexes, and edge cases.
 
 It’s not meant to replace JSON, but it was a great playground for anyone curious about how parsers work.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

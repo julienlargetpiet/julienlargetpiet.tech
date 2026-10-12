@@ -11570,3 +11570,11 @@ And gameover screen, with score.
 Hope you found this article useful !
 
 !! Ciao Ciao !!
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -205,3 +205,10 @@ Please leave a comment below with your thoughts on the limitations of AI. Do you
 - \[1\] Blogger
 
 ---
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

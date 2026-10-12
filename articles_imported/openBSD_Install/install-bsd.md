@@ -2302,3 +2302,11 @@ reboot
 Hope this article was useful, see you later ;)
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

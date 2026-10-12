@@ -59,3 +59,10 @@ If you want to add a table, you can use the following format:
 Let me know if you want to add anything else.
 
 Note that the maximum header allowed is
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

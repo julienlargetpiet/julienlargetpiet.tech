@@ -26,3 +26,10 @@ While machines may not be able to truly understand meaning in the way humans do,
 - \[1\] Turing, A. (1950). Computing Machinery and Intelligence. Mind, 59(236), 433-460.
 - \[2\] Searle, J. R. (1980). Minds, Brains, and Programs. Behavioral and Brain Sciences, 3(3), 417-424.
 - \[3\] McCarthy, J. (2007). What is Artificial Intelligence? In J. R. Anderson, J. M. Howard, & D. W. W.
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

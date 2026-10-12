@@ -366,3 +366,11 @@ Conclusion:
 ## 11\. One-Liner Summary
 
 > My VPS wasn’t slow. The Internet path to it was.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

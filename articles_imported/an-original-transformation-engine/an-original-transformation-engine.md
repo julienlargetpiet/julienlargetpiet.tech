@@ -315,3 +315,11 @@ In fact, what we'l output in the html file is, at this stage, scattered inside a
 Each vector of vector corresponds to all the requested iteraation data for the current crossed path. At a point in the algorithm, if we are inside a level 3 of nesting for loop, then the vector of vector will contain 3 vectors. The last vector correspond to the data of the current path. The last element of the last vector correspond to the stored data of the last loop iteration with the last current path.
 
 It's when we get out of the for loop that we'll have to sort ascendingly or descendingly the last vector elements before adding them to the last element of the penultimate vector. Now we can remove the last vector from `tracks_ref`.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

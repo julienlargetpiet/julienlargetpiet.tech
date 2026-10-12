@@ -232,3 +232,11 @@ In this intermediate overview, we explored:
 
 In short, the Haskell type system isn’t just a safety net — it’s a design language.
 Mastering it is the first real step toward writing expressive, composable, and reliable Haskell code.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

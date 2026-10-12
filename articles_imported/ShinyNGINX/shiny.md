@@ -3926,3 +3926,11 @@ For this kind of server-side Shiny dashboard, where the same reactive resources 
 
 `fread()` for ingestion, `data.table` for transformation, and explicit boolean masks for filtering.
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

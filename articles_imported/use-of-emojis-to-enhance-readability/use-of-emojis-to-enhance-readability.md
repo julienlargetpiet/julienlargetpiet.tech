@@ -67,3 +67,10 @@ Please let me know if you need any further assistance! 🤝
 ### The markdown headers used in this article are '\#\#' and '\#' for the title.
 
 ### The content of the article is written in Markdown and follows the required structure.
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -67,3 +67,11 @@ Reimplementing KNN from scratch in R was a rewarding exercise. It reinforced how
 ## Source
 
 The repo is available here: [https://github.com/julienlargetpiet/Rmach](https://github.com/julienlargetpiet/Rmach)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

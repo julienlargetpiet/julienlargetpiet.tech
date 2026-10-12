@@ -320,3 +320,11 @@ you begin to see systems design not as isolated layers,
 but as a continuous pressure-balanced pipeline.
 
 And that is the real lesson behind streaming a database dump.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

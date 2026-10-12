@@ -34,3 +34,11 @@ This is what i call a **rotation link mechanism**.
 # Limitations
 
 If using a `SQL` like database, the server will call a lot of `UPDATE credentials SET temp_password='newone';` which can be a lot of work compared to extracting content of cookies.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

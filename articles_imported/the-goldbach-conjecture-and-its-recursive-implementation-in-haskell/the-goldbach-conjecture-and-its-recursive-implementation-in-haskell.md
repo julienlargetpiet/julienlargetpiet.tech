@@ -190,3 +190,11 @@ The Goldbach Conjecture may remain unproven, but in Haskell, we can express its 
 
 Whether or not Goldbach is ever proven true, one thing is certain:
 recursion in Haskell provides one of the cleanest ways to **think like a mathematician** in code.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

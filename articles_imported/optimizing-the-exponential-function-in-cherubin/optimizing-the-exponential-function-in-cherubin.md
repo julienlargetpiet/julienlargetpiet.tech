@@ -65,3 +65,11 @@ This optimization shows how mathematical decomposition can turn an otherwise inf
 The result: a vastly faster exponential function inside Cherubin, proving once again that sometimes the best way to handle big numbers is to combine clever math tricks with pragmatic shortcuts.
 
 👉 Check out the full library here: [Cherubin on GitHub](https://github.com/julienlargetpiet/Cherubin)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

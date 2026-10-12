@@ -2616,3 +2616,11 @@ A lot of the important behavior is hidden behind:
 Once you inspect the stdout spans, logs, and metrics carefully, the model finally becomes concrete.
 
 And after that, the API starts to feel much less mysterious.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -3437,3 +3437,11 @@ Our phone has an excellent camera, so use it instead of tweaking firmware parame
 
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

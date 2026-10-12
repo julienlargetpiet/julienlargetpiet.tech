@@ -51,3 +51,11 @@ This makes dmenu\_all less a static program and more a framework for productivit
 dmenu\_all is about reclaiming speed and simplicity on Linux. By extending `dmenu`/ `rofi` into a universal system navigator, it makes interacting with your machine faster and more keyboard-centric.
 
 👉 Check it out: [GitHub Repo](https://github.com/julienlargetpiet/dmenu_all)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

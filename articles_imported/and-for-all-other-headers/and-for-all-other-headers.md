@@ -43,3 +43,10 @@ Note: Please replace \[Author's Name\] with the actual author's name. The refere
 ### Footnote
 
 1. \[1\] is not used in this article, but it was left as an example of how to use a footnote in Markdown. The footnote can be used to provide additional information or explanations that are not essential to the main text. If you want to use a footnote, you can use the following syntax: `[1] This is a footnote.`. The
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

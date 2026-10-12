@@ -223,3 +223,11 @@ each layout may have its strengths.
 
 
 _From abstract recursion to geometric harmony — Haskell shows how code can quite literally draw meaning._
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

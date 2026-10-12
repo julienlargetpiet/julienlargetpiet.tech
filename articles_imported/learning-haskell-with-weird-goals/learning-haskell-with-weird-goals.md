@@ -1,7 +1,5 @@
 
 ![../../assets/common_files/thumbnails/learning-haskell-with-weird-goals.png](../../assets/common_files/thumbnails/learning-haskell-with-weird-goals.png)
-s
-
 
 Sometimes, the best way to learn a language is by using a simple, even slightly “weird” goal as an excuse to explore
 its core concepts. Here, the goal is to extract the sides (apart from the hypotenuse) from a list of
@@ -107,3 +105,11 @@ and `let` as “taking notes along the way.” Each tool builds a different piec
 Our little “extract the sides” exercise might seem arbitrary, but it’s a perfect excuse to explore three of Haskell’s
 most important ideas. Once you’re comfortable with these, you’ll find yourself using them everywhere—pattern matching
 for data access, recursion for iteration, and `let` or `where` for organizing logic cleanly.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

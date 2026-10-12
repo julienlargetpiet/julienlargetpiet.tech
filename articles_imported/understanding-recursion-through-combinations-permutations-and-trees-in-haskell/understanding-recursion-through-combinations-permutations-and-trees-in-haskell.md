@@ -187,3 +187,11 @@ It provides a mental model for describing exploration, branching, and structure 
 Once you start visualizing recursion as a network of simultaneous explorers,
 each moving down its own branch of a decision tree, recursion stops feeling abstract —
 it becomes the most natural way to think about combinatorial and structural problems.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

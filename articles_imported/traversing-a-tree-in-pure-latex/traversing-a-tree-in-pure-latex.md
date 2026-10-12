@@ -1004,3 +1004,11 @@ N4: ( ( Side: L | ( ( Side: L | Value: V5 ) | ( Side: R | Value: V6
 ```
 
 WOW, traversing a Tree in LateX, something i will remember !
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

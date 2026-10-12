@@ -17,3 +17,11 @@ Julia Desmazes’ blog about chip design, ASICs, Verilog, FPGAs and hardware eng
 
 Luke Smith’s personal corner of the web, covering Linux, free and self-hosted software, command-line tools, privacy, languages, books and broader essays about technology and culture. Very opinionated, very personal, and refreshingly far from the usual polished corporate-tech-blog style.
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

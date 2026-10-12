@@ -1,0 +1,58 @@
+
+I wrote a follow-up article after my previous post about benchmarking a Shiny dashboard pipeline for blog analytics.
+
+The previous article was somewhat polarizing. Most feedback was positive, but some people disagreed with the benchmarking methodology. That criticism was useful, so I tried to make this new benchmark more transparent and reproducible.
+
+The pipeline is still based on my real blog analytics use case:
+
+- read NGINX TSV logs
+- filter bot traffic
+- apply time-window filters
+- do ASN / Geo enrichment
+- compute read-time metrics
+
+This time I benchmarked 6 pipeline configurations:
+
+- `readr::read_tsv() + dplyr`
+- `vroom::vroom() + dplyr`
+- `fread() + dplyr`
+- `readr::read_tsv() + data.table`
+- `vroom::vroom() + data.table`
+- `fread() + data.table`
+
+The benchmark uses 20 generated log files, from 1× to 20× the original size, with increasing timestamp and IP cardinality instead of simply appending the same file repeatedly.
+
+Methodology:
+
+- 20 log files, from ~557k rows to ~11.1M rows
+
+- 10 consecutive runs per file and per configuration (we will distinguish the cold-starts from the others runs)
+
+- execution time measured per pipeline step with `proc.time()`, so `elapsed`, `user`, and `system` time recorded
+
+- memory tracked with `gc()` counters: current/max `NCells` and `VCells` (more on that in the article)
+
+
+A few things I found interesting:
+
+- `fread + data.table` is still the most predictable path when the pipeline eventually works on fully materialized data.
+
+- `readr + dplyr` is closer than I expected in several parts of the pipeline.
+
+- `data.table` becomes more clearly advantageous in grouped / index-like filtering steps.
+
+- `vroom + dplyr` is very interesting: it looks extremely cheap at ingestion because columns stay lazy / ALTREP-backed.
+
+But `vroom` does not make parsing free; it moves the cost to later operations that force materialization.
+
+Nevertheless, in this specific pipeline, that can still be a big memory win (and `elapsed_time` not draatic), because the dataframe is filtered before all columns are fully materialized so later materialization happens on a smaller subset compared to the other configurations.
+
+- `gc()`-based memory results are useful, but they are not perfect per-operation allocation measurements because the R process is reused across reloads.
+
+
+Article:
+
+https://julienlargetpiet.tech/articles/where-r-data-pipelines-pay-their-cost.html
+
+I would be curious to hear how people here would improve the methodology further, especially for the memory side. 
+

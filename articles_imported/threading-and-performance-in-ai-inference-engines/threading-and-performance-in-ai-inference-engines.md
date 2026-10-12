@@ -55,3 +55,10 @@ Threading plays a vital role in AI inference engines, enabling these engines to 
 This article provides a comprehensive overview of threading and performance in AI inference engines, discussing the role of threading, its advantages, challenges, and best practices for implementation. By following the best practices outlined in this article, AI inference engine developers can create more efficient, scalable, and reliable engines that meet the demands of real-time applications. \[^1\]
 
 \[^1\]: This is a reference. You can add as many as you
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

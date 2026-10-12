@@ -139,3 +139,11 @@ The full project is open here:
 Inspired by [https://beej.us/guide/bgnet/html/](https://beej.us/guide/bgnet/html/)
 
 Or on this server: [here](/assets/common_files/Beejs.html)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

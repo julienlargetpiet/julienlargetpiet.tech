@@ -41,3 +41,10 @@ Image 1: [AI and Humans](https://www.pexels.com/photo/artificial-intelligence-hu
 Image 2: [AI and Future](https://www.pexels.com/photo/robotic-arm-future-tech-artificial-intelligence-1077611/)
 
 Note: The images are just examples, you need to replace them with actual images that fit the topic. Also, make sure to
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

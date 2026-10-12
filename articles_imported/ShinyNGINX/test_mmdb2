@@ -1,0 +1,31 @@
+
+root@srv549506:/var/www/RShinyApp# mmdblookup --file geo/GeoLite2-City.mmdb --ip 1.1.1.1
+
+  {
+    "registered_country":
+      {
+        "geoname_id":
+          2077456 <uint32>
+        "iso_code":
+          "AU" <utf8_string>
+        "names":
+          {
+            "de":
+              "Australien" <utf8_string>
+            "en":
+              "Australia" <utf8_string>
+            "es":
+              "Australia" <utf8_string>
+            "fr":
+              "Australie" <utf8_string>
+            "ja":
+              "オーストラリア" <utf8_string>
+            "pt-BR":
+              "Austrália" <utf8_string>
+            "ru":
+              "Австралия" <utf8_string>
+            "zh-CN":
+              "澳大利亚" <utf8_string>
+          }
+      }
+  }

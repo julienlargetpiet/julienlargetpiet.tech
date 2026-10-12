@@ -46,3 +46,10 @@ For further reading on KV caches and memory bottlenecks, I recommend checking ou
 - [Caching Strategies and Techniques](https://example.com/caching-strategies-techniques)
 
 Note: This is a sample Markdown blog article and should be reviewed and edited for grammar, punctuation, and style before publication. The links provided are examples and should be replaced with actual resources. Also, this is a sample and should be reviewed to meet your specific requirements. Also, note that some of the text might have to be changed to
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

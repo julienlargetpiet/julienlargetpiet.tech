@@ -187,3 +187,11 @@ in computer science, from optimization to AI planning.
 
 _With a few elegant recursive functions, Haskell transforms a complex constraint system_
 _into a readable and mathematical solution._
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

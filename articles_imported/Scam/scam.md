@@ -100,3 +100,11 @@ So yes, even if you are comfortable with computers, know what phishing is, and t
 
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

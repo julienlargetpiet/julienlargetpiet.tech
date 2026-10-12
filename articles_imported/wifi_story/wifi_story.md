@@ -2130,3 +2130,11 @@ tc               -> packet queueing
 Hope you found the article interesting !
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -1101,3 +1101,11 @@ The browser is, in the most technical sense, a game engine for documents. And li
 ---
 
 _Written for developers who want to go beyond "avoid layout reflow" and understand the actual machinery underneath._
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

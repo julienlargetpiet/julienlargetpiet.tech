@@ -71,3 +71,10 @@ Finally, there is the issue of liability. As autonomous systems become more prev
 ### Conclusion
 
 Autonomous systems have the potential to revolutionize the way we live and work, with benefits including improved safety, increased efficiency,
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

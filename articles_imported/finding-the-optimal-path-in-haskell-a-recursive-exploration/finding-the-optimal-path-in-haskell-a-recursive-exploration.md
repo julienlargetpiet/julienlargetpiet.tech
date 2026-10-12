@@ -168,3 +168,10 @@ This approach — maintaining all viable states until the end — captures the e
 
 
 And with just a few lines of Haskell, we model a decision system that stays both elegant and robust.
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

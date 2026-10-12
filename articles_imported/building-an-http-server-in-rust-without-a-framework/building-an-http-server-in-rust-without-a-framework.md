@@ -248,3 +248,11 @@ Use a framework when you need to ship, but build a server at least once to truly
 Remember: the code snippets here are only **highlights**.
 For the complete implementation and context, check the repository:
 [HTTP\_Server on GitHub](https://github.com/julienlargetpiet/HTTP_Server).
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

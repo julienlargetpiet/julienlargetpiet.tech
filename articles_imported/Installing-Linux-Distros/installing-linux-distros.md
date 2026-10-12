@@ -1,6 +1,5 @@
 
 ![../../assets/common_files/thumbnails/installing-linux-distros.png](../../assets/common_files/thumbnails/installing-linux-distros.png)
-s
 
 In this article, we'll deep dive into the manual installation of multi-distrributions in one disk.
 
@@ -1994,4 +1993,12 @@ menu
 Hope you found this article usefull, see you later !
 
 
+
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
 

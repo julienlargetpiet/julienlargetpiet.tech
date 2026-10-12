@@ -767,3 +767,11 @@ And start thinking: _"What transformation pipeline do I want to express?"_
 That's when AWK becomes not just useful—
 
 **but elegant.**
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

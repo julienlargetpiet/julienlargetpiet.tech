@@ -76,3 +76,11 @@ Example:
 With **simple\_doc**, you can generate clear, structured documentation for any codebase without leaving your source files. It’s like Roxygen, but universal. The result: less friction, more consistent docs, and a smoother workflow across all your projects.
 
 👉 Try it out here: [GitHub Repository: simple\_doc](https://github.com/julienlargetpiet/simple_doc)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

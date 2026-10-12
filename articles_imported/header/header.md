@@ -31,3 +31,10 @@ In conclusion, AI systems can indeed be exploited, and it is essential to addres
 \[1\] Schmidhuber, J. (2015). Deep learning in natural language processing. In Proceedings of the 25th International Conference on Computational Linguistics (pp. 1-10). Note: The URL is not required, but if it is available, it should be included.
 
 Note that the references should be in the Markdown format for citations, i.e., `[1]` for a single reference or `[1-3]` for multiple references. Note that if you want to add a reference, you can add it after the last sentence of the text, i.e., after the sentence: "By understanding the vulnerabilities of AI systems and implementing effective mitigation strategies, we can minimize the risks associated with AI system exploitation." However, if you don't want to add a reference, you can omit this section. In this case, the text is written in a way that no additional reference is required.
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -211,3 +211,11 @@ sudo logrotate -f /etc/logrotate.d/nginx
 - `size 500M`: rotate based on size threshold (evaluated whenever logrotate runs).
 
 With these pieces understood, you can tune rotation to match your traffic, protect your disk, and keep your analytics consistent.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

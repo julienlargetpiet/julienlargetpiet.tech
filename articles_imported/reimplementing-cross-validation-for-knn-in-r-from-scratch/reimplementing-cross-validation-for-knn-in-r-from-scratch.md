@@ -84,3 +84,11 @@ By writing my own fold generator and cross-validation functions, I rebuilt the s
 repo: [https://github.com/julienlargetpiet/Rmach](https://github.com/julienlargetpiet/Rmach)
 
 or here as a zip: [Rmach](/assets/common_files/Rmach.zip)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -39,3 +39,11 @@ PS: It appears that it was a company that shared my Cv with another one during a
 
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

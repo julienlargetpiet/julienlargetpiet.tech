@@ -117,3 +117,10 @@ We call on policymakers, industry leaders, and researchers to work together to e
 Note: Markdown formatting used to make it more readable.
 
 The code is written in markdown and HTML,
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -67,3 +67,11 @@ Your `rss_data.xml` should contain a `?` placeholder where you want the new `<it
 - Configurable insertion strategies beyond a single placeholder.
 
 Check it out on GitHub: [julienlargetpiet/automate\_rss](https://github.com/julienlargetpiet/automate_rss)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

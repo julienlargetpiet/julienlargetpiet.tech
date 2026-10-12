@@ -1033,3 +1033,11 @@ In fact `sed` is what `jq` is for `JSon` but for text.
 Note:
 
 To modify the file in-place, use the `-i` flag followed by the name of the file.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

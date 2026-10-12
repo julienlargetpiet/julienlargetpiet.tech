@@ -87,3 +87,11 @@ _InFoEnd_ is not production-ready, but it shows how Go, WebSockets, RSA/AES-GCM 
 For me, it was both a learning exercise and a fun way to explore cryptography and networking.
 
 👉 [GitHub Repo](https://github.com/julienlargetpiet/InFoEnd)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

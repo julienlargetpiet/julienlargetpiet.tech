@@ -279,3 +279,11 @@ Rebuilding it was absolutely worth it.
 - _J.H. Wilkinson (1950s)_ — _Error analysis and partial pivoting_
 - _The Nine Chapters on the Mathematical Art_ (~200 BCE) — the original elimination idea
 - Eigen Library documentation — `PartialPivLU`
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

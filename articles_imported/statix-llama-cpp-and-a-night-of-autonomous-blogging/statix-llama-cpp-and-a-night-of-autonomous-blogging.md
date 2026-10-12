@@ -597,3 +597,11 @@ In other words, the experiment did not only generate and publish content. It als
 That is another sign that this was not a toy hack glued on top of the blog. It became a genuine part of the publishing ecosystem.
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

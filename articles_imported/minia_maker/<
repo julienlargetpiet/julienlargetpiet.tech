@@ -1,0 +1,415 @@
+
+Ok, so following on my YouTube channel creation from the last artcile, on this `Mon. 25 may 2026 14:02:06 CEST` I wanted to make a programm to automate the generation of my thumbnails
+
+Since my face will be shown on my YouTube channel, i've studied YouTubers thumbnails that have their face visible, such as [https://www.youtube.com/@LowLevelTV/videos](https://www.youtube.com/@LowLevelTV/videos).
+
+## Anatomy of YouTube Thumbnails
+
+And i made the following conclusion:
+
+**The composition is simple -> arround 3 or 4 elements**
+
+Soper thumbnals we got:
+
+1. The Background -> minimalistic enough, just one color tone
+
+2. The upper body with (shoulders + face) -> so that we see in advance the face of the YouTubers -> less shock ater clicking the video -> better retention time
+
+Note that we do not want the PNG of the YouTuber upper body + face beeing horizontally cropped -> bad integration.
+
+3. Epic face -> Shock / Desperation / Interogating (maybe looking at the title)
+
+Note that the YouTuber PNG must not take more than 1/3 of the space (especially horizontal space)
+
+Also, the PNG is more often placed at the right, so the YouTuber is looking at the left -> towards title for example
+
+4. The title (monochromatic)
+
+5. When the Topic is about a company we add the logo above the title, if we can update the title font / color with the Logo + Thematic that's great !
+
+That's basically all, but for me i wanted to add the logo of my YouTube channel in small at the top left of each video.
+
+## Novelty and Identity
+
+First, the composition of a thumbnail for a YouTube channel must not differe to much between a video and another.
+
+We can keep the same composition and/or colorsheme.
+
+Some change color identity which is fine so that the viewer directly get that it is a new video.
+
+But imo, i think that the title and YouTuber PNG changing are enough to tell express that it is a new video -> novelty.
+
+That's what i'll do.
+
+-> **Prepare a dozens of PNG of myself with different expressions and adapt to the sibject.**
+
+But keeping a certain rotations of PNGs to keept he novelty.
+
+And i'l use same composition, background and title font and color to respect the identity.
+
+You know what ?
+
+I'll keep the exact same T-Shirt for the PNGs and the time when i'll record a video.
+
+## Uploading Selfies onto my computer (overkill)
+
+Alright, let's create a Go HTTP server that handles file upload :)
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+)
+
+const uploadDir = "uploads"
+
+// 2 GB max upload size
+const maxUploadSize = 2 << 30
+
+func main() {
+	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+		log.Fatal(err)
+	}
+
+	http.HandleFunc("/", uploadPage)
+	http.HandleFunc("/upload", uploadHandler)
+
+	log.Println("Server running on http://0.0.0.0:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func uploadPage(w http.ResponseWriter, r *http.Request) {
+	html := `
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Upload Video</title>
+</head>
+<body>
+	<h1>Upload a file</h1>
+
+    <form method="POST" action="http://192.168.1.20:8080/upload" enctype="multipart/form-data">
+        <input type="file" name="file" accept="video/*,image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+
+</body>
+</html>
+`
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, html)
+}
+
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Upload request received")
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
+
+	if err := r.ParseMultipartForm(maxUploadSize); err != nil {
+		log.Println("ParseMultipartForm error:", err)
+		http.Error(w, "File too large or invalid upload", http.StatusBadRequest)
+		return
+	}
+
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		log.Println("FormFile error:", err)
+		http.Error(w, "Could not read uploaded file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	log.Printf("Receiving file: %s, size: %d bytes\n", header.Filename, header.Size)
+
+	filename := filepath.Base(header.Filename)
+
+	// Add timestamp to avoid overwriting files with same name
+	finalName := fmt.Sprintf("%d_%s", time.Now().Unix(), filename)
+	dstPath := filepath.Join(uploadDir, finalName)
+
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		log.Println("os.Create error:", err)
+		http.Error(w, "Could not create file on server", http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	written, err := io.Copy(dst, file)
+	if err != nil {
+		log.Println("io.Copy error:", err)
+		http.Error(w, "Could not save file", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Saved file: %s (%d bytes)\n", dstPath, written)
+
+	fmt.Fprintf(w, "File uploaded successfully: %s\nSize: %d bytes\n", finalName, written)
+}
+
+
+```
+
+The thing when receiving a file in go is:
+
+1. writing with a limit the raw data from the HTTP POST request (`method="POST"`) with:
+
+```go
+
+r.body := http.MaxBytesReader(w, r.Body, maxUploadSize)
+
+```
+
+2. Formatting the response to be able to distinguish between ressources sent with:
+
+```
+
+if err := r.ParseMultipartForm(maxUploadSize); err != nil {
+	log.Println("ParseMultipartForm error:", err)
+	http.Error(w, "File too large or invalid upload", http.StatusBadRequest)
+	return
+}
+
+```
+
+3. And now we are able to use `r.FormFile()` method to select the `"file"` content by its name, which is defined here in the client:
+
+```html
+
+<input type="file" name="file" accept="video/*,image/*" required>
+
+```
+
+We do it here:
+
+```go
+
+file, header, err := r.FormFile("file")
+
+```
+
+At this point `file` is an object behavng like a file stream containing the raw data of the file, and `header` is a little struct containing metadata, like the filename, size, content-type...
+
+Example:
+
+```go
+
+fmt.Println(header.Filename)
+fmt.Println(header.Size)
+fmt.Println(header.Header.Get("Content-Type"))
+
+```
+
+That's why we'll close the file connection with `defer file.close()`.
+
+4. Extract the filename
+
+Simple enough, we just use `filepath.Base(header.filename)`.
+
+Example:
+
+```go
+
+filepath.Base("AA/BB.txt")
+
+```
+
+-> "BB.txt"
+
+5. Ensuring uniqueness of the filename.
+
+```go
+
+finalName := fmt.Sprintf("%d_%s", time.Now().Unix(), filename)
+dstPath := filepath.Join(uploadDir, finalName)
+
+```
+
+-> "uploads/filename_SECONDSSINCE1STJANUARY1970"
+
+6. Creating the destination file.
+
+```go
+
+dst, err := os.Create(dstPath)
+
+if err != nil {
+	log.Println("os.Create error:", err)
+	http.Error(w, "Could not create file on server", http.StatusInternalServerError)
+	return
+}
+
+defer dst.close()
+
+```
+
+7. Finally copying the content to permanant file.
+
+We use `io.Copy(dst, src)`, its signature is:
+
+```go
+
+func Copy (dst Writer, src Reader) (writen int64, err error)
+
+```
+
+We use it here:
+
+```go
+
+written, err := io.Copy(dst, file)
+if err != nil {
+	log.Println("io.Copy error:", err)
+	http.Error(w, "Could not save file", http.StatusInternalServerError)
+	return
+}
+
+```
+
+And **forward** a succeed response to the client:
+
+```go
+
+fmt.Fprintf(w, "File uploaded successfully: %s\nSize: %d bytes\n", finalName, written)
+
+```
+
+So now i just have to:
+
+```bash
+
+> go run main.go
+2026/05/25 15:51:51 Server running on http://0.0.0.0:8080
+
+```
+
+And now connect to my local network computer IP with my SmartPhone.
+
+We can find my computer IP in the local network with `ip addr`
+
+```bash
+
+❯ ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute
+       valid_lft forever preferred_lft forever
+2: enp7s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether fc:34:97:67:a8:93 brd ff:ff:ff:ff:ff:ff
+3: wlp6s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 70:9c:d1:62:92:3d brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.20/24 brd 192.168.1.255 scope global dynamic noprefixroute wlp6s0
+       valid_lft 65629sec preferred_lft 65629sec
+    inet6 2a01:cb00:125c:ef00:f791:46ce:28f3:a51e/64 scope global temporary dynamic
+       valid_lft 86259sec preferred_lft 459sec
+    inet6 2a01:cb00:125c:ef00:1e87:5f78:e039:8e92/64 scope global dynamic mngtmpaddr noprefixroute
+       valid_lft 86259sec preferred_lft 459sec
+    inet6 fe80::15e1:d82f:2d5e:b8a0/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default
+    link/ether 3a:b3:bf:71:b7:3d brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+5: br-83d249e18dae: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default
+    link/ether 5a:9e:c1:43:a3:1e brd ff:ff:ff:ff:ff:ff
+    inet 172.18.0.1/16 brd 172.18.255.255 scope global br-83d249e18dae
+       valid_lft forever preferred_lft forever
+
+```
+
+These are all networks.
+
+They show the adress of my computer on their own ip book.
+
+For example on docker network, my computer has address `172.17.0.1`.
+
+And what is interesting us is the wireless network `wlp6s0`, where my address is `192.168.1.20`.
+
+But what is the `/24` ?
+
+This is a mask applied to the ip adress range format for this network, meaning that the 24 first bits are set to `1`.
+
+An IPV4 adress is 4 bytes, one byte can represent 256 states -> 0 to 255, that is why IPV4 has this format:
+
+```
+[0, 255]:[0, 255]:[0, 255]:[0, 255]
+```
+
+In tis case masking the first 24 bits is like masking the 3 first bytes, in consequences it set them to `255`, because underlying bits are `11111111`.
+
+So we got only 256 possibles computers, phones... connected on the local network.
+
+Also, a mask value can be anywhere between 0 and 32, meaning that in IPV4 the bytes are not uncuttable.
+
+So here on my phone i just type the address `http://192.168.1.20:8080` and uploads a bunch of picures of me with interogating face.
+
+## Our good friend `imagemagick`
+
+Wait, apparently it is now renamed to `convert` (what a downgrade :( )
+
+We install it:
+
+```bash
+
+> sudo apt install imagemagick
+
+```
+
+In this article i use this version:
+
+```bash
+
+❯ convert -version
+Version: ImageMagick 6.9.12-98 Q16 x86_64 18038 https://legacy.imagemagick.org
+Copyright: (C) 1999 ImageMagick Studio LLC
+License: https://imagemagick.org/script/license.php
+Features: Cipher DPC Modules OpenMP(4.5)
+Delegates (built-in): bzlib djvu fftw fontconfig freetype heic jbig jng jp2 jpeg lcms lqr ltdl lzma openexr pangocairo png raw tiff webp wmf x xml zlib
+juju@juju-System-Product-Name ~/simple_uploader/uploads
+
+```
+
+Now, `convert` will work for detouring yourself only if your background is uniform enough and you detach enough from yur background in term of color.
+
+
+
+## Some hollow 
+
+## FFmpeg is all we need
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

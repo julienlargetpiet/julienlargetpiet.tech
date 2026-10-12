@@ -112,3 +112,11 @@ While the procedure is particularly convenient for matrices up to 5×5, its main
 determinants can be viewed not only as recursive symbols or elimination steps, but as structured combinations of simple
 geometric relationships. It’s a concise, personal exploration of the determinant’s inner structure — one that invites curiosity
 rather than claiming to replace classical methods.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

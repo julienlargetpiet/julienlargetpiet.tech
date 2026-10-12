@@ -77,3 +77,11 @@ Possible improvements could include:
 For now, though, I’m satisfied with this minimal diff clone. It’s a small project, but one that forced me to dive into text processing and algorithmic thinking in C++.
 
 👉 [GitHub Repo](https://github.com/julienlargetpiet/semantic_tools/blob/main/semdiff.cpp)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

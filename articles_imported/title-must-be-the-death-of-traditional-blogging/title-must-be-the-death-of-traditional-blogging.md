@@ -57,3 +57,10 @@ By combining this code block with a library such as `matplotlib`, you can create
 
 
 ```
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

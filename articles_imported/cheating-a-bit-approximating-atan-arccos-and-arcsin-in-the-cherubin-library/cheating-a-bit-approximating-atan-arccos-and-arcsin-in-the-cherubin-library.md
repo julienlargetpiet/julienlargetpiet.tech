@@ -89,3 +89,11 @@ So rather than designing a new approximation, I simply reused the `arccos` logic
 Within **Cherubin**, I needed workable approximations of `atan`, `asin`, and `acos` that fit a string-based math framework. By mixing a log trick, a cubic correction, and a piecewise quadratic patch, I ended up with a set of lightweight approximations that keep calculations flowing without getting bogged down in heavy expansions.
 
 They may be “cheats,” but they prove a point: when you leave the comfort zone of floats and doubles, you can still recreate the math you need — with a little creativity 😎.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

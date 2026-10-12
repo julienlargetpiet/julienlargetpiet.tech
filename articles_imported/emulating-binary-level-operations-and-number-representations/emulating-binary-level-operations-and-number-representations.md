@@ -236,3 +236,11 @@ By mastering these representations and operations, developers gain a deeper unde
 To go beyond theory, I’ve built a C++ library from scratch that emulates all these operations — from bitwise logic to number representations. You can explore it here:
 
 [Numero on GitHub](https://github.com/julienlargetpiet/Numero)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

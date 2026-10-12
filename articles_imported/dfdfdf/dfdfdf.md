@@ -88,3 +88,10 @@ Overall, the Markdown code is well-structured and follows best practices for wri
 This article can be used as a reference for writing Markdown articles, especially for topics related to AI and collaboration. It demonstrates how to effectively use Markdown to present complex technical information in a clear and engaging way.
 
 You can copy and paste this code
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

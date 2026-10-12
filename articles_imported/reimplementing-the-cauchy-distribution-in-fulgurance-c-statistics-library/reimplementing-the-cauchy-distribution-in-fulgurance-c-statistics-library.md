@@ -113,3 +113,11 @@ And this is only one example: I’ve implemented **dozens of other statistical l
 👉 [GitHub Repository: Fulgurance](https://github.com/julienlargetpiet/fulgurance/)
 
 Even though C++ already provides some distributions in `<random>`, reimplementing them from scratch gave me a much deeper understanding of probability distributions, and was a fun addition to Fulgurance.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

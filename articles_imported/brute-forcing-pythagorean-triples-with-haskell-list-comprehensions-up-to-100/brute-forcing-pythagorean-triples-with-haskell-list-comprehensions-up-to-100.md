@@ -89,3 +89,11 @@ Remember: you cannot write `c <- [1..b-1]` before `b` exists—the comprehension
 - **Bottleneck early:** since `a < 100`, restrict `b,c < a` to cut the search space.
 - **Exploit symmetry:** enforce `c < b` to avoid duplicate leg permutations.
 - With these in place, you get a tiny, expressive enumerator for all solutions with `c < b < a < 100`.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -119,3 +119,11 @@ with just a few lines, you can build a stack-based interpreter capable of evalua
 
 And because it’s written in pure functional style, it reads more like a description of how to evaluate an expression
 than a step-by-step algorithm. That’s the beauty of Haskell.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

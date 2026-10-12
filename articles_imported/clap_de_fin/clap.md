@@ -19,3 +19,11 @@ Merci à toutes celles et ceux qui ont regardé et soutenu cette chaîne.
 Si vous souhaitez me contacter, vous pouvez m’écrire à cette adresse : j.larget-piet@proton.me
 
 ```
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -92,3 +92,10 @@ As LLMs continue to advance, we can expect to see even more significant changes 
 - **Human-AI Collaboration**: Exploring the potential of human-AI collaboration in software development, where LLMs assist developers in real-time.
 
 ### Image of
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

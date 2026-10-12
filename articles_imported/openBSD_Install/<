@@ -1,0 +1,1204 @@
+
+In this article, we'll go through the manual installation of OpenBSDand see the differencesand similitudes with Linux.
+
+## The setup
+
+We'll directly download the latest image of OpenBSD, at the time the version `7.9` and copy it to an USB stick, you can also use Ventoy if you want.
+
+In Linux, we have the `dd` command to copy the entirety of an image to an external disk.
+
+```bash
+
+sudo dd if=install79.img of=/dev/sdX bs=4M status=progress conv=fsync
+
+```
+
+Replace `/dev/sdX` by the name of your usb-stick, you can see it with `lsblk` or `sudo fdisk -l`.
+
+## Booting 
+
+After putting the usb stick to the PC you want to install OpenBSD to, choose to boot on this usb stick on its BIOS.
+
+Now, you'll be prompted the following:
+
+```
+
+Welcome to the OpenBSD/amd64 7.9 installation program.
+
+(I)nstall, (U)pgrade, (A)utoinstall or (S)hell?
+
+```
+
+Here, we'll go for the manual installation, so press "S".
+
+Now, you are in the small RAM-environment (live environment).
+
+## An important Linux difference: no `initramfs`
+
+This is worth understanding immediately.
+
+On Linux, a typical boot chain looks approximately like:
+
+```
+
+firmware
+   |
+   V
+GRUB/systemd-boot
+   |
+   V
+Linux kernel
+   |
+   V
+initramfs
+   |
+   V
+find/mount real root filesystem
+   |
+   V
+switch_root
+   |
+   V
+PID 1
+
+```
+
+The `initramfs` may be generated with:
+
+- `mkinitcpio`
+
+- `dracut`
+
+- `update-initramfs`
+
+OpenBSD's normal installed system does not use this model.
+
+The normal boot path is closer to:
+
+```
+
+firmware
+   |
+   V
+OpenBSD bootloader
+   |
+   V
+/bsd
+   |
+   V
+kernel mounts root filesystem
+   |
+   V
+/sbin/init
+   |
+   V
+/etc/rc <- this is the main system startup script (we'll see later)
+
+```
+
+Therefore, we have:
+
+- Linux -> kernel + separately generated `initramfs`
+
+- OpenBSD -> normal kernel `/bsd` can boot the installed system directly
+
+## Disk identification
+
+In linux, we have `lsblk`, on BSD we have `sysctl hw.disknames`.
+
+In fact we just inspect the value of the kernel parameter containing the disknames (in the `hw` namespace).
+
+In fact here's a part of the `hw` namespace:
+
+```
+
+hw
+|-- machine
+|-- model
+|-- ncpu
+|-- physmem
+|-- disknames
+|-- ...
+
+```
+
+This will show something like:
+
+```
+
+hw.disknames=wd0:...,sd0:...,sd1:...
+
+```
+
+This is very similar to Linux:
+
+```
+
+sysctl kernel.hostname
+sysctl net.ipv4.ip_forward
+
+```
+
+where:
+
+`kernel.hostname` and `net.ipv4.ip_forward`
+
+are also hierarchical kernel parameters.
+
+You can also inspect the boot messages:
+
+```bash
+
+dmesg
+
+```
+
+Which is also present in Linux.
+
+Typical OpenBSD naming:
+
+- `wd0` -> SATA/ATA disk on certain controllers
+
+- `sd0` -> SCSI-like disk, including many USB/SATA/NVMe devices
+
+- `cd0` -> optical drive
+
+`SCSI` is a command protocol/language, not a specific piece of hardware anymore.
+
+Because it's decoupled from the physical transport, many different technologies (USB, SATA via translation, network storage like iSCSI, virtual disks in VMs, Fibre Channel) can all "speak SCSI" to the OS.
+
+This gives modularity because the OS kernel only needs one SCSI driver stack to handle many different underlying hardware types, the hardware specifics are abstracted away.
+
+## What's going on in `/dev`
+
+The kernel may know about `sd1` while the installer RAM disk does not yet contain its partitions:
+
+```
+
+/dev/sd1a
+/dev/sd1b
+...
+
+```
+
+In that case, you need to manually populate `/dev` for the required partition:
+
+```bash
+
+cd /dev
+sh MAKEDEV sd1
+
+```
+
+This creates the required device **nodes**.
+
+OpenBSD's own disk documentation explicitly mentions doing this from `bsd.rd` (the specific kernel the live environment uses) when additional disk devices are needed.
+
+This gives us an interesting comparison:
+
+```
+
+Linux
+kernel discovers device
+   |
+   V
+devtmpfs + udev normally populate /dev underneath
+
+OpenBSD installation environment
+kernel discovers device
+   |
+   V
+MAKEDEV may be needed for missing nodes
+
+```
+
+## Wait, what ? There's 2 partitioning levels ?
+
+On Linux you are accustomed to something like:
+
+```
+
+physical disk
+|
+GPT
+|-- /dev/sda1 EFI
+|-- /dev/sda2 Linux root
+|-- /dev/sda3 Linux home
+
+```
+
+Each GPT partition can directly contain a filesystem.
+
+On OpenBSD/amd64 there are commonly two layers:
+
+```
+
+physical disk
+|-- GPT
+    |-- EFI System Partition
+    |-- OpenBSD GPT partition
+         |-- BSD disklabel
+             |-- a  /
+             |-- b  swap
+             |-- d  /tmp
+             |-- e  /var
+             |-- ...
+
+```
+
+We explicitly distinguishes:
+
+- `fdisk` partitions -> the tool OpenBSD uses to inspect **GPT** partitions
+
+- `disklabel` partitions ->  the ones that normally contain the actual OpenBSD filesystems.
+
+So do not mentally equate:
+
+Linux -> `/dev/sda2`
+
+with:
+
+OpenBSD -> `/dev/wd0a`
+
+They exist at different conceptual layers.
+
+## The `disklabel` letters
+
+OpenBSD disklabels have partitions:
+
+```
+
+a b c d e f g h i j k l m n o p
+
+```
+
+Some letters have conventional meanings.
+
+Most importantly:
+
+- `a` -> root filesystem on the boot disk
+
+- `b` -> usually swap
+
+- `c` -> entire physical disk
+
+OpenBSD documents `c` specifically as the partition representing the entire disk.
+
+And yess, `c` isn't an ordinary filesystem partition, it overlapps other partitions because of its semantic nature.
+
+It exists mainly as a special whole-disk view.
+
+It is not meant to hold a normal filesystem. Its purpose is to give OpenBSD a device name that refers to the entire physical disk, including all partitions and metadata.
+
+That whole-disk view is useful for low-level tools that need access to sectors outside any individual filesystem partition, for example partitioning tools, bootloader tools, disk imaging, or reading disk metadata.
+
+## Create the outer disk partition
+
+We'll use the `fdisk` shell on the targeted disk (here named `wd0`), so:
+
+```bash
+
+fdisk -e wd0
+
+```
+
+Now we enter its shell:
+
+```bash
+
+wd0:1> reinit gpt
+
+```
+
+This initializes a new GPT layout in memory, including the protective MBR. 
+
+GPT stores its primary GPT header at LBA (Logical Block Adressing) 1, followed by the GPT partition-entry array starting in subsequent LBAs
+
+So GPT disks usually place a tiny **"fake"** MBR in sector 0.
+
+That protective MBR normally contains one partition entry of type `0xEE` covering essentially the whole disk.
+
+Its purpose is compatibility with old MBR-only software.
+
+Without it, an old program that knows nothing about GPT might inspect sector 0, see “no MBR partitions,” and conclude that the disk is empty and potentially **overwrite it**.
+
+With the protective MBR, that old program instead sees roughly:
+
+```
+
+MBR:
+partition 0: type EE
+             occupies whole disk
+
+```
+
+so it is much less likely to treat the disk as unused.
+
+Nothing is written to disk yet until you use `write` or `quit`.
+
+The on-disk GPT structure is roughly:
+
+```
+
+LBA 0
+|-- protective MBR
+
+LBA 1
+|-- primary GPT header
+
+LBA 2 ...
+|-- GPT partition-entry array
+
+... usable disk space ...
+
+near end of disk
+|-- backup GPT partition-entry array
+
+last LBA
+|-- backup GPT header
+
+```
+
+Back to partitioning.
+
+Now create/edit one GPT entry for the ESP:
+
+```
+
+wd0*:1> edit 0
+
+```
+
+( The "`*`" in the shell means that there is at least one change that has not been written, at this point that's just the `reinit gpt`. )
+
+and give it:
+
+```
+
+type:   EFI System
+offset: 1m
+size:   512m
+
+```
+
+`fdisk` accepts `b`, `k`, `m`, `g`, and `t` units
+
+Then create the OpenBSD GPT partition:
+
+```
+
+wd0*:1> edit 1
+
+```
+
+with something like:
+
+```
+
+type:   OpenBSD
+offset: 513m
+size:   *
+
+```
+
+Instead of setting `513m` for example, you can use the next aligned offset computed by `fdisk`.
+
+You'd see something like:
+
+```
+
+Partition offset [1050624]:
+
+```
+
+and just press:
+
+```
+
+Enter
+
+```
+
+That accepts the proposed sector offset.
+
+Also, the special size:
+
+```
+
+*
+
+```
+
+means to use the remainder of the available disk.
+
+Then inspect:
+
+```
+
+wd0*:1> print
+
+```
+
+and finally:
+
+```
+
+wd0*:1> write
+wd0:1> exit
+
+```
+
+## Creating the disklabel
+
+Now we create the internal OpenBSD partitions.
+
+Run:
+
+```bash
+
+disklabel -E wd0
+
+```
+
+The `-E` means interactive editing, you'll enter its REPL.
+
+This is the closest conceptual equivalent to using `parted` again, but now we are operating on the BSD disklabel, not on the MBR/GPT table.
+
+`disklabel` does not blindly assume the entire physical disk is available.
+
+The kernel already knows the outer GPT layout. It knows:
+
+```
+
+wd0
+|-- foreign GPT region: EFI
+|-- OpenBSD GPT region
+
+```
+
+and the OpenBSD `disklabel` is constrained to the OpenBSD area.
+
+We'll create something like:
+
+```
+
+wd0a   /
+wd0b   swap
+wd0d   /tmp
+wd0e   /var
+wd0f   /usr
+wd0g   /usr/X11R6
+wd0h   /usr/local
+wd0i   /home
+
+```
+
+1. `wd0a` -> The root filesystem. It is the top of the entire filesystem hierarchy and contains the essential directories needed to boot and operate the system, such as `/etc`, `/bin`, `/sbin`, `/dev`, and the mount points for the other filesystems.
+
+2. `wd0b` -> Disk space reserved for virtual memory. The kernel may move inactive memory pages from RAM to swap when needed. It is not a filesystem and therefore has no mount point.
+
+3. `wd0d` -> Temporary files created by programs and users. These files are generally not expected to be permanent. Keeping `/tmp` separate also allows restrictive mount options such as `nodev` or `nosuid`, and prevents temporary files from filling the root filesystem.
+
+Indeed, `/tmp` is writable by ordinary users, so it is a good place to apply extra restrictions in the `/etc/fstab` file (see later).
+
+`nodev` means:
+
+device files on this filesystem are ignored as devices
+
+On Unix, special files can represent devices, for example:
+
+```
+
+/dev/null
+/dev/tty
+/dev/sd0a
+
+```
+
+These are not ordinary files; their inode type tells the kernel to route accesses to a device driver.
+
+If a filesystem is mounted with the `nodev` option (set in the `/etc/fstab` file).
+
+Then even if someone somehow creates a block or character device node inside it, for example:
+
+```
+
+/tmp/fake-device
+
+```
+
+The kernel will not treat it as an actual device.
+
+This is useful on filesystems like:
+
+```
+
+/tmp
+/home
+
+```
+
+because users have no legitimate reason to create usable device nodes there.
+
+Now, `nosuid` is about the set-user-ID and set-group-ID permission bits.
+
+Normally, an executable can have the `setuid` bit:
+
+```
+
+-rwsr-xr-x
+
+```
+
+You recognize the octals (first its owner, second for the group it belongs to and the third one for the others).
+
+The first character isn't therefore a permission bit but rather a bit indicating the filesystem object this is.
+
+Common first characters are:
+
+```
+
+-  regular file
+d  directory
+l  symbolic link
+c  character device # like a keyboard (stream of bytes)
+b  block device  # like a storage device such as /dev/sda1 -> can be accessed at an arbitrary position
+p  FIFO / named pipe
+s  socket
+
+```
+
+Back to the `setuid`, if owned by root, running it (as others) can cause the process to execute with the owner's effective UID rather than the caller's UID.
+
+We therefore make the asumption that the file is executable by "others".
+
+Conceptually:
+
+```
+
+normal executable:
+julien runs program
+-> process runs as julien
+
+setuid-root executable:
+julien runs program
+-> process may run with effective UID root
+
+```
+
+This mechanism is used legitimately by some Unix programs that need limited privileged operations, like one programm that should not be the owner of a file but need to run its programm that needs to run with root UID, so the permissions associated to this owner.
+
+At this point, you guessed it, in the octal permission bits representation, the `setuid` bits is not `x` (which only means executable), but is `s`.
+
+We have:
+
+```
+
+x  = executable
+s  = executable + setuid
+S  = setuid, but NOT executable
+
+```
+
+The `setgid` bits is exactly the same concept of `setuid` but applied for the groups.
+
+When an executable with `setgid` is run, the process gets the effective group ID of the file’s group.
+
+This is why Unix permissions can actually be written with four octal digits, not just three.
+
+You already know:
+
+```
+
+755
+
+```
+
+as:
+
+```
+
+7 5 5
+| | |
+| | |- others
+| |--- group
+|----- owner
+
+```
+
+But the full representation can be:
+
+```
+
+4755
+
+```
+
+where the first digit is for the special bits:
+
+```
+
+4 = setuid
+2 = setgid
+1 = sticky
+
+```
+
+The `sticky` permission bit is mainly used for directories.
+
+On Linux or BSD we often see the `/tmp` folder use this permission bit:
+
+```bash
+
+ls -ld /tmp
+
+```
+
+Output:
+
+```
+
+        here
+         |
+         V
+drwxrwxrwt 19 root root 135168 sept.  5 14:45 /tmp
+
+```
+
+`/tmp` is a shared directory used by many different users and programs. Those processes must be able to create their own temporary files there, so `/tmp` is normally writable and searchable by everyone.
+
+However, we still want separation between users and programs. Program A should not be able to delete or rename a file belonging to program B merely because both can write to `/tmp`.
+
+This is what the `sticky` permission bit is for. On a `sticky` directory, users can still create and manage their own files, but they cannot normally delete or rename files owned by other users.
+
+On a filesystem mounted with `nosuid`, the kernel ignores the `setuid` and `setgid` bits.
+
+So even if someone places:
+
+```
+
+/tmp/something
+
+```
+
+with the `setuid` bit set, executing it from `/tmp` will not grant the elevated identity.
+
+
+4. `wd0e` -> Variable system data: logs, mail queues, spool data, caches, databases used by system services, temporary runtime state that persists longer than `/tmp`, and other data whose size changes while the machine is running.
+
+5. `wd0f` -> A large part of the installed base system: userland programs, libraries, headers, documentation...
+
+6. `wd0g` ->  OpenBSD's X Window System files: `X11` binaries, libraries, configuration/support files, and other components belonging to the base X system. Keeping it separate reflects the fact that `X11` is a distinct part of the OpenBSD base-system sets.
+
+7. `wd0h` -> Software installed outside the OpenBSD base system, especially third-party packages installed with `pkg_add` (see later). This separation is very important conceptually:
+
+- `/usr` -> OpenBSD base system
+
+- `/usr/local` ->  third-party/local software
+
+8. `wd0i` -> Users' personal home directories and files
+
+Notice that there is no filesystem on `wd0c`.
+
+Again:
+
+```
+
+wd0c = whole disk
+
+```
+
+not:
+
+```
+
+wd0c = third normal partition
+
+```
+
+But this is not guarantee that those letters would be free to use, because when we did create the ESP GPT partition, a `wd0X` (where `X` is a letter) could have been reserved as the ESP partition, so please inspect the `disklabel` partitions at this point with:
+
+```bash
+
+disklabel wd0
+
+```
+
+And you might see something like:
+
+```
+
+i: ... MSDOS
+
+```
+
+That is actually quite common. But the letter is not inherently fixed to `i`.
+
+Therefore, you must not blindly follow the following commands and adapt the partitions name in the `disklabel` REPL commands.
+
+So, when you enter the `disklabel` REPL, you’ll be prompted something similar to:
+
+```
+
+Label editor (enter '?' for help at any prompt)
+wd0>
+
+```
+
+The most important commands are:
+
+- `p` -> Print the current disklabel
+
+- `a`-> Add a partition
+
+- `d` -> Delete a partition
+
+- `m` -> Modify an existing partition
+
+- `w` -> Write the disklabel to disk
+
+- `q` -> Quit
+
+So a manual session could look like this:
+
+Add root `/` :
+
+```
+
+wd0> a a
+
+```
+
+You’ll be prompted for things like:
+
+```
+
+offset: [default]
+size: 4G
+FS type: 4.2BSD
+mount point: /
+
+```
+
+the value:
+
+```
+
+4.2BSD
+
+```
+
+is the traditional `disklabel` type meaning:
+
+"this partition is intended to contain a BSD Fast File System"
+
+It does not mean that you are literally using the filesystem from BSD 4.2.
+
+The name is historical.
+
+OpenBSD's native filesystem lineage comes from the Berkeley Fast File System, introduced around the 4.2BSD era, so the disklabel type name remained:
+
+```
+
+4.2BSD
+
+```
+
+Then later as you'll see, you actually create the filesystem with:
+
+```
+
+newfs wd0a
+
+```
+
+Now, `swap`:
+
+```
+
+wd0> a b
+
+```
+
+For example:
+
+```
+
+offset: [default]
+size: 4G
+FS type: swap
+
+```
+
+`swap` has no mount point because it is not mounted into the filesystem tree at all.
+
+A normal filesystem partition is attached somewhere under `/`.
+
+But `swap` is just a pool of disk space the kernel can use as virtual memory backing. There is no directory like `/swap` where you browse files.
+
+
+Then `/tmp`:
+
+```
+
+wd0> a d
+offset: [default]
+size: 4G
+FS type: 4.2BSD
+mount point: /tmp
+
+```
+
+Then `/var`:
+
+```
+
+wd0> a e
+offset: [default]
+size: 8G
+FS type: 4.2BSD
+mount point: /var
+
+```
+
+Then `/usr`:
+
+```
+
+wd0> a f
+offset: [default]
+size: 25G
+FS type: 4.2BSD
+mount point: /usr
+
+```
+
+Then `/usr/X11R6`:
+
+```
+
+wd0> a g
+offset: [default]
+size: 15G
+FS type: 4.2BSD
+mount point: /usr/X11R6
+
+```
+
+Then `/usr/local`:
+
+```
+
+wd0> a h
+offset: [default]
+size: 10G
+FS type: 4.2BSD
+mount point: /usr/local
+
+```
+
+Then `/home` with the remaining space:
+
+```
+
+wd0> a i
+
+```
+
+## Creating the filesystems
+
+After the `disklabel` step we have partition metadata, but the partitions that are marked `4.2BSD` are still empty raw regions until we run `newfs`.
+
+On Linux we would do that for example (no `newfs` command):
+
+```bash
+
+mkfs.ext4 /dev/sda2
+
+```
+
+The `newfs` command create an OpenBSD FFS filesystem on the targeted partition.
+
+Se we run the following:
+
+```bash
+
+newfs wd0a
+newfs wd0d
+newfs wd0e
+newfs wd0f
+newfs wd0g
+newfs wd0h
+newfs wd0i
+
+```
+
+But remember to adapt the letters to your actual layout.
+
+When we do for example:
+
+```bash
+
+newfs wd0a
+
+```
+
+the kernel layer resolves `wd0a` to disk `wd0`, `disklabel` partition `a` which is, as we saw, directly set on the OpenBSD outer (GPT) partition.
+
+Now, we need to correctly format to `FAT 32` the ESP partition so the firmware can read it.
+
+In this example, we make the asumption that the ESP partition has reserved the name `wd0p`.
+
+Therefore, we apply the following:
+
+```bash
+
+newfs_msdos -F 32 /dev/rwd0i
+
+```
+
+And yess, `newfs_msdos` is the Linux equivalent of `mkfs.fat` command.
+
+## Mounting
+
+
+First, we have to mount root:
+
+```bash
+
+mount /dev/wd0a /mnt
+
+```
+
+And then, create mountpoint directories:
+
+```bash
+
+mkdir -p /mnt/tmp
+mkdir -p /mnt/var
+mkdir -p /mnt/usr
+mkdir -p /mnt/usr/X11R6
+mkdir -p /mnt/usr/local
+mkdir -p /mnt/home
+
+```
+
+Then mount the sources:
+
+```bash
+
+mount /dev/wd0d /mnt/tmp
+mount /dev/wd0e /mnt/var
+mount /dev/wd0f /mnt/usr
+mount /dev/wd0g /mnt/usr/X11R6
+mount /dev/wd0h /mnt/usr/local
+mount /dev/wd0i /mnt/home
+
+```
+
+Unlike Linux, we don't need to mount `/proc`, `/sys`, `/dev`, and `/run` using Linux-style recursive bind mounts. 
+
+OpenBSD simply has a different runtime architecture.
+
+In particular, there is no Linux-style:
+
+```bash
+
+mount --rbind /dev /mnt/dev
+mount --rbind /proc /mnt/proc
+mount --rbind /sys /mnt/sys
+mount --rbind /run /mnt/run
+
+```
+
+## Configuring the Wi-Fi
+
+If you are directly plugged with a ethernet cable, you can skip this part.
+
+Before configuring Wi-Fi, we first need to identify which network interfaces OpenBSD detected.
+
+A simple way is:
+
+```bash
+
+ifconfig
+
+```
+
+or, for a more concise view:
+
+```bash
+
+ifconfig -a
+
+```
+
+On our machine, OpenBSD exposed interfaces including:
+
+```
+
+em0
+wpi0
+lo0
+
+```
+
+The important one was:
+
+```
+
+wpi0
+
+```
+
+`wpi0` was the wireless interface.
+
+OpenBSD interface names are usually derived from the kernel driver name. So unlike Linux, where you may see names such as:
+
+```
+
+wlp3s0
+enp2s0
+
+```
+
+OpenBSD often gives you names like:
+
+```
+
+em0
+wpi0
+iwm0
+ath0
+re0
+
+```
+
+The prefix tells you which driver is managing the device.
+
+In our case:
+
+```
+
+wpi0
+
+```
+
+means:
+
+```
+
+wpi driver
++
+interface instance 0
+
+```
+
+You can now inspect the `dmesg` messages and grep those who contain `wpi` to potentially see the model name of the Wi-Fi antenna:
+
+```bash
+
+dmesg | grep wpi
+
+```
+
+Now, on many installation the kernel successfully detects the interfaces but may fail to interract with tem with `ifconfig` for example.
+
+In my case, I tried to do:
+
+```bash
+
+ifconfig wpi0 up
+
+```
+
+And OpenBSD returned an error similar to:
+
+```
+
+wpi0: error: 2, could not read firmware wpi-3945abg
+wpi0: could not read firmware
+
+```
+
+That meant that the antenna firmware was missing.
+
+The driver is kernel code that knows how to communicate with the hardware.
+
+The firmware is code that must be uploaded into the Wi-Fi chipset itself before the device can operate.
+
+On an already installed OpenBSD system with Internet access, firmware is normally managed with:
+
+```bash
+
+fw_update
+
+```
+
+But here we had a circular problem:
+
+```
+
+we need Internet
+    |
+    V
+to download the Wi-Fi firmware
+
+```
+
+But
+
+```
+
+we need the Wi-Fi firmware
+    |
+    V
+to get Internet
+
+```
+
+Then, on another machine, we downloaded the OpenBSD firmware package containing:
+
+```
+
+wpi-3945abg
+
+```
+
+We extracted it and copied the firmware file onto a second USB stick.
+
+Back inside the installer shell, we then plugged that USB stick into the laptop.
+
+To see the disks detected by OpenBSD, we checked the famous kernel variable:
+
+```
+
+sysctl hw.disknames
+
+```
+
+For example:
+
+hw.disknames=wd0:...,sd0:...,sd1:...
+
+In our case:
+
+wd0 = internal Kingston SSD
+sd0 = installer USB stick
+sd1 = second USB stick containing the firmware
+
+You can also confirm this through:
+
+
+
+
+
+
+
+
+
+
+
+
+
+

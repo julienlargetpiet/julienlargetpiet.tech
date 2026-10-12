@@ -95,3 +95,11 @@ The same goes for the compresed data.
 Last, i've reimplemented the `tree` algorithm to list files recursively during compression and store them. The algo is available here [zip](/assets/common_files/mirador.zip) or here [repo](https://github.com/julienlargetpiet/mirador).
 
 The path of each file is stored at the end of the compression key file.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

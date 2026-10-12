@@ -112,3 +112,11 @@ For example, for `21 bits`, the number of combinations is the sum of `k = 0` to 
 The best i found is with `21 bits` block size where it took 1 to 2 milliseconds to cipher and decipher the example sentence. `2 097 151` is the number of combinations.
 
 Voilà!
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

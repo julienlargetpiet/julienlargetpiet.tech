@@ -518,3 +518,11 @@ Go optimizes for pragmatic runtime flexibility and simplicity.
 Understanding where type reasoning lives — compiler or runtime —
 clarifies why these ecosystems feel so different,
 even when they solve similar conceptual problems.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

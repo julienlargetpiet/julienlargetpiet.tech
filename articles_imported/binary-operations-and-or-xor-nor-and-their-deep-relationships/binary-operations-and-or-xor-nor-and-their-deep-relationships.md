@@ -266,3 +266,11 @@ And your C++ implementations reflect this beautifully:
 - `!( || )` → NOR
 
 Minimal syntax, maximum meaning.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

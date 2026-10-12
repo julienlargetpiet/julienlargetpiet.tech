@@ -48,3 +48,10 @@ As we look to the future, it's clear that AI agents will play a pivotal role in 
 ---
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) \[!\[GitHub\](https://img.shields.io/badge
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

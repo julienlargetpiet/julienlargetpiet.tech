@@ -245,3 +245,11 @@ rslt 2
 ## Conclusion
 
 Metaprogramming in Rust via `macro_rules!` blends **power**, **safety**, and **clarity**. Unlike C/C++ preprocessor macros, Rust macros expand into syntactically valid Rust code that the compiler checks **after expansion**, ensuring type safety and hygiene.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

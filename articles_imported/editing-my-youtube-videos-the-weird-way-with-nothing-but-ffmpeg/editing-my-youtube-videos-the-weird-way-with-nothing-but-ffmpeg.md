@@ -88,3 +88,11 @@ Voilà (allow it, i'm french). The final file, `outF2.mp4`, is YouTube-ready.
 Sure, it’s not “normal.” But if you enjoy the command line and want a lightweight, minimalist approach to editing, `ffmpeg` can handle it all: recording, cutting, concatenating, and even audio fixes.
 
 And that’s how I edit my YouTube videos in the weirdest, nerdiest way possible —> no timeline, no GUI, just pure `ffmpeg` kung-fu.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

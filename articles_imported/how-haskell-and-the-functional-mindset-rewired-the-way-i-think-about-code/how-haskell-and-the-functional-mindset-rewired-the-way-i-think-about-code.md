@@ -145,3 +145,11 @@ In short, Haskell programmers in 2025 resemble digital hermits: misunderstood, e
 ## Conclusion
 
 Discovering the functional paradigm through Haskell changed how I code and how I think. It nudged me from “do this, then that” toward “describe the problem precisely and let the compiler help enforce it.” Even when I’m not writing Haskell, the lessons stick: model with types, separate pure from impure, compose functions, use partial application, and even invent new operators when it improves readability. That shift didn’t just make my programs better—it made programming more enjoyable.
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

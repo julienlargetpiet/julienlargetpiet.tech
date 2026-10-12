@@ -82,3 +82,10 @@ The limits of artificial intelligence are a topic of ongoing research and debate
 
 
 ```
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

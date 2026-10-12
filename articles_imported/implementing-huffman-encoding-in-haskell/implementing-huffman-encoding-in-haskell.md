@@ -185,3 +185,11 @@ it always generates a correct Huffman encoding that respects prefix-free structu
 
 
 _In the end, this is a great example of how mathematical ideas and functional programming come together beautifully in Haskell._
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

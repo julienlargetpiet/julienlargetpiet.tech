@@ -88,3 +88,10 @@ Note: The text is written in Markdown format, with valid headings, images, quote
 - [The Ethics of Artificial Intelligence](https://example.com/ethics-of-ai)
 
 This is a complete HTML blog article. The text is written in Markdown format with valid headings, images, quote, table, and links. The text is free
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

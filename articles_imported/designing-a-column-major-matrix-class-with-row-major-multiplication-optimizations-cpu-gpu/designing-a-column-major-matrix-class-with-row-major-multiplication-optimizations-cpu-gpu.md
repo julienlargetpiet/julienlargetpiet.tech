@@ -333,3 +333,10 @@ For deep chains, delaying the final transpose yields a clean performance win. An
 offloading to the GPU via cuBLAS delivers one to two orders of magnitude speedups — all without changing the high-level math.
 
 **Fulgurance** now spans both worlds: a clear, column-major architecture with CPU-friendly row-major computation paths, and a clean bridge to GPU acceleration for large-scale workloads.
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

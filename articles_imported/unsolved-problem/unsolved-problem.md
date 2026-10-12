@@ -163,3 +163,11 @@ ghci> unique $ map (\(_, x) -> x) (subPuzzle ["12", "4", "22", "87"] "++*" examp
 Or as a zip on this website:
 
  [OpenProblems](/assets/common_files/OpenProblems.zip)
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

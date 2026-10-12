@@ -5694,3 +5694,11 @@ That explains the lower `VCells` usage and the execution time not being dramatic
 However, this advantage does not come for free in execution time. The first operations that force materialization still pay a significant cost, even if they materialize a smaller dataframe. In other words, `vroom + dplyr` saves a lot of memory here, but part of the parsing/materialization cost is simply moved from ingestion to the later materialization-triggering operations.
 
 
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -134,3 +134,10 @@ The next milestone is implementing **joins**, which will significantly expand it
 If you’re interested, you can explore the full project here:
 
 👉 [GitHub Repository: Tablo](https://github.com/julienlargetpiet/tablo)
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

@@ -74,3 +74,11 @@ Always is not really exact, because if the integer is less than 256, i can just 
 By this process wa are sure that every value of the byte slice is between 0 and 255.
 
 In the second algorithm, we start from the end, multiply by 256 the last value, add the associated rest and take this value that we will multiply with the `n - 3` value (n being the length of the slice/vector), add the rest which is at `n - 4` and so on...
+
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

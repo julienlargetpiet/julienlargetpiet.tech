@@ -361,3 +361,10 @@ The result is a color-coded time series chart showing how request volume evolves
 **Project:** Access Log Analyzer in R
 
 **License:** Open for educational use
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+

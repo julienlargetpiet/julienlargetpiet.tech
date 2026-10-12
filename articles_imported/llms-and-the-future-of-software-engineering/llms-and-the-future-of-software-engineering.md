@@ -41,3 +41,10 @@ If you are interested in learning more about LLMs and their applications in soft
 This article is part of our ongoing coverage of the latest trends and advancements in software engineering. For more articles on software engineering and related topics, please visit our [blog](https://example.com).
 
 **Note:** The code in the article is a placeholder and should be replaced with actual code examples. The references provided are also placeholders and should be updated with actual resources. The links to the tutorials and guides are also placeholders and should be updated with actual links. The article is a sample and should be updated with actual content. The references should be updated to reflect the actual sources used in the article. The
+<a href="https://liberapay.com/julienlargetpiet/donate"
+   class="support-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    ♥ Support
+</a>
+
