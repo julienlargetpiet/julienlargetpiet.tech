@@ -799,6 +799,8 @@ Here's what happens:
 
 - `wait "$YAD_PID"` suspends the script until the YAD process terminates, typically when the user clicks a button. It then returns the process's exit status.
 
+Here's how it looks:
+
 ![../../assets/common_files/VoiceMessage/yad.jpg](../../assets/common_files/VoiceMessage/dialog.jpg)
 
 ## Conclusion
