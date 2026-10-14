@@ -98,7 +98,7 @@ And just an excuse to test a new CSS class I added...
 
   <div class="carousel-slide" id="slide-1b">
       <img src="../../assets/common_files/goodbye-disks/tk1.jpg" alt="Hard drive 1">
-      <a class="carousel-prev" href="#slide-14b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-prev" href="#slide-10b" aria-label="Previous image">&#10094;</a>
       <a class="carousel-next" href="#slide-2b" aria-label="Next image">&#10095;</a>
   </div>
 
@@ -153,7 +153,7 @@ And just an excuse to test a new CSS class I added...
   <div class="carousel-slide" id="slide-10b">
       <img src="../../assets/common_files/goodbye-disks/tk10.jpg" alt="Hard drive 10">
       <a class="carousel-prev" href="#slide-9b" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-11b" aria-label="Next image">&#10095;</a>
+      <a class="carousel-next" href="#slide-1b" aria-label="Next image">&#10095;</a>
   </div>
 
 </div>
