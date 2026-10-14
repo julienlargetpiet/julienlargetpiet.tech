@@ -763,6 +763,42 @@ i3-msg reload
 
 ```
 
+### Making the YAD window behave like a dialog in i3
+
+Since I'm using `i3`, I want the YAD window to behave like a dialog rather than a regular tiled window.
+
+First, I add the following option to the `yad` command:
+
+```bash
+--window-type=dialog
+```
+
+This tells the window manager that YAD should be treated as a dialog window. However, the window manager isn't necessarily required to honor this request.
+
+To explicitly control the window's behavior in `i3`, I launch YAD in the background by appending `&` to its command, then execute the following code before handling the selected button:
+
+```bash
+
+YAD_PID=$!
+
+sleep 0.2
+
+i3-msg '[title="^Voice recorder$"] floating enable, move position center, border none'
+
+wait "$YAD_PID"
+
+```
+
+Here's what happens:
+
+- `YAD_PID=$!` stores the process ID of the most recently launched background process, which is YAD in this case.
+
+- `sleep 0.2` pauses the script for 200 milliseconds, giving YAD time to create its window before `i3` attempts to manipulate it. Without this delay, the `i3-msg` command might execute before the window exists.
+
+- `i3-msg` sends commands directly to the running `i3` window manager. It identifies the window by its title (`^Voice recorder$`), enables floating mode (`floating enable`), centers it (`move position center`), and removes its borders and title bar (`border none`).
+
+- `wait "$YAD_PID"` suspends the script until the YAD process terminates, typically when the user clicks a button. It then returns the process's exit status.
+
 ## Conclusion
 
 Hope this article was usefull ;)
