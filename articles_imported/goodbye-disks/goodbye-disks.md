@@ -6,59 +6,36 @@ And just an excuse to test a new CSS class I added...
 ## Hard-drives
 
 <div class="image-carousel">
-    <button class="carousel-arrow carousel-prev"
-            aria-label="Previous image">&#10094;</button>
-
- <div class="carousel-images">
-
- <img src="../../assets/common_files/goodbye-disks/hard1.jpg" class="active">
- <img src="../../assets/common_files/goodbye-disks/hard2.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard3.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard4.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard5.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard6.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard7.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard8.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard9.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard10.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard11.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard12.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard13.jpg">
- <img src="../../assets/common_files/goodbye-disks/hard14.jpg">
-
- </div>
-
- <button class="carousel-arrow carousel-next"
-         aria-label="Next image">&#10095;</button>
-
+    <img src="../../assets/common_files/goodbye-disks/hard1.jpg" alt="Hard drive 1">
+    <img src="../../assets/common_files/goodbye-disks/hard2.jpg" alt="Hard drive 2">
+    <img src="../../assets/common_files/goodbye-disks/hard3.jpg" alt="Hard drive 3">
+    <img src="../../assets/common_files/goodbye-disks/hard4.jpg" alt="Hard drive 4">
+    <img src="../../assets/common_files/goodbye-disks/hard5.jpg" alt="Hard drive 5">
+    <img src="../../assets/common_files/goodbye-disks/hard6.jpg" alt="Hard drive 6">
+    <img src="../../assets/common_files/goodbye-disks/hard7.jpg" alt="Hard drive 7">
+    <img src="../../assets/common_files/goodbye-disks/hard8.jpg" alt="Hard drive 8">
+    <img src="../../assets/common_files/goodbye-disks/hard9.jpg" alt="Hard drive 9">
+    <img src="../../assets/common_files/goodbye-disks/hard10.jpg" alt="Hard drive 10">
+    <img src="../../assets/common_files/goodbye-disks/hard11.jpg" alt="Hard drive 11">
+    <img src="../../assets/common_files/goodbye-disks/hard12.jpg" alt="Hard drive 12">
+    <img src="../../assets/common_files/goodbye-disks/hard13.jpg" alt="Hard drive 13">
+    <img src="../../assets/common_files/goodbye-disks/hard14.jpg" alt="Hard drive 14">
 </div>
 
 ## Taekwondo Kimono
 
 <div class="image-carousel">
-    <button class="carousel-arrow carousel-prev"
-            aria-label="Previous image">&#10094;</button>
-
- <div class="carousel-images">
-
- <img src="../../assets/common_files/goodbye-disks/tk1.jpg" class="active">
- <img src="../../assets/common_files/goodbye-disks/tk2.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk3.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk4.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk5.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk6.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk7.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk8.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk9.jpg">
- <img src="../../assets/common_files/goodbye-disks/tk10.jpg">
-
- </div>
-
- <button class="carousel-arrow carousel-next"
-         aria-label="Next image">&#10095;</button>
-
+    <img src="../../assets/common_files/goodbye-disks/tk1.jpg" alt="Hard drive 1">
+    <img src="../../assets/common_files/goodbye-disks/tk2.jpg" alt="Hard drive 2">
+    <img src="../../assets/common_files/goodbye-disks/tk3.jpg" alt="Hard drive 3">
+    <img src="../../assets/common_files/goodbye-disks/tk4.jpg" alt="Hard drive 4">
+    <img src="../../assets/common_files/goodbye-disks/tk5.jpg" alt="Hard drive 5">
+    <img src="../../assets/common_files/goodbye-disks/tk6.jpg" alt="Hard drive 6">
+    <img src="../../assets/common_files/goodbye-disks/tk7.jpg" alt="Hard drive 7">
+    <img src="../../assets/common_files/goodbye-disks/tk8.jpg" alt="Hard drive 8">
+    <img src="../../assets/common_files/goodbye-disks/tk9.jpg" alt="Hard drive 9">
+    <img src="../../assets/common_files/goodbye-disks/tk10.jpg" alt="Hard drive 10">
 </div>
-
 
 
 
