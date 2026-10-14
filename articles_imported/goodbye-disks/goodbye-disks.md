@@ -96,64 +96,64 @@ And just an excuse to test a new CSS class I added...
 
 <div class="image-carousel">
 
-  <div class="carousel-slide" id="slide-1">
+  <div class="carousel-slide" id="slide-1b">
       <img src="../../assets/common_files/goodbye-disks/tk1.jpg" alt="Hard drive 1">
-      <a class="carousel-prev" href="#slide-14" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-2" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-14b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-2b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-2">
+  <div class="carousel-slide" id="slide-2b">
       <img src="../../assets/common_files/goodbye-disks/tk2.jpg" alt="Hard drive 2">
-      <a class="carousel-prev" href="#slide-1" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-3" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-1b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-3b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-3">
+  <div class="carousel-slide" id="slide-3b">
       <img src="../../assets/common_files/goodbye-disks/tk3.jpg" alt="Hard drive 3">
-      <a class="carousel-prev" href="#slide-2" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-4" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-2b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-4b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-4">
+  <div class="carousel-slide" id="slide-4b">
       <img src="../../assets/common_files/goodbye-disks/tk4.jpg" alt="Hard drive 4">
-      <a class="carousel-prev" href="#slide-3" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-5" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-3b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-5b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-5">
+  <div class="carousel-slide" id="slide-5b">
       <img src="../../assets/common_files/goodbye-disks/tk5.jpg" alt="Hard drive 5">
-      <a class="carousel-prev" href="#slide-4" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-6" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-4b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-6b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-6">
+  <div class="carousel-slide" id="slide-6b">
       <img src="../../assets/common_files/goodbye-disks/tk6.jpg" alt="Hard drive 6">
-      <a class="carousel-prev" href="#slide-5" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-7" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-5b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-7b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-7">
+  <div class="carousel-slide" id="slide-7b">
       <img src="../../assets/common_files/goodbye-disks/tk7.jpg" alt="Hard drive 7">
-      <a class="carousel-prev" href="#slide-6" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-8" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-6b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-8b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-8">
+  <div class="carousel-slide" id="slide-8b">
       <img src="../../assets/common_files/goodbye-disks/tk8.jpg" alt="Hard drive 8">
-      <a class="carousel-prev" href="#slide-7" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-9" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-7b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-9b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-9">
+  <div class="carousel-slide" id="slide-9b">
       <img src="../../assets/common_files/goodbye-disks/tk9.jpg" alt="Hard drive 9">
-      <a class="carousel-prev" href="#slide-8" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-10" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-8b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-10b" aria-label="Next image">&#10095;</a>
   </div>
 
-  <div class="carousel-slide" id="slide-10">
+  <div class="carousel-slide" id="slide-10b">
       <img src="../../assets/common_files/goodbye-disks/tk10.jpg" alt="Hard drive 10">
-      <a class="carousel-prev" href="#slide-9" aria-label="Previous image">&#10094;</a>
-      <a class="carousel-next" href="#slide-11" aria-label="Next image">&#10095;</a>
+      <a class="carousel-prev" href="#slide-9b" aria-label="Previous image">&#10094;</a>
+      <a class="carousel-next" href="#slide-11b" aria-label="Next image">&#10095;</a>
   </div>
 
 </div>
