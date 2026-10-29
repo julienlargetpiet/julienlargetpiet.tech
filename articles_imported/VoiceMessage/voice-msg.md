@@ -1,5 +1,5 @@
 
-![../../assets/common_files/thumbnails/voice-msg.webp](../../assets/common_files/thumbnails/voice-msg.webp)
+![../../assets/common_files/thumbnails/voice-msg.png](../../assets/common_files/thumbnails/voice-msg.png)
 
 This article comes from a frustration I had with Discord Web.
 
