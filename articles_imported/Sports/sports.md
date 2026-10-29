@@ -1,5 +1,5 @@
 
-![../../assets/common_files/thumbnails/sports.webp](../../assets/common_files/thumbnails/sports.webp)
+![../../assets/common_files/thumbnails/sports.png](../../assets/common_files/thumbnails/sports.png)
 
 During my teenage years, I was quite into weightlifting. When the COVID-19 pandemic hit, I decided to buy some equipment and build my own little home gym.
 
