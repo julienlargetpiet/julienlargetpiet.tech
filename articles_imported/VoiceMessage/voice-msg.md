@@ -1,5 +1,15 @@
 
-![../../assets/common_files/thumbnails/voice-msg.png](../../assets/common_files/thumbnails/voice-msg.png)
+<img
+  src="../../assets/common_files/thumbnails/voice-msg.png"
+  alt=""
+  class="portrait-light"
+>
+
+<img
+  src="../../assets/common_files/thumbnails/voice-msg-dark.png"
+  alt=""
+  class="portrait-dark"
+>
 
 This article comes from a frustration I had with Discord Web.
 
