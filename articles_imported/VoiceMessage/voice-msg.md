@@ -1,15 +1,7 @@
 
-<img
-  src="../../assets/common_files/thumbnails/voice-msg.png"
-  alt=""
-  class="portrait-light"
->
+<img src="../../assets/common_files/thumbnails/voice-msg.png" class="portrait-light">
 
-<img
-  src="../../assets/common_files/thumbnails/voice-msg-dark.png"
-  alt=""
-  class="portrait-dark"
->
+<img src="../../assets/common_files/thumbnails/voice-msg-dark.png" class="portrait-dark">
 
 This article comes from a frustration I had with Discord Web.
 
