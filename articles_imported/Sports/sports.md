@@ -1,5 +1,6 @@
 
-![../../assets/common_files/thumbnails/sports.png](../../assets/common_files/thumbnails/sports.png)
+<img src="../../assets/common_files/thumbnails/sports.png" class="portrait-light">
+<img src="../../assets/common_files/thumbnails/sports-dark.png" class="portrait-dark">
 
 During my teenage years, I was quite into weightlifting. When the COVID-19 pandemic hit, I decided to buy some equipment and build my own little home gym.
 
