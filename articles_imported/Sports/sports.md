@@ -30,9 +30,17 @@ In other words, there's no single standard, and the specifications can vary cons
 
 </div>
 
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/domyos2.jpg](../../assets/common_files/sports/domyos2.jpg)
 
+</div>
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/domyos3.jpg](../../assets/common_files/sports/domyos3.jpg)
+
+</div>
 
 This was a good fit for my previous 28mm barbell.
 
