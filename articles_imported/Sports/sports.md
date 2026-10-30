@@ -137,39 +137,199 @@ There are 12 plates of 0.5kg and 4 plates of 1kg.
 
 ## The curl EZ bar - 50mm
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1D">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/ez1.jpg](../../assets/common_files/sports/ez1.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-2D" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2D" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2D">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/ez2.jpg](../../assets/common_files/sports/ez2.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-1D" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1D" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
+
+
 ## The olympic bar
+
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1E">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/bar1.jpg](../../assets/common_files/sports/bar1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2E" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2E" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2E">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/bar2.jpg](../../assets/common_files/sports/bar2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1E" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1E" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 ## The olympic squat bar
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1F">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/bar_squat1.jpg](../../assets/common_files/sports/bar_squat1.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-2F" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2F" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2F">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/bar_squat2.jpg](../../assets/common_files/sports/bar_squat2.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-1F" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1F" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
+
+
 ## The grey 25kg plates - 50mm
+
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1G">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/25kg_gris1.jpg](../../assets/common_files/sports/25kg_gris1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2G" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2G" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2G">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/25kg_gris2.jpg](../../assets/common_files/sports/25kg_gris2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1G" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1G" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
+
 
 ## The black 25kg plates - 50mm
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1H">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/25kg_black1.jpg](../../assets/common_files/sports/25kg_black1.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-2H" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2H" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2H">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/25kg_black2.jpg](../../assets/common_files/sports/25kg_black2.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-1H" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1H" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
+
 ## The black 15kg plates - 50mm
+
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1I">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/afw1.jpg](../../assets/common_files/sports/afw1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2I" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2I" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2I">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/afw2.jpg](../../assets/common_files/sports/afw2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1I" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1I" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
+
 
 ## The calibrated 10kg plates - 50mm
 
@@ -179,17 +339,69 @@ This means that a 10 kg plate can weigh anywhere between 9.99 kg and 10.01 kg.
 
 The brand is "Pallini".
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1J">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/palini_vert1.jpg](../../assets/common_files/sports/palini_vert1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2J" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2J" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2J">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/palini_vert2.jpg](../../assets/common_files/sports/palini_vert2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1J" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1J" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 ## The calibrated 5kg plates - 50mm
 
 They are also calibrated.
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1K">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/palini_blanc1.jpg](../../assets/common_files/sports/palini_blanc1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2K" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2K" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2K">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/palini_blanc2.jpg](../../assets/common_files/sports/palini_blanc2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1K" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1K" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 ## The 2.5kg plates - 50mm
 
