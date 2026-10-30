@@ -24,7 +24,11 @@ In other words, there's no single standard, and the specifications can vary cons
 
 ## The 10 kg, 28 mm Weight Plates
 
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/domyos1.jpg](../../assets/common_files/sports/domyos1.jpg)
+
+</div>
 
 ![../../assets/common_files/sports/domyos2.jpg](../../assets/common_files/sports/domyos2.jpg)
 
