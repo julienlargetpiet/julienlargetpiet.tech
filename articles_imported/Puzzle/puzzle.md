@@ -1,5 +1,6 @@
 
-![../../assets/common_files/thumbnails/puzzle.png](../../assets/common_files/thumbnails/puzzle.png)
+<img src="../../assets/common_files/thumbnails/puzzle.png" class="portrait-light">
+<img src="../../assets/common_files/thumbnails/voice-dark.png" class="portrait-dark">
 
 This article is about several mathematical puzzles which will sharpen your reasoning.
 
