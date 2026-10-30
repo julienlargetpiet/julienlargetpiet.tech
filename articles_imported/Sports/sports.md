@@ -405,37 +405,179 @@ They are also calibrated.
 
 ## The 2.5kg plates - 50mm
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1L">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/afw_small1.jpg](../../assets/common_files/sports/afw_small1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2L" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2L" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2L">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/afw_small2.jpg](../../assets/common_files/sports/afw_small2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1L" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1L" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 ## The calibrates 1.25kg plates - 50mm
 
 The brand is "Rogue".
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1M">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/rogue1.jpg](../../assets/common_files/sports/rogue1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2M" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2M" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2M">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/rogue2.jpg](../../assets/common_files/sports/rogue2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1M" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1M" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
+
 
 ## The bench
 
 This bench has been heavily reinforced to support heavier loads and widened to provide better shoulder support and stability during exercises.
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1N">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/banc1.jpg](../../assets/common_files/sports/banc1.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-8N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2N" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2N">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/banc2.jpg](../../assets/common_files/sports/banc2.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-1N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-3N" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-3N">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/banc3.jpg](../../assets/common_files/sports/banc3.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-2N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-4N" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-4N">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/banc4.jpg](../../assets/common_files/sports/banc4.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-3N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-5N" aria-label="Next image">&#10095;</a>
+
+</div><div class="carousel-slide" id="slide-5N">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/banc5.jpg](../../assets/common_files/sports/banc5.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-4N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-6N" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-6N">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/banc6.jpg](../../assets/common_files/sports/banc6.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-5N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-7N" aria-label="Next image">&#10095;</a>
+
+</div><div class="carousel-slide" id="slide-7N">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/banc7.jpg](../../assets/common_files/sports/banc7.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-6N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-8N" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-8N">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/banc8.jpg](../../assets/common_files/sports/banc8.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-7N" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1N" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
+
 
 ## Pair of Adjustable Squat and Bench Press Stands
 
