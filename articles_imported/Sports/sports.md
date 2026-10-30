@@ -24,11 +24,22 @@ In other words, there's no single standard, and the specifications can vary cons
 
 ## The 10 kg, 28 mm Weight Plates
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1A">
+
 <div class="pixel-portrait">
 
 ![../../assets/common_files/sports/domyos1.jpg](../../assets/common_files/sports/domyos1.jpg)
 
 </div>
+
+<a class="carousel-prev" href="#slide-3A" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2A" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2A">
 
 <div class="pixel-portrait">
 
@@ -36,9 +47,23 @@ In other words, there's no single standard, and the specifications can vary cons
 
 </div>
 
+<a class="carousel-prev" href="#slide-1A" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-3A" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-3A">
+
 <div class="pixel-portrait">
 
 ![../../assets/common_files/sports/domyos3.jpg](../../assets/common_files/sports/domyos3.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-2A" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1A" aria-label="Next image">&#10095;</a>
+
+</div>
 
 </div>
 
