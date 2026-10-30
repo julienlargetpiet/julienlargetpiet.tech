@@ -71,17 +71,69 @@ This was a good fit for my previous 28mm barbell.
 
 ## A pair of adjustable dumbbells with their weight plates - 28mm
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1B">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/kit1.jpg](../../assets/common_files/sports/kit1.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-2B" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2B" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2B">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/kit2.jpg](../../assets/common_files/sports/kit2.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1B" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1B" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 There are 12 plates of 0.5kg and 4 plates of 1kg.
 
 ## The kettlebell
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1C">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/kettlebell1.jpg](../../assets/common_files/sports/kettlebell1.jpg)
 
-![../../assets/common_files/sports/kettlebell2.jpg](../../assets/common_files/sports/kettlebell2.jpg)
+</div>
+
+<a class="carousel-prev" href="#slide-2C" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2C" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2C">
+
+<div class="pixel-portrait">
+
+![../../assets/common_files/sports/kettlebell1.jpg](../../assets/common_files/sports/kettlebell1.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-1C" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1C" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 ## The curl EZ bar - 50mm
 
