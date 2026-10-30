@@ -583,23 +583,88 @@ This bench has been heavily reinforced to support heavier loads and widened to p
 
 These stands have also been modified to provide additional support against a wall, significantly improving their overall stability.
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1O">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/supports.jpg](../../assets/common_files/sports/supports.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-3O" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2O" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2O">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/supports2.jpg](../../assets/common_files/sports/supports2.jpg)
 
+</div>
+
+<a class="carousel-prev" href="#slide-1O" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-3O" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-3O">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/supports3.jpg](../../assets/common_files/sports/supports3.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-2O" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1O" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 ## Massage Foam Roller
 
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/back_massage1.jpg](../../assets/common_files/sports/back_massage1.jpg)
+
+</div>
 
 ## Squat Shoes
 
+<div class="image-carousel">
+
+<div class="carousel-slide" id="slide-1P">
+
+<div class="pixel-portrait">
+
 ![../../assets/common_files/sports/squat_shoes1.jpg](../../assets/common_files/sports/squat_shoes1.jpg)
+
+</div>
+
+<a class="carousel-prev" href="#slide-2P" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-2P" aria-label="Next image">&#10095;</a>
+
+</div>
+
+<div class="carousel-slide" id="slide-2P">
+
+<div class="pixel-portrait">
 
 ![../../assets/common_files/sports/squat_shoes2.jpg](../../assets/common_files/sports/squat_shoes2.jpg)
 
+</div>
 
+<a class="carousel-prev" href="#slide-1P" aria-label="Previous image">&#10094;</a>
+<a class="carousel-next" href="#slide-1P" aria-label="Next image">&#10095;</a>
+
+</div>
+
+</div>
 
 
 
@@ -609,4 +674,6 @@ These stands have also been modified to provide additional support against a wal
    rel="noopener noreferrer">
     ♥ Support
 </a>
+
+
 
