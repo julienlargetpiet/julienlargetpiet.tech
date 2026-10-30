@@ -124,7 +124,7 @@ There are 12 plates of 0.5kg and 4 plates of 1kg.
 
 <div class="pixel-portrait">
 
-![../../assets/common_files/sports/kettlebell1.jpg](../../assets/common_files/sports/kettlebell1.jpg)
+![../../assets/common_files/sports/kettlebell2.jpg](../../assets/common_files/sports/kettlebell2.jpg)
 
 </div>
 
