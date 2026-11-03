@@ -5508,6 +5508,10 @@ This is also normal, in the `vroom + dplyr` path, we just fully materialize the 
 <h3>mem / max_ncells</h3>
 <div class="matrix-tabs" data-matrix-tabs>
 
+<div class="admin-table-scroll-top">
+  <div class="admin-table-scroll-inner"></div>
+</div>
+
   <div class="matrix-tabs-header">
   <div class="matrix-tabs-scroll">
     <div class="matrix-tabs-grid" style="--matrix-cols: 6; --matrix-row-header-width: 12em;">
