@@ -8,7 +8,11 @@ So, 13 listings and about four hours later, I received an offer, which I accepte
 
 And boom: in Leboncoin’s rather terrible chat interface, a very professional-looking sales notification suddenly appeared:
 
+<div class="pixel-portrait">
+
 ![../../assets/common_files/scam/scam1.jpg](../../assets/common_files/scam/scam1.jpg)
+
+</div>
 
 For someone who doesn’t know how the platform works, someone who has never used it before, or who has only ever been paid in cash during an in-person sale, this can look completely legitimate.
 
@@ -26,7 +30,11 @@ So I did.
 
 And this is what it looked like:
 
+<div class="pixel-portrait">
+
 ![../../assets/common_files/scam/scam2.jpg](../../assets/common_files/scam/scam2.jpg)
+
+</div>
 
 “Maybe Leboncoin uses generative AI,” I thought to myself.
 
@@ -34,13 +42,21 @@ Then I clicked on **“Voir les détails”**.
 
 It redirected me to a domain name that, at first glance, looked like it belonged to Leboncoin:
 
+<div class="pixel-portrait">
+
 ![../../assets/common_files/scam/scam3.jpg](../../assets/common_files/scam/scam3.jpg)
+
+</div>
 
 But it didn’t.
 
 In fact, it's just a sub-domain of another domain name (`nouvellevoie.pro`):
 
+<div class="pixel-portrait">
+
 [https://leboncoin.nouvellevoie.pro/receive/623046761675](https://leboncoin.nouvellevoie.pro/receive/623046761675)
+
+</div>
 
 Then, I clicked on **“Étape 2/2 : obtenir”**.
 
