@@ -52,11 +52,7 @@ But it didn’t.
 
 In fact, it's just a sub-domain of another domain name (`nouvellevoie.pro`):
 
-<div class="pixel-portrait">
-
 [https://leboncoin.nouvellevoie.pro/receive/623046761675](https://leboncoin.nouvellevoie.pro/receive/623046761675)
-
-</div>
 
 Then, I clicked on **“Étape 2/2 : obtenir”**.
 
