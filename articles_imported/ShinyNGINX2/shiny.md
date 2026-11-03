@@ -5506,15 +5506,19 @@ This is also normal, in the `vroom + dplyr` path, we just fully materialize the 
 #### `max_ncells`
 
 <h3>mem / max_ncells</h3>
-<div class="matrix-tabs" data-matrix-tabs>
 
-<div class="matrix-scroll-hint" aria-hidden="true">
-    ◀ SCROLL HORIZONTALLY ▶
-</div>
+<div class="matrix-container" data-matrix-tabs>
 
 <div class="matrix-scroll-top">
   <div class="matrix-scroll-inner"></div>
 </div>
+
+
+<div class="matrix-tabs" data-matrix-tabs>
+
+<!--<div class="matrix-scroll-hint" aria-hidden="true">
+    ◀ SCROLL HORIZONTALLY ▶
+</div> -->
 
   <div class="matrix-tabs-header">
   <div class="matrix-tabs-scroll">
@@ -5676,6 +5680,8 @@ This is also normal, in the `vroom + dplyr` path, we just fully materialize the 
     <div class="matrix-loader" aria-hidden="true"></div>
     <img class="matrix-img" src="/assets/common_files/shiny_bench2/plots/datatable_fread_plots/max_ncells_metric.png" alt="max_ncells - fread() + data.table">
   </div>
+
+</div>
 
 </div>
 
