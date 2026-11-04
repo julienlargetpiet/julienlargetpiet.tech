@@ -1,6 +1,6 @@
 ![](/assets/common_files/roads.png)
 
-I will explain from my point of view the solution to the following problem [https://learnyouahaskell.com/functionally-solving-problems#heathrow-to-london](https://learnyouahaskell.com/functionally-solving-problems#heathrow-to-london), we explore a recursive approach
+I will explain from my point of view the solution to the following problem [here](https://learnyouahaskell.com/functionally-solving-problems#heathrow-to-london), we explore a recursive approach
 to solving an **optimal path problem** — where at each step, multiple paths are possible, and we must
 decide which route minimizes the total cost.
 
