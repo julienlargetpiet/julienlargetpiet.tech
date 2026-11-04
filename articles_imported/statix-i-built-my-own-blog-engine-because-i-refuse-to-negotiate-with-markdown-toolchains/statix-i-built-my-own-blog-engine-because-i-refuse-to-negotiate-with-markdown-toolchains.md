@@ -4,7 +4,7 @@
 Let me clarify something immediately.
 
 
-First the repo is here lol: [https://github.com/julienlargetpiet/Statix](https://github.com/julienlargetpiet/Statix), and second
+First the repo is here lol: [Statix](https://github.com/julienlargetpiet/Statix), and second
 
 This is not a “framework”.
 This is not a “platform”.
