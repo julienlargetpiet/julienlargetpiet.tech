@@ -1,6 +1,10 @@
 
+<center>
+
 <img src="../../assets/common_files/thumbnails/PackageManagers.png" class="portrait-light">
 <img src="../../assets/common_files/thumbnails/PackageManagers-dark.png" class="portrait-dark">
+
+</center>
 
 Package managers are often reduced to a few commands: `install`, `update`, `remove`.
 
