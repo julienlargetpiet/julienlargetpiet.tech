@@ -1,5 +1,14 @@
 
-![../../assets/common_files/thumbnails/installing-linux-distros.png](../../assets/common_files/thumbnails/installing-linux-distros.png)
+<center>
+
+<div class="img-loading">
+
+<img src="../../assets/common_files/thumbnails/installing-linux-distros.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/installing-linux-distros-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+
+</div>
+
+</center>
 
 In this article, we'll deep dive into the manual installation of multi-distrributions in one disk.
 
