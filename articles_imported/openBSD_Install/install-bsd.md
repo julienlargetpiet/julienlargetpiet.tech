@@ -1,5 +1,11 @@
 
-![../../assets/common_files/thumbnails/install-bsd.png](../../assets/common_files/thumbnails/install-bsd.png)
+<center>
+
+<img src="../../assets/common_files/thumbnails/install-bsd.png" class="portrait-light">
+
+<img src="../../assets/common_files/thumbnails/install-bsd-dark.png" class="portrait-dark">
+
+</center>
 
 In this article, we'll go through the manual installation of OpenBSD and see the differences and similarities with Linux.
 
