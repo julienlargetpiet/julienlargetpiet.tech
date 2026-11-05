@@ -1972,7 +1972,15 @@ Output:
 
 Corresponding to sources configured in `/etc/apt/sources.list.d`.
 
-And in `/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_noble-backports_InRelease` I have:
+And in 
+
+```
+
+/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_noble-backports_InRelease
+
+```
+
+I have:
 
 ```
 
