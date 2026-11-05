@@ -803,7 +803,11 @@ Here's what happens:
 
 Here's how it looks:
 
+<div class="pixel-portrait">
+
 ![../../assets/common_files/VoiceMessage/yad.jpg](../../assets/common_files/VoiceMessage/dialog.jpg)
+
+</div>
 
 ## Conclusion
 
