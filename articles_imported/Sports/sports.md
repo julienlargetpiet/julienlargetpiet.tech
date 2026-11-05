@@ -1,6 +1,14 @@
 
-<img src="../../assets/common_files/thumbnails/sports.png" class="portrait-light">
-<img src="../../assets/common_files/thumbnails/sports-dark.png" class="portrait-dark">
+<center>
+
+<div class="img-loading">
+
+<img src="../../assets/common_files/thumbnails/sports.png" class="portrait-light" onload="this.ParentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/sports-dark.png" class="portrait-dark"  onload="this.ParentElement.classList.add('loaded')">
+
+</div>
+
+</center>
 
 During my teenage years, I was quite into weightlifting. When the COVID-19 pandemic hit, I decided to buy some equipment and build my own little home gym.
 
