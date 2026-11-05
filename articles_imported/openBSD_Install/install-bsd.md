@@ -1,9 +1,13 @@
 
 <center>
 
-<img src="../../assets/common_files/thumbnails/install-bsd.png" class="portrait-light">
+<div class="img-loading">
 
-<img src="../../assets/common_files/thumbnails/install-bsd-dark.png" class="portrait-dark">
+<img src="../../assets/common_files/thumbnails/install-bsd.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+
+<img src="../../assets/common_files/thumbnails/install-bsd-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+
+</div>
 
 </center>
 
