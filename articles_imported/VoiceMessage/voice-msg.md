@@ -1,7 +1,15 @@
 
-<img src="../../assets/common_files/thumbnails/voice-msg.png" class="portrait-light">
+<center>
 
-<img src="../../assets/common_files/thumbnails/voice-msg-dark.png" class="portrait-dark">
+<div class="img-loading">
+
+<img src="../../assets/common_files/thumbnails/voice-msg.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+
+<img src="../../assets/common_files/thumbnails/voice-msg-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+
+</div>
+
+</center>
 
 This article comes from a frustration I had with Discord Web.
 
