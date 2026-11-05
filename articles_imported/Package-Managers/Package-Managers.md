@@ -4834,7 +4834,7 @@ This temporary override applies only to that invocation of `apt-cache`; it does 
 
 Anyway, here's a PDF `dotty` coupled with `dot` can produce:
 
-[less-graph.pdf](/assets/common_files/Packages-Managers/less-graph.pdf)
+[less-graph.pdf](/assets/common_files/Package-Managers/less-graph.pdf)
 
 ### The `apt-file` command familly
 
