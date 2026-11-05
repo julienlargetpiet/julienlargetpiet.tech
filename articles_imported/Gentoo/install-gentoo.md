@@ -1,5 +1,7 @@
 
-![../../assets/common_files/thumbnails/install-gentoo.png](../../assets/common_files/thumbnails/install-gentoo.png)
+<img src="../../assets/common_files/thumbnails/install-gentoo.png" class="portrait-light">
+
+<img src="../../assets/common_files/thumbnails/install-gentoo-dark.png" class="portrait-dark">
 
 In this article, we'll proceed to install Gentoo.
 
