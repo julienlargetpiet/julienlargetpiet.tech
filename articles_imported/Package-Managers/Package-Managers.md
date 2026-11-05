@@ -1,12 +1,8 @@
 
 <center>
 
-<div class="img-loading">
-
-<img src="../../assets/common_files/thumbnails/PackageManagers.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
-<img src="../../assets/common_files/thumbnails/PackageManagers-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
-
-</div>
+<img src="../../assets/common_files/thumbnails/PackageManagers.png" class="portrait-light">
+<img src="../../assets/common_files/thumbnails/PackageManagers-dark.png" class="portrait-dark">
 
 </center>
 
