@@ -1,8 +1,12 @@
 
 <center>
 
+<div class="img-loading">
+
 <img src="../../assets/common_files/thumbnails/PackageManagers.png" class="portrait-light">
 <img src="../../assets/common_files/thumbnails/PackageManagers-dark.png" class="portrait-dark">
+
+</div>
 
 </center>
 
