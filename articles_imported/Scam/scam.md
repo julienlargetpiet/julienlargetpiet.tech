@@ -3,8 +3,8 @@
 
 <div class="img-loading">
 
-<img src="../../assets/common_files/thumbnails/scam.png" class="portrait-light" onload="this.parentElement.add('loaded')">
-<img src="../../assets/common_files/thumbnails/scam-dark.png" class="portrait-dark" onload="this.parentElement.add('loaded')">
+<img src="../../assets/common_files/thumbnails/scam.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/scam-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
 
 </div>
 
