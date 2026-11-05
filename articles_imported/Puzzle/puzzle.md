@@ -1,6 +1,14 @@
 
-<img src="../../assets/common_files/thumbnails/puzzle.png" class="portrait-light">
-<img src="../../assets/common_files/thumbnails/puzzle-dark.png" class="portrait-dark">
+<center>
+
+<div class="img-loading">
+
+<img src="../../assets/common_files/thumbnails/puzzle.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/puzzle-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+
+</div>
+
+</center>
 
 This article is about several mathematical puzzles which will sharpen your reasoning.
 
