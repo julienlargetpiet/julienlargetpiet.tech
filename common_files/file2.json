@@ -1,0 +1,64 @@
+{
+  "company": "DeepQuery",
+  "departments": [
+    {
+      "name": "Engineering",
+      "teams": [
+        {
+          "name": "Platform",
+          "members": [
+            {
+              "id": 1,
+              "name": "Alice",
+              "skills": [
+                "rust",
+                "c++"
+              ]
+            },
+            {
+              "id": 2,
+              "name": "Bob",
+              "skills": [
+                "go",
+                "kubernetes"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Infra",
+          "members": [
+            {
+              "id": 3,
+              "name": "Charlie",
+              "skills": [
+                "terraform",
+                "aws"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Research",
+      "teams": [
+        {
+          "name": "ML",
+          "members": [
+            {
+              "id": 4,
+              "name": "Diana",
+              "skills": [
+                "python",
+                "ml"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+

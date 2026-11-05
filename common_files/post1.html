@@ -1,0 +1,394 @@
+<div style="margin-right:150px; border-style: solid; padding: 50px; font-family:'Courier'; border-width: thin;">
+
+<img src="../../static/files/gits3.jpg" width="350" height="200">
+<br>
+<i>Ghost in the Shell, 1995</i>
+
+<br><br>
+
+<div style="padding: 15px;">
+
+<h1>Table Of Contents</h1>
+
+<br>
+
+<ul>
+
+<li><a href="#intro">Introduction</a> </li>
+<br><br>
+
+<li><a href="#value1">Instruction: Value</a> </li>
+<li><a href="#where1">Instruction: Where</a> </li>
+<li><a href="#forloop1">Instruction: For loop</a> </li>
+<li><a href="#sort1">Instruction: Sort</a> </li>
+
+<br><br>
+
+<li><a href="#value2">Method for Value</a> </li>
+<li><a href="#forloop2">Method for For loop</a> </li>
+<li><a href="#where2">Method for Where</a> </li>
+<li><a href="#sort2">Method for Sort</a> </li>
+
+
+</ul>
+
+
+</div> 
+<br>
+<br>
+
+<h1 id="intro">Introduction</h1>
+
+<br>
+<br>
+
+In this article i will introduce you, in short, how i've implemented transformation engine XSLT like from scratch (with C++). <br><br>
+
+<a href="https://github.com/julienlargetpiet/Moutarde">repo</a> <br><br>
+
+<br><br>
+
+Or download on this website:
+
+<br><br>
+
+<a href="../../static/files/Moutarde.zip">zip</a> 
+
+<br><br>
+
+Which means requesting a value using its path in the data structure, the introduction of conditions, loops and sorting algorithms to generate a html page that the user describes inside a file with query instructions. <br><br>
+
+Since i start from scratch, i have to create my own synthax to structure data. <br><br>
+
+I remember of an algorithm i've created 1 year ago now allowing to <code>tokenize</code> pairs of parentheses inside a string. <br><br>
+
+Bingo, for nested data XML, Json or even TOML like, pairs of parentheses design is great to describe their nesting. <br><br>
+
+
+How it looks: <br> <br>
+
+<div style="background-color:#383838;padding:45px;margin-right:45px;overflow-y: scroll; height:600px;">
+<pre><code>
+(destination:
+
+  (restaurant:
+  
+    (menu:
+      (size:
+        (weight:150g)
+        (size:small)
+      )
+      
+      (size:
+        (weight:200g)
+        (size:medium)
+      )
+      
+      (size:
+        (weight:250g)
+        (size:large)
+      )
+    )
+  
+  )
+
+
+  (bookstore:  
+  
+    (book:
+     (title:Everyday Italian)
+     (author:Giadia De Laurentiis)
+     (year:2005)
+     (price:
+       (country:
+         (price:40.0)
+         (country:France)
+       )
+       (country:
+         (price:39.5)
+         (country:UK)
+       )
+       (country:
+         (price:38.0)
+         (country:Italy)
+       )
+     )
+     (sells:
+       (country:
+         (s:10840)
+         (country:France)
+       )
+       (country:
+         (s:96539)
+         (country:UK)
+       )
+       (country:
+         (s:38)
+         (country:Italy)
+       )
+     )
+    )
+  
+    (book:
+     (title:Harry Poter)
+     (author:J K Rowling)
+     (year:2005)
+     (price:
+       (country:
+         (price:20.0)
+         (country:France)
+       )
+       (country:
+         (price:37.5)
+         (country:UK)
+       )
+       (country:
+         (price:31.0)
+         (country:Italy)
+       )
+     )
+     (sells:
+       (country:
+         (s:10840)
+         (country:France)
+       )
+       (country:
+         (s:96539)
+         (country:UK)
+       )
+       (country:
+         (s:38)
+         (country:Italy)
+       )
+     )
+    )
+  
+    (book:
+     (title:Learning XML)
+     (author:Erik T. Ray)
+     (year:2003)
+     (price:
+       (country:
+         (price:49.0)
+         (country:France)
+       )
+       (country:
+         (price:305.0)
+         (country:UK)
+       )
+       (country:
+         (price:306.0)
+         (country:Italy)
+       )
+     )
+     (sells:
+       (country:
+         (s:10840)
+         (country:France)
+       )
+       (country:
+         (s:96539)
+         (country:UK)
+       )
+       (country:
+         (s:38)
+         (country:Italy)
+       )
+     )
+    )
+  )
+)
+</code></pre></div>
+
+<br>These files are used to store data have the <code>.moutarde</code> extension.<br>
+
+<br>Ok,so i read the file and then i use my algorithm.<br>
+
+<br> The latter returns two vectors having a length equal to the number of parentheses inside the string made after reading the file. The first vector contains number from 0 to the number of pairs of parentheses and having as index their apparition order inside the string. For example: <br><br>
+
+<code>"(mdffg(gfgf)kl)dfd()" </code>
+
+<br><br>
+
+will have the following pair vector
+
+<br><br>
+
+<code>[1, 0, 0, 1, 2, 2]</code>
+
+<br><br>
+
+The second vector simply returns the index of each parenthesis inside the string.
+
+<br><br>
+
+So, in our example:
+
+<br><br>
+
+<code>[0, 6, 11, 14, 18, 19]</code>
+
+<br><br>
+
+There only to describe the synthax of the data queries, and no surprise it's based on pairs of parentheses: <br><br>
+
+<div style="background-color:#383838;padding:45px;margin-right:45px;overflow-y: scroll; height:600px;"><pre><code>
+&lt;!DOCTYPE html&gt; <br>
+&lt;html lang="en"&gt; <br>
+&lt;head&gt; <br>
+        &lt;title&gt; Teste &lt;/title&gt; <br>
+        &lt;link rel = "stylesheet" href = "style.css"&gt; <br>
+        &lt;meta charset="utf-8"/&gt; <br>
+&lt;/head&gt; <br>
+(&lt;body&gt; <br>
+         (f:destination:
+         &lt;b&gt;(v:restaurant/menu/size/weight:)&lt;/b&gt;
+           (f:bookstore/book:+:title:
+             (w:title:=[Everyday Italian,Harry Poter,Learning XML]
+               &lt;ul&gt;
+                 (f:price/country:-:price:
+                   (w:country:=[UK,Italy]
+                     &lt;li&gt;here 1: (v:price:)&lt;/li&gt;
+                   )
+                 )
+                
+                 (w:sells/country/country:=[France]
+                 (f:sells/country:
+                   (w:country:=[Franc2e]
+                       &lt;li&gt;here 2: (v:s:)&lt;/li&gt;
+                   )
+                 )
+                 )
+                
+                 (f:sells/country:+:s:
+                   (w:country:=[France,Italy]
+                     &lt;li&gt;here3: (v:s:)&lt;/li&gt;
+                   )
+                 )
+
+                 &lt;li&gt;(v:title:)&lt;/li&gt;
+                 &lt;li&gt;(v:author:)&lt;/li&gt;
+               &lt;/ul&gt;
+             )
+           )
+  &lt;center&gt;
+          (f:restaurant/menu/size:-:weight:
+            (w:size:=[large,small]
+            &lt;i&gt;(v:weight:)&lt;/i&gt;
+            )
+          )
+          (v:restaurant/menu/size/weight:)
+        )
+  &lt;/center&gt;
+&lt;/body&gt;
+)
+</code></pre></div>
+
+<br><br>
+We notice the same structure as the html file we want to output and the given instructions are inside parentheses. These files used for html file generation according to the requested data have the <code>.instruct</code> instruction.
+
+ <br><br>
+
+<hr style="border-top: dotted 1px;">
+
+There are 4 instructions type: <br><br>
+
+<h1 id="value1">Value:</h1> <br><br>
+
+<code>(v:variable_path:) </code><br><br>
+
+<hr style="border-top: dotted 1px;">
+
+<h1 id="where1">Where / If: </h1> <br><br>
+
+<code>(w:to_evaluate_variable_path:=[X1,X2]) </code><br><br>
+
+Note that the previous condition is validated if the variable is equal to at least one of the variable in the list <code>[X1,X2]</code>. <br><br>
+
+Comparisons can also be <code>&gt;</code> (greater), <code>&lt;</code> (lower) or <code>!</code> (not equal). <br><br>
+
+<hr style="border-top: dotted 1px;">
+
+
+<h1 id="forloop1"> For loop </h1>
+<br>
+
+
+<div style="background-color:#383838;padding:45px;margin-right:45px;overflow-y: scroll; maxheight:600px;">
+<pre><code>
+(f:variable_path:
+   other_instructions 
+)
+</code></pre>
+</div>
+
+<br><br>
+
+Nesting is allowed. <br><br>
+
+<h1 id="sort1">Sort</h1> <br>
+
+<div style="background-color:#383838;padding:45px;margin-right:45px;overflow-y: scroll; maxheight:600px;">
+<pre><code>
+(f:variable_path:+:sorting_variable_path:
+other_instructions
+)</code></pre>
+</div>
+
+<br><br>
+
+The character <code>+</code> is used to ascendly sort, <code>-</code> for the opposite.
+
+<br><br>
+
+Now, we'll tokenize the pairs of parenthesee of the instruct file. <br><br>
+
+<hr style="border-top: dotted 1px;">
+
+<h1 id="value2"> Value </h1>
+<br>
+
+
+Starting from the current path, we iterate over the opening parentheses of <code>.moutarde</code> to find the right variable name at the same depth. If we don't find it, we return <code>VALUE_ERROR: wrong path</code> <br>
+
+<hr style="border-top: dotted 1px;">
+
+<h1 id="forloop2"> For Loop </h1>
+<br>
+
+Same thing, we search for the right variable path on which we'll iterate, then the depth of the current path will be stored inside a variable we name <code>depth_pos</code>. <br><br>
+
+It's from the current path that the search of the value and the conditions evaluations will be done. <br><br>
+
+Note that inside a for loop, our variable that iterates over the opening parentheses of the  <code>.moutarde</code> can't go back beyond the lask known position of the iteration variable. The last known position of our iteration variable should be stored inside a  vector to allow for loop nesting. Indeed, when we'll get out of the loop, we'll <code>pop_back()</code> the last element of the vector that stores the last known position of the iterating variables. <br><br>
+
+If our depth inside the <code>.moutarde</code> (computed from the sum of encountered opening parentheses - sum of encountered closing parenthesis) is higher to the current path depth, we jump directly to the end position of the parenthesis that gave us a depth too big. <br><br>
+
+- How to get out of the for loop? <br><br>
+
+When the iterating variable path does not appear anymore in the <code>.moutarde</code>. <br><br>
+
+The only instruction that can change the current path is the for loop <code>f</code> <br><br>
+
+<hr style="border-top: dotted 1px;">
+
+<h1 id="where2"> Where </h1>
+<br>
+
+The same method to find the value, except that when we found it, we take its value and compre it to the introduced elements inside the associated list <code>[]</code>. <br><br>
+
+If the condition is validated, we normaly continue inside the <code>.instruct</code> and the <code>.moutarde</code>, else we put the current depth of <code>.moutarde</code> to the previous one, before we've encountered the condition and, inside the <code>.instruct</code>, we directly jump after the condition. <br><br>
+
+<hr style="border-top: dotted 1px;">
+
+<h1 id="sort2"> Sort </h1>
+<br>
+
+It's getting a little more complicated. <br><br>
+
+In fact, what we'l output in the html file is, at this stage, scattered inside a vector of vector of string type, we'll name <code>tracks_ref</code>. <br><br>
+
+Each vector of vector corresponds to all the requested iteraation data for the current crossed path. At a point in the algorithm, if we are inside a level 3 of nesting for loop, then the vector of vector will contain 3 vectors. The last vector correspond to the data of the current path. The last element of the last vector correspond to the stored data of the last loop iteration with the last current path. <br><br>
+
+It's when we get out of the for loop that we'll have to sort ascendingly or descendingly the last vector elements before adding them to the last element of the penultimate vector. Now we can remove the last vector from <code>tracks_ref</code>. 
+</div>
