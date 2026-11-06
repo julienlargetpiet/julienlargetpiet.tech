@@ -249,7 +249,7 @@ Remember: the code snippets here are only **highlights**.
 For the complete implementation and context, check the repository:
 [HTTP\_Server on GitHub](https://github.com/julienlargetpiet/HTTP_Server).
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
