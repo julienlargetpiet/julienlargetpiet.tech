@@ -188,7 +188,7 @@ Once again, Haskell turns a complex theoretical problem into elegant, composable
 
 _Graph theory and Haskell — a perfect meeting point between mathematics and abstraction._
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
