@@ -267,7 +267,7 @@ It’s not trying to be trendy.
 It’s just my blog.
 And it finally removed every excuse not to write.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
