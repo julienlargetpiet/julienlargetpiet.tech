@@ -77,7 +77,7 @@ This was one of my older projects, but it shows how much you can learn by reinve
 
 It’s not meant to replace JSON, but it was a great playground for anyone curious about how parsers work.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
