@@ -2617,7 +2617,7 @@ Once you inspect the stdout spans, logs, and metrics carefully, the model finall
 
 And after that, the API starts to feel much less mysterious.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
