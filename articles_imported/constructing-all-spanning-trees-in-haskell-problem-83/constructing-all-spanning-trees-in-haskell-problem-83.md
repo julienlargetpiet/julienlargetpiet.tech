@@ -166,7 +166,7 @@ a gateway to more advanced topics in algorithmic graph theory.
 
 _Every spanning tree is a minimal structure — and every functional program, a minimal expression of logic._
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
