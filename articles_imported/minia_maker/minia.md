@@ -928,7 +928,7 @@ The composition is easy to reproduce and standardize from the command line, eith
 
 
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
