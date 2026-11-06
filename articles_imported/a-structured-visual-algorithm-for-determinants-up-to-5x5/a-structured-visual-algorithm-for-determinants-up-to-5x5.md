@@ -113,7 +113,7 @@ determinants can be viewed not only as recursive symbols or elimination steps, b
 geometric relationships. It’s a concise, personal exploration of the determinant’s inner structure — one that invites curiosity
 rather than claiming to replace classical methods.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
