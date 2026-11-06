@@ -1676,7 +1676,7 @@ vtable (in Metaspace):
 
 _Article written as a technical reference for Java learners with a background in C/C++._
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
