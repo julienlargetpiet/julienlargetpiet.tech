@@ -168,7 +168,7 @@ it analyzes which nodes are fully connected, a concept that relates to
 
 _From recursion to reachability — Haskell turns abstract graph logic into elegant, declarative exploration._
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
