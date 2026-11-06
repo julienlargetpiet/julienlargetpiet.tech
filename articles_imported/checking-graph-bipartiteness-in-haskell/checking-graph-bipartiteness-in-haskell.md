@@ -163,7 +163,7 @@ The code isn’t just functional — it reflects the mathematical definition of 
 
 _Graph theory meets Haskell’s purity — and the result is both precise and expressive._
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
