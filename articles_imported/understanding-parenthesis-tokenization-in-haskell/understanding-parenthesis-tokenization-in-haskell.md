@@ -148,7 +148,7 @@ and final interpretation — naturally built upon it.
 
 **In short:** Parenthesis tokenization wasn’t just a side utility — it was the first real piece of the calculator’s interpreter logic.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
