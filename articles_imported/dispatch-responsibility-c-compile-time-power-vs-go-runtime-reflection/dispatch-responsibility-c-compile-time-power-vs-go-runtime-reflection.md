@@ -519,7 +519,7 @@ Understanding where type reasoning lives — compiler or runtime —
 clarifies why these ecosystems feel so different,
 even when they solve similar conceptual problems.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
