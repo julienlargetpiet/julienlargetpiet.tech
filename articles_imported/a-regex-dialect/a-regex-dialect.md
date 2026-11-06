@@ -121,7 +121,7 @@ The function will be in charge to filter the differents found matchable patterns
 
 The files 1 and 2 were used for the implementation of a first dialect that did not have the break pattern feature. Then the 2 other files took in count the break pattern feature because they were built on the first dialect.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
