@@ -3927,7 +3927,7 @@ For this kind of server-side Shiny dashboard, where the same reactive resources 
 `fread()` for ingestion, `data.table` for transformation, and explicit boolean masks for filtering.
 
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
