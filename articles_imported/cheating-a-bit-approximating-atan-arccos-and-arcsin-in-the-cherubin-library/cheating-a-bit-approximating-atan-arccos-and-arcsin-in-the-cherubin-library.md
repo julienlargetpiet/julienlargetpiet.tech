@@ -90,7 +90,7 @@ Within **Cherubin**, I needed workable approximations of `atan`, `asin`, and `ac
 
 They may be “cheats,” but they prove a point: when you leave the comfort zone of floats and doubles, you can still recreate the math you need — with a little creativity 😎.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
