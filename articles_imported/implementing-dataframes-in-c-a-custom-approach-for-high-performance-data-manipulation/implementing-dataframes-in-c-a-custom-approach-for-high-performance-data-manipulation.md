@@ -134,7 +134,7 @@ The next milestone is implementing **joins**, which will significantly expand it
 If you’re interested, you can explore the full project here:
 
 👉 [GitHub Repository: Tablo](https://github.com/julienlargetpiet/tablo)
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
