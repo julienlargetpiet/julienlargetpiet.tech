@@ -113,7 +113,7 @@ The best i found is with `21 bits` block size where it took 1 to 2 milliseconds 
 
 Voilà!
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
