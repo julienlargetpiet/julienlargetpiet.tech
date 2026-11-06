@@ -188,7 +188,7 @@ Once you start visualizing recursion as a network of simultaneous explorers,
 each moving down its own branch of a decision tree, recursion stops feeling abstract —
 it becomes the most natural way to think about combinatorial and structural problems.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
