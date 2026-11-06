@@ -66,7 +66,7 @@ The result: a vastly faster exponential function inside Cherubin, proving once a
 
 👉 Check out the full library here: [Cherubin on GitHub](https://github.com/julienlargetpiet/Cherubin)
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
