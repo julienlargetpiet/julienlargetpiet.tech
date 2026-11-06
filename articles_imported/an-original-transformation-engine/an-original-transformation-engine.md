@@ -316,7 +316,7 @@ Each vector of vector corresponds to all the requested iteraation data for the c
 
 It's when we get out of the for loop that we'll have to sort ascendingly or descendingly the last vector elements before adding them to the last element of the penultimate vector. Now we can remove the last vector from `tracks_ref`.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
