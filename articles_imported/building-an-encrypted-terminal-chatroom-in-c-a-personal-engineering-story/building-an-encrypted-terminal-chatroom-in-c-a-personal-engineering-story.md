@@ -140,7 +140,7 @@ Inspired by [https://beej.us/guide/bgnet/html/](https://beej.us/guide/bgnet/html
 
 Or on this server: [here](/assets/common_files/Beejs.html)
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
