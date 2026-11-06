@@ -1005,7 +1005,7 @@ N4: ( ( Side: L | ( ( Side: L | Value: V5 ) | ( Side: R | Value: V6
 
 WOW, traversing a Tree in LateX, something i will remember !
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
