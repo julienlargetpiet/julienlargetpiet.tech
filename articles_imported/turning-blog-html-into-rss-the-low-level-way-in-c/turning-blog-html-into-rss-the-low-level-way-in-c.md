@@ -68,7 +68,7 @@ Your `rss_data.xml` should contain a `?` placeholder where you want the new `<it
 
 Check it out on GitHub: [julienlargetpiet/automate\_rss](https://github.com/julienlargetpiet/automate_rss)
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
