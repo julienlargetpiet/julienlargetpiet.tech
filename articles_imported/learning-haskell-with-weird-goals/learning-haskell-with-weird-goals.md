@@ -106,7 +106,7 @@ Our little “extract the sides” exercise might seem arbitrary, but it’s a p
 most important ideas. Once you’re comfortable with these, you’ll find yourself using them everywhere—pattern matching
 for data access, recursion for iteration, and `let` or `where` for organizing logic cleanly.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
