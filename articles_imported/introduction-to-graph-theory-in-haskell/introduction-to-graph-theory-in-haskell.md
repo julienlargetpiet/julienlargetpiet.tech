@@ -152,7 +152,7 @@ In Haskell, graphs are just data — and traversing them becomes an act of pure 
 
 _That’s the beauty of functional programming applied to graph theory._
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
