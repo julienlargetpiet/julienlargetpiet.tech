@@ -598,7 +598,7 @@ That is another sign that this was not a toy hack glued on top of the blog. It b
 
 
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
