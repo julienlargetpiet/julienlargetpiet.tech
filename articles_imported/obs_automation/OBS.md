@@ -3438,7 +3438,7 @@ Our phone has an excellent camera, so use it instead of tweaking firmware parame
 
 
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
