@@ -89,7 +89,7 @@ Sure, it’s not “normal.” But if you enjoy the command line and want a ligh
 
 And that’s how I edit my YouTube videos in the weirdest, nerdiest way possible —> no timeline, no GUI, just pure `ffmpeg` kung-fu.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
