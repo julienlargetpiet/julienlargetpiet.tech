@@ -20,7 +20,7 @@ Si vous souhaitez me contacter, vous pouvez m’écrire à cette adresse : j.lar
 
 ```
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
