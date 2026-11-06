@@ -725,7 +725,7 @@ piekvorst mentioned these ressources on HN:
 
 [sam\_tut.pdf](https://ratfactor.com/papers/sam_tut.pdf) [struct-regex.pdf](https://9p.io/sources/contrib/steve/other-docs/struct-regex.pdf)
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
