@@ -52,7 +52,7 @@ dmenu\_all is about reclaiming speed and simplicity on Linux. By extending `dmen
 
 👉 Check it out: [GitHub Repo](https://github.com/julienlargetpiet/dmenu_all)
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
