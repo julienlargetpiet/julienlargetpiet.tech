@@ -77,7 +77,7 @@ With **simple\_doc**, you can generate clear, structured documentation for any c
 
 👉 Try it out here: [GitHub Repository: simple\_doc](https://github.com/julienlargetpiet/simple_doc)
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
