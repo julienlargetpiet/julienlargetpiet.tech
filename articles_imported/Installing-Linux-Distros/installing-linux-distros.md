@@ -2004,7 +2004,7 @@ Hope you found this article usefull, see you later !
 
 
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
