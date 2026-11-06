@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+
+        <script>
+          (function () {
+            const theme = localStorage.getItem("theme");
+            if (theme) {
+              document.documentElement.dataset.theme = theme;
+            }
+          })();
+        </script>
+
+        <meta charset="utf-8" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+
+	    <meta name="description" content="your description.">
+
+        <!-- <link rel="preload"
+      	    href="/assets/Luciole_webfonts/Luciole-Regular/Luciole-Regular.woff2"
+      	    as="font"
+      	    type="font/woff2"
+            crossorigin> -->
+
+        <title>Support</title>
+
+        <link rel="stylesheet" href="/assets/css/font.css">
+        <link rel="stylesheet" href="/assets/css/theme.css">
+        <link rel="stylesheet" href="/assets/css/style.css">
+
+        <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+
+</head>
+<body>
+
+        <div class="scroll-progress">
+          <div class="scroll-progress-bar"></div>
+        </div>
+
+
+      <!-- =========================
+       Top Navigation
+       ========================= -->
+        <header class="topbar">
+            <div class="topbar-inner">
+
+                <div class="logo">
+                    <a href="/">
+                        <img src="/assets/logo/logo.png" alt="Home" width="64">
+                    </a>
+                </div>
+
+                <nav>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                      ☾
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <main id="page-content">
+          
+        <section class="support-page">
+        
+            <header class="support-header">
+                <p class="support-eyebrow">SUPPORT.EXE / KEEP THE BLOG ALIVE</p>
+        
+                <h1>Support my work</h1>
+        
+                <p>
+                    I spend a lot of time researching, experimenting,
+                    building software, and writing detailed articles
+                    about the things I learn.
+                </p>
+        
+                <p>
+                    If you enjoy my work and would like to support
+                    its development, here are three ways to do so.
+                </p>
+            </header>
+        
+            <div class="support-grid">
+        
+                <!-- LIBERAPAY -->
+        
+                <article class="support-card">
+        
+                    <div class="support-card-top">
+                        <span class="support-card-number">01 / TIPS</span>
+                        <span class="support-card-tag">FLEXIBLE</span>
+                    </div>
+        
+                    <h2>Leave a tip</h2>
+        
+                    <p class="support-card-description">
+                        Support my work with a recurring contribution
+                        through Liberapay. You choose how much you
+                        want to give.
+                    </p>
+        
+                    <div class="support-card-detail">
+                        <span class="support-card-symbol">€</span>
+                        <span>Choose your amount</span>
+                    </div>
+        
+                    <a
+                        class="support-card-button"
+                        href="https://liberapay.com/julienlargetpiet/donate"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Support on Liberapay
+                        <span aria-hidden="true">↗</span>
+                    </a>
+        
+                </article>
+        
+                <!-- PATREON -->
+        
+                <article class="support-card">
+        
+                    <div class="support-card-top">
+                        <span class="support-card-number">02 / MEMBERSHIP</span>
+                        <span class="support-card-tag">SUBSCRIBE</span>
+                    </div>
+        
+                    <h2>Become a patron</h2>
+        
+                    <p class="support-card-description">
+                        Join my Patreon to support the blog through
+                        a monthly membership and get access to
+                        additional content and community benefits.
+                    </p>
+        
+                    <div class="support-card-detail">
+                        <span class="support-card-symbol">★</span>
+                        <span>Monthly membership</span>
+                    </div>
+        
+                    <a
+                        class="support-card-button"
+                        href="https://www.patreon.com/YOUR_USERNAME"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Join on Patreon
+                        <span aria-hidden="true">↗</span>
+                    </a>
+        
+                </article>
+       
+                <!-- KO-FI -->
+                
+                <article class="support-card">
+                
+                    <div class="support-card-top">
+                        <span class="support-card-number">03 / ARTICLES</span>
+                        <span class="support-card-tag">ONE-TIME</span>
+                    </div>
+                
+                    <h2>Buy an article</h2>
+                
+                    <p class="support-card-description">
+                        Interested in a particular article without committing
+                        to a monthly subscription? Purchase individual articles
+                        through Ko-fi and support my work directly.
+                    </p>
+                
+                    <div class="support-card-detail">
+                        <span class="support-card-symbol">↧</span>
+                        <span>Pay once, no subscription</span>
+                    </div>
+                
+                    <a
+                        class="support-card-button"
+                        href="https://ko-fi.com/YOUR_USERNAME/shop"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Browse articles on Ko-fi
+                        <span aria-hidden="true">↗</span>
+                    </a>
+                
+                </article>
+
+            </div>
+        
+            <p class="support-footer-note">
+                No pressure, of course. Reading my articles,
+                sharing them, or simply finding them useful
+                is already greatly appreciated. Thank you!
+            </p>
+        
+        </section>
+
+
+        </main>
+
+        <script src="/assets/js/main.js"></script>
+        <script src="/assets/js/agressive_cacher.js"></script>
+
+        <script defer src="/assets/prism/prism.min.js"></script>
+        <script defer src="/assets/prism/components/prism-clike.min.js"></script>
+        <script defer src="/assets/prism/components/prism-c.min.js"></script>
+        <script defer src="/assets/prism/components/prism-cpp.min.js"></script>
+        <script defer src="/assets/prism/components/prism-haskell.min.js"></script>
+        <script defer src="/assets/prism/components/prism-rust.min.js"></script>
+        <script defer src="/assets/prism/components/prism-go.min.js"></script>
+        <script defer src="/assets/prism/components/prism-r.min.js"></script>
+        <script defer src="/assets/prism/components/prism-nginx.min.js"></script>
+        <script defer src="/assets/prism/components/prism-systemd.min.js"></script>
+        <script defer src="/assets/prism/components/prism-bash.min.js"></script>
+        <script defer src="/assets/prism/components/prism-jq.min.js"></script>
+        <script defer src="/assets/prism/components/prism-java.min.js"></script>
+        <script defer src="/assets/prism/components/prism-sas.min.js"></script>
+        <script defer src="/assets/prism/components/prism-python.min.js"></script>
+        <script defer src="/assets/prism/components/prism-awk.min.js"></script>
+        <script defer src="/assets/prism/components/prism-latex.min.js"></script>
+
+        <link rel="stylesheet" href="/assets/katex/katex.min.css">        
+        <script defer src="/assets/katex/katex.min.js"></script>
+        <script defer src="/assets/katex/contrib/auto-render.min.js"></script>
+
+        <script defer>
+          document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+              delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false }
+              ]
+            });
+          });
+        </script>
+
+        <footer class="site-footer">
+          <span class="architecture-note">
+            Statically served. Dynamically authored.
+          </span><br>
+          <span class="architecture-note">
+            Powered by <a href="https://github.com/julienlargetpiet/statix?tab=readme-ov-file#express-your-ideas-without-friction">Statix</a>
+          </span>
+          <address>
+              <a href="mailto:j.larget-piet@proton.me">j.larget-piet@proton.me</a>
+          </address>
+        </footer>
+
+        <br>
+
+<script defer>
+  document.addEventListener("DOMContentLoaded", function () {
+    Prism.highlightAll();
+  });
+</script>
+
+</body>
+</html>
