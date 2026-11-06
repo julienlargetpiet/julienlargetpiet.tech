@@ -650,7 +650,7 @@ And the most important one:
 
 > You decide when you pay the cost — and why.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
