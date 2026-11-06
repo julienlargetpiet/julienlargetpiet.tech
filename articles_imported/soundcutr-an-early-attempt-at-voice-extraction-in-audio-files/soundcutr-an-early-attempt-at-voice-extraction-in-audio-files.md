@@ -68,7 +68,7 @@ If you want to check it out (nostalgia and all included), the code is available 
 
 👉 [GitHub Repository: SoundCutr](https://github.com/julienlargetpiet/sound_cutr)
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
