@@ -280,7 +280,7 @@ Rebuilding it was absolutely worth it.
 - _The Nine Chapters on the Mathematical Art_ (~200 BCE) — the original elimination idea
 - Eigen Library documentation — `PartialPivLU`
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
