@@ -113,7 +113,7 @@ Great, now i can know something that i've never asked myself such as `factorial 
 
 Done.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
