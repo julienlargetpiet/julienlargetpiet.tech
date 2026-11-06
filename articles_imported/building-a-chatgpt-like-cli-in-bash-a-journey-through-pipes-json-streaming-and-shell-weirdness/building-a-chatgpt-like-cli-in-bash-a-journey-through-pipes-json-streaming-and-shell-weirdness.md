@@ -1087,7 +1087,7 @@ It is not just a wrapper around an API.
 
 It is a small lesson in how Unix thinks.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
