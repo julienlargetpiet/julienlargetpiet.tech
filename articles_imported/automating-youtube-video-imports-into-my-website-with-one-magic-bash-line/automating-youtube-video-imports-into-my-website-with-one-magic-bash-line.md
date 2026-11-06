@@ -94,7 +94,7 @@ $ find . -type f \( -name "*.webm" -o -name "*.mp4" -o -name "*.mkv" \) -printf 
 
 to rename all my files without any whitespace, then just an `ls > markup.html`
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
