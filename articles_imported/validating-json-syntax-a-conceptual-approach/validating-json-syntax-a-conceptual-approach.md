@@ -48,7 +48,7 @@ The value is not in producing yet another parser, but in providing a framework f
 
 JSON validation is often taken for granted and delegated to tools. But by analyzing what validity really means, we uncover a rich conceptual territory. Framing validation as the enforcement of structural invariants deepens our understanding of JSON as a language and validation as an algorithmic principle. This perspective is both theoretical and practical, culminating in an implementation within my C++ library, Fulgurance. Sometimes, the act of validation is less about the code we run and more about the concepts we sharpen.
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
