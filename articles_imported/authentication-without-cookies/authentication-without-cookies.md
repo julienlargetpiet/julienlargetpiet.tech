@@ -35,7 +35,7 @@ This is what i call a **rotation link mechanism**.
 
 If using a `SQL` like database, the server will call a lot of `UPDATE credentials SET temp_password='newone';` which can be a lot of work compared to extracting content of cookies.
 
-<a href="https://julienlargetpiet.tech/support.html"
+<a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
