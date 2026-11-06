@@ -88,7 +88,7 @@ For me, it was both a learning exercise and a fun way to explore cryptography an
 
 👉 [GitHub Repo](https://github.com/julienlargetpiet/InFoEnd)
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
