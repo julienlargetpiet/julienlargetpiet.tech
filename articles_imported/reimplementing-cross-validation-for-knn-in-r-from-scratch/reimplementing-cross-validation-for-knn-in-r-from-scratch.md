@@ -85,7 +85,7 @@ repo: [https://github.com/julienlargetpiet/Rmach](https://github.com/julienlarge
 
 or here as a zip: [Rmach](/assets/common_files/Rmach.zip)
 
-<a href="https://liberapay.com/julienlargetpiet/donate"
+<a href="https://julienlargetpiet.tech/support.html"
    class="support-button"
    target="_blank"
    rel="noopener noreferrer">
