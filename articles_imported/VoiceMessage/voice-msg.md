@@ -822,11 +822,6 @@ Here's how it looks:
 Hope this article was usefull ;)
 
 
-test
-
-
-
-
 <a href="https://julienlargetpiet.tech/assets/common_files/support.html"
    class="support-button"
    target="_blank"
