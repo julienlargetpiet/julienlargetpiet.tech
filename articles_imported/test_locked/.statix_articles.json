@@ -1,8 +1,8 @@
 {
-  "test_locked3": {
-    "title": "test-locked3",
-    "subject_id": 1,
+  "test_locked": {
+    "title": "Test Locked",
+    "subject_id": 9,
     "is_public": false,
-    "article_id": 237
+    "article_id": 238
   }
 }
