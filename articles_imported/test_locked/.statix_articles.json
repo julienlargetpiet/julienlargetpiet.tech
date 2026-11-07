@@ -2,7 +2,7 @@
   "test_locked": {
     "title": "Test Locked",
     "subject_id": 9,
-    "is_public": false,
+    "is_public": true,
     "article_id": 238
   }
 }
