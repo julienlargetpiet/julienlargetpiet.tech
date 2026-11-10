@@ -241,11 +241,11 @@ We notice the same structure as the html file we want to output and the given in
 
 There are 4 instructions type:
 
-# Value:
+## Value:
 
 `(v:variable_path:) `
 
-# Where / If:
+## Where / If:
 
 `(w:to_evaluate_variable_path:=[X1,X2])
 `
@@ -254,7 +254,7 @@ Note that the previous condition is validated if the variable is equal to at lea
 
 Comparisons can also be `>` (greater), `<` (lower) or `!` (not equal).
 
-# For loop
+## For loop
 
 ```
 
@@ -266,7 +266,7 @@ Comparisons can also be `>` (greater), `<` (lower) or `!` (not equal).
 
 Nesting is allowed.
 
-# Sort
+## Sort
 
 ```
 
@@ -280,11 +280,11 @@ The character `+` is used to ascendly sort, `-` for the opposite.
 
 Now, we'll tokenize the pairs of parenthesee of the instruct file.
 
-# Value
+## Value
 
 Starting from the current path, we iterate over the opening parentheses of `.moutarde` to find the right variable name at the same depth. If we don't find it, we return `VALUE_ERROR: wrong path`
 
-# For Loop
+## For Loop
 
 Same thing, we search for the right variable path on which we'll iterate, then the depth of the current path will be stored inside a variable we name `depth_pos`.
 
@@ -300,13 +300,13 @@ When the iterating variable path does not appear anymore in the `.moutarde`.
 
 The only instruction that can change the current path is the for loop `f`
 
-# Where
+## Where
 
 The same method to find the value, except that when we found it, we take its value and compre it to the introduced elements inside the associated list `[]`.
 
 If the condition is validated, we normaly continue inside the `.instruct` and the `.moutarde`, else we put the current depth of `.moutarde` to the previous one, before we've encountered the condition and, inside the `.instruct`, we directly jump after the condition.
 
-# Sort
+## Sort
 
 It's getting a little more complicated.
 
