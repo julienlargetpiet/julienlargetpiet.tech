@@ -1,6 +1,11 @@
 
-![../../assets/common_files/thumbnails/dissecting-latex-revenge-four-years-later.png](../../assets/common_files/thumbnails/dissecting-latex-revenge-four-years-later.png)
+<div class="img-loading">
 
+<img src="../../assets/common_files/thumbnails/dissecting-latex-revenge-four-years-later.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+
+<img src="../../assets/common_files/thumbnails/dissecting-latex-revenge-four-years-later-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+
+</div>
 
 When I was a chemist, I wrote my internship report in LaTeX.
 
