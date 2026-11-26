@@ -1,5 +1,8 @@
 
-![../../assets/common_files/thumbnails/PARSER.png](../../assets/common_files/thumbnails/PARSER.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/PARSER.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/PARSER-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 A lot of text-processing tools can get surprisingly far without a real parser.
 
