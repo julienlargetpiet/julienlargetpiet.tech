@@ -1,5 +1,8 @@
 
-![../../assets/common_files/thumbnails/minia.png](../../assets/common_files/thumbnails/minia.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/minia.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/minia-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 Following up on my YouTube channel creation from the previous article, on Mon. 25 May 2026 14:02:06 CEST, I wanted to write a program to automate the generation of my thumbnails.
 
