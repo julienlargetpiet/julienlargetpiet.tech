@@ -1,17 +1,8 @@
 
 <div class="img-loading">
 
-<img 
-    src="../../assets/common_files/thumbnails/ShinyNGINX.png" 
-    class="portrait-light" 
-    onload="this.parentElement.classList.add('loaded')"
->
-
-<img 
-    src="../../assets/common_files/thumbnails/ShinyNGINX-dark.png" 
-    class="portrait-dark"
-    onload="this.parentElement.classList.add('loaded')"
->
+<img src="../../assets/common_files/thumbnails/ShinyNGINX.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/ShinyNGINX-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
 
 </div>
 
