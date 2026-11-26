@@ -3,7 +3,7 @@
 
 <img src="../../assets/common_files/thumbnails/personal.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
 
-<img src="../../assets/common_files/thumbnails/personal-dark.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/personal-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
 
 </div>
 
