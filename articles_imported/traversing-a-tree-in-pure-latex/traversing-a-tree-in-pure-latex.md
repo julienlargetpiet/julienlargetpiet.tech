@@ -1,5 +1,11 @@
 
-![../../assets/common_files/thumbnails/traversing-a-tree-in-pure-latex.png](../../assets/common_files/thumbnails/traversing-a-tree-in-pure-latex.png)
+<div class="img-loading">
+
+<img src="../../assets/common_files/thumbnails/traversing-a-tree-in-pure-latex.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+
+<img src="../../assets/common_files/thumbnails/traversing-a-tree-in-pure-latex-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+
+</div>
 
 This article is a part of my full LaTeX guide here [article](https://julienlargetpiet.tech/articles/dissecting-latex-revenge-four-years-later.html)
 
