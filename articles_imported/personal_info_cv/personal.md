@@ -1,7 +1,10 @@
 
 <div class="img-loading">
+
 <img src="../../assets/common_files/thumbnails/personal.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+
 <img src="../../assets/common_files/thumbnails/personal-dark.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+
 </div>
 
 The other day, I was searching for the name of a friend on Google, and his personal Curriculum Vitae appeared as the second search result, just after his LinkedIn profile.
