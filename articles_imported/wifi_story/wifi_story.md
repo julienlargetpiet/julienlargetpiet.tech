@@ -1,6 +1,9 @@
 
-![../../assets/common_files/thumbnails/wifi_story.png](../../assets/common_files/thumbnails/wifi_story.png)
- 
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/wifi_story.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/wifi_story-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
+
 About a week ago, I needed to set up a laptop for my mum to use while working remotely.
 
 The initial plan sounded trivial: install Debian, GNOME, connect it to Wi-Fi, and call it a day.
