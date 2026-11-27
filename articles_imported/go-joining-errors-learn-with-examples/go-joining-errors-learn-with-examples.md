@@ -1,5 +1,10 @@
 
-![../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples.png](../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples.png)
+
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples.png" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples-dark.png" onload="this.parentElement.classList.add('loaded')">
+</div>
+
 
 In Go (since **Go 1.20**), `errors.Join` lets you **combine multiple errors into a single error** while still preserving each individual error inside it.
 
