@@ -1,4 +1,4 @@
-
+ 
 <div class="img-loading">
 <img src="../../assets/common_files/thumbnails/building-a-chatgpt-like-cli-in-bash-a-journey-through-pipes-json-streaming-and-shell-weirdness.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
 <img src="../../assets/common_files/thumbnails/building-a-chatgpt-like-cli-in-bash-a-journey-through-pipes-json-streaming-and-shell-weirdness-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
