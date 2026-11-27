@@ -1,5 +1,9 @@
 
-![../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasn-t-slow.png](../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasn-t-slow.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasn-t-slow.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/debugging-a-slow-vps-that-wasn-t-slow-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
+
 
 My VPS suddenly felt _extremely slow_:
 
