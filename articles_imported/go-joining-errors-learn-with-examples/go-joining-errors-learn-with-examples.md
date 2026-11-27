@@ -1,8 +1,8 @@
 
 
 <div class="img-loading">
-<img src="../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples.png" onload="this.parentElement.classList.add('loaded')">
-<img src="../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples-dark.png" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/go-joining-errors-learn-with-examples-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
 </div>
 
 
