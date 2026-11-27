@@ -1,5 +1,8 @@
 
-![../../assets/common_files/thumbnails/bash-arrays-from-first-steps-to-real-world-mastery.png](../../assets/common_files/thumbnails/bash-arrays-from-first-steps-to-real-world-mastery.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/bash-arrays-from-first-steps-to-real-world-mastery.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/bash-arrays-from-first-steps-to-real-world-mastery-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 Bash arrays aren't just containers, they're a way to control how data flows through the shell.
 
