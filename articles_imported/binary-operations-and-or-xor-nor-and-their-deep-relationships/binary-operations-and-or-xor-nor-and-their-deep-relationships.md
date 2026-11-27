@@ -1,5 +1,8 @@
 
-![../../assets/common_files/thumbnails/binary-operations-and-or-xor-nor-and-their-deep-relationships.png](../../assets/common_files/thumbnails/binary-operations-and-or-xor-nor-and-their-deep-relationships.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/binary-operations-and-or-xor-nor-and-their-deep-relationships.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/binary-operations-and-or-xor-nor-and-their-deep-relationships-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 Binary operations are the foundation of computation. At the lowest level, everything reduces to simple operations on bits: `true` (1) and `false` (0).
 
