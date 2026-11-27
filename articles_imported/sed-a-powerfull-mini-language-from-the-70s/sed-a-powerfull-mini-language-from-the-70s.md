@@ -1,5 +1,8 @@
 
-![../../assets/common_files/thumbnails/sed-a-powerfull-mini-language-from-the-70s.png](../../assets/common_files/thumbnails/sed-a-powerfull-mini-language-from-the-70s.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/sed-a-powerfull-mini-language-from-the-70s.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/sed-a-powerfull-mini-language-from-the-70s-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 There's a moment when using `sed` stops feeling like typing weird incantations… and starts feeling like you're programming a living stream of text.
 
