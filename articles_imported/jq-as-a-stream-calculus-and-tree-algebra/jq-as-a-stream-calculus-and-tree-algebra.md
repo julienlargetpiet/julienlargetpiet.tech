@@ -1,5 +1,7 @@
 
-![../../assets/common_files/thumbnails/jq-as-a-stream-calculus-and-tree-algebra.png](../../assets/common_files/thumbnails/jq-as-a-stream-calculus-and-tree-algebra.png)
+<div class="img-loading" class="thumbnail-image">
+<img src="../../assets/common_files/thumbnails/jq-as-a-stream-calculus-and-tree-algebra.png" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 ## A Deep Semantic and Operational Mini-Book
 
