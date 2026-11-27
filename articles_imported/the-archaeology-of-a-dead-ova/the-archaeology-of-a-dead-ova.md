@@ -1,6 +1,9 @@
 
-![../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova.png](../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova.png)
 
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/the-archaeology-of-a-dead-ova-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 
 > _"It should be easy to download."_
