@@ -1,5 +1,8 @@
 
-![../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph.png](../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 Most static site generators rebuild everything.
 
