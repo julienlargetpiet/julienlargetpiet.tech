@@ -1,6 +1,6 @@
 
 <div class="img-loading">
-<img src="../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph.png">
+<img src="../../assets/common_files/thumbnails/statix-a-static-engine-that-behaves-like-a-dependency-graph.png" onload="this.parentElement.classList.add('loaded')">
 </div>
 
 
