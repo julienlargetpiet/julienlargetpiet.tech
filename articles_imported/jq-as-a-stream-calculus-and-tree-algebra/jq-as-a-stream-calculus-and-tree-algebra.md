@@ -1,6 +1,6 @@
 
-<div class="img-loading" class="thumbnail-image">
-<img src="../../assets/common_files/thumbnails/jq-as-a-stream-calculus-and-tree-algebra.png" onload="this.parentElement.classList.add('loaded')">
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/jq-as-a-stream-calculus-and-tree-algebra.png" class="thumbnail-img" onload="this.parentElement.classList.add('loaded')">
 </div>
 
 ## A Deep Semantic and Operational Mini-Book
