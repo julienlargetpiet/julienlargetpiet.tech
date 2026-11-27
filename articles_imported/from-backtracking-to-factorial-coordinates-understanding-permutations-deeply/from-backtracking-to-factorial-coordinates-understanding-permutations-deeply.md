@@ -1,5 +1,9 @@
 
-![../../assets/common_files/thumbnails/from-backtracking-to-factorial-coordinates-understanding-permutations-deeply.png](../../assets/common_files/thumbnails/from-backtracking-to-factorial-coordinates-understanding-permutations-deeply.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/from-backtracking-to-factorial-coordinates-understanding-permutations-deeply.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/from-backtracking-to-factorial-coordinates-understanding-permutations-deeply-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
+
 
 Most developers learn permutation generation through recursion and swapping.
 
