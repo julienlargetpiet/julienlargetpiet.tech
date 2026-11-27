@@ -1,5 +1,8 @@
 
-![../../assets/common_files/thumbnails/awk-the-small-language-that-quietly-became-a-data-engine.png](../../assets/common_files/thumbnails/awk-the-small-language-that-quietly-became-a-data-engine.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/awk-the-small-language-that-quietly-became-a-data-engine.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/awk-the-small-language-that-quietly-became-a-data-engine-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
 
 There is a moment every engineer hits.
 
