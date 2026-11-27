@@ -1,5 +1,9 @@
 
-![../../assets/common_files/thumbnails/opentelemetry-in-go-finally-explained-traces-metrics-logs-propagation-middleware.png](../../assets/common_files/thumbnails/opentelemetry-in-go-finally-explained-traces-metrics-logs-propagation-middleware.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/opentelemetry-in-go-finally-explained-traces-metrics-logs-propagation-middleware.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/opentelemetry-in-go-finally-explained-traces-metrics-logs-propagation-middleware-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
+
 
 I spent the day digging into OpenTelemetry in Go and, honestly, a lot of things that look magical at first finally clicked.
 
