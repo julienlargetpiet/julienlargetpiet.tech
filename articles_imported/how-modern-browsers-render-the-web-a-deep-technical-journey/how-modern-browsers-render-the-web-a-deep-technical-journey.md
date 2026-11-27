@@ -1,5 +1,9 @@
 
-![../../assets/common_files/thumbnails/how-modern-browsers-render-the-web-a-deep-technical-journey.png](../../assets/common_files/thumbnails/how-modern-browsers-render-the-web-a-deep-technical-journey.png)
+<div class="img-loading">
+<img src="../../assets/common_files/thumbnails/how-modern-browsers-render-the-web-a-deep-technical-journey.png" class="portrait-light" onload="this.parentElement.classList.add('loaded')">
+<img src="../../assets/common_files/thumbnails/how-modern-browsers-render-the-web-a-deep-technical-journey-dark.png" class="portrait-dark" onload="this.parentElement.classList.add('loaded')">
+</div>
+
 
 > From HTML bytes to GPU pixels — the complete architecture of a modern browser rendering engine.
 
